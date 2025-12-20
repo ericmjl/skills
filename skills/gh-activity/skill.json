@@ -1,0 +1,29 @@
+{
+  "name": "gh-activity",
+  "description": "Report your GitHub activity for a given day using the gh CLI. Defaults to today's date.",
+  "version": "1.0.0",
+  "command": "bash {skill_dir}/gh-activity.sh {args}",
+  "parameters": {
+    "date": {
+      "description": "Date to report activity for in YYYY-MM-DD format (defaults to today)",
+      "required": false,
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    }
+  },
+  "examples": [
+    {
+      "description": "Get today's GitHub activity",
+      "command": "/gh-activity"
+    },
+    {
+      "description": "Get activity for a specific date",
+      "command": "/gh-activity 2025-12-15"
+    }
+  ],
+  "requirements": {
+    "cli_tools": ["gh", "jq"]
+  },
+  "author": "Eric Ma",
+  "tags": ["github", "activity", "reporting", "gh-cli"]
+}
