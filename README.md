@@ -1,41 +1,48 @@
 # Skills
 
-This repository contains custom skills for Claude Code and other automation tools.
+This repository contains custom skills following the [Anthropic Agent Skills Specification](https://github.com/anthropics/skills).
 
 ## What are skills?
 
-Skills are reusable commands that extend the functionality of your development environment. Each skill is a self-contained tool that performs a specific task, like reporting GitHub activity, analyzing code, or automating workflows.
+Skills are folders of instructions, scripts, and resources that AI agents load dynamically to improve performance on specialized tasks. Each skill teaches an agent how to complete specific tasks in a repeatable way.
 
 ## Structure
 
-The repository follows this organization:
+Each skill lives in its own directory under `skills/` with:
 
-- `skills/` - All skill implementations live here
-- `docs/` - Documentation and guides
-- `README.md` - This file (the index)
+- `SKILL.md` - Required. Contains YAML frontmatter (name, description) and markdown instructions.
+- Supporting files - Scripts, references, or other resources the skill needs.
 
 ## Available skills
 
-### GitHub activity reporter
+### gh-activity
 
 Location: `skills/gh-activity/`
 
-Reports your GitHub activity for a specific day using the `gh` CLI. Useful for tracking what you worked on, generating status updates, or reviewing your contributions.
-
-[Read more →](skills/gh-activity/README.md)
+Reports your GitHub activity for a specific day using the `gh` CLI. Shows commits, issues, and activity timeline. Useful for tracking what you worked on, generating status updates, or reviewing your contributions.
 
 ## Adding new skills
 
-Each skill should live in its own directory under `skills/` with:
+Create a new directory under `skills/` with a `SKILL.md` file:
 
-- The skill implementation (script, program, etc.)
-- A `skill.json` metadata file
-- A `README.md` explaining what it does and how to use it
+```markdown
+---
+name: my-skill-name
+description: A clear description of what this skill does and when to use it (min 20 chars)
+license: MIT
+---
 
-The approach is straightforward: keep skills focused on doing one thing well, document them clearly, and make them easy to use.
+# My Skill Name
+
+Instructions for the agent to follow when this skill is active.
+```
+
+The `name` field must match the directory name (lowercase with hyphens).
 
 ## Using these skills
 
-The specific method for using these skills depends on your environment. If you're using Claude Code, you can invoke skills with the `/` command syntax.
+These skills are compatible with:
 
-For standalone use, you can run the scripts directly from their directories.
+- **OpenCode** via the [opencode-skills](https://github.com/malhashemi/opencode-skills) plugin
+- **Claude Code** via native skills support
+- **Standalone use** by running the scripts directly
