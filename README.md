@@ -33,6 +33,30 @@ Location: `skills/gh-cli/`
 
 Comprehensive GitHub CLI operations skill for common tasks like creating PRs, viewing GitHub Actions logs, managing issues, reviewing code, and more. Use this when you need to interact with GitHub repositories directly from the command line without switching to the browser.
 
+### gh-pr-code-review
+
+Location: `skills/gh-pr-code-review/`
+
+PR code review workflow: pull diff, two-pass findings, draft and prioritize comments, then optionally post via gh api. Use when reviewing pull requests and leaving actionable feedback.
+
+### ml-experimentation
+
+Location: `skills/ml-experimentation/`
+
+Conduct machine learning experiments from planning through evaluation and report writing. Covers single-hypothesis scoping, fast iteration loops (&lt; 60 s), targeted logging (loguru, .log files), JOURNAL.md protocol, quick vs full run artifact split, data-backed diagnostic plots (WebP), and scientific report writing. Use when running ML experiments, testing hypotheses, training models, or writing up results.
+
+### skill-creator
+
+Location: `skills/skill-creator/`
+
+Guide for creating effective skills. Use when you want to create a new skill (or update an existing skill) that extends an agent with specialized workflows, tool integrations, or repo conventions. Includes init, edit, and package workflow.
+
+### skill-installer
+
+Location: `skills/skill-installer/`
+
+Install and migrate skills across harnesses (OpenCode, Claude Code, Cursor, etc.). Use when installing a skill into a particular product or moving skills between repo-specific and machine-specific locations. See `references/harness-locations.md` for paths.
+
 ### youtube
 
 Location: `skills/youtube/`
