@@ -1,5 +1,5 @@
 ---
-name: gh-activity-report
+name: gh-activity-summary
 description: Generate a plain-language activity report of your GitHub work for a given date range, including commits, pull requests, reviews, issues, and comments. Use this when you need to summarize what you've accomplished on GitHub for status updates, retrospectives, or tracking your work.
 license: MIT
 ---
@@ -14,10 +14,10 @@ Run the bundled script with optional `START_DATE` and `END_DATE` (format: `YYYY-
 
 ```bash
 # Default: last 7 days
-bash skills/gh-activity-report/activity-report.sh
+bash skills/gh-activity-summary/activity-report.sh
 
 # Specific range
-bash skills/gh-activity-report/activity-report.sh 2026-01-01 2026-01-07
+bash skills/gh-activity-summary/activity-report.sh 2026-01-01 2026-01-07
 ```
 
 ## Requirements
@@ -42,5 +42,5 @@ bash skills/gh-activity-report/activity-report.sh 2026-01-01 2026-01-07
 To generate a short natural-language summary, you can pipe the report into your preferred model:
 
 ```bash
-bash skills/gh-activity-report/activity-report.sh 2026-01-01 2026-01-07 | claude "Summarize this in 2-3 sentences"
+bash skills/gh-activity-summary/activity-report.sh 2026-01-01 2026-01-07 | claude "Summarize this in 2-3 sentences"
 ```

@@ -15,11 +15,17 @@ Each skill lives in its own directory under `skills/` with:
 
 ## Available skills
 
-### gh-activity
+### gh-daily-timeline
 
-Location: `skills/gh-activity/`
+Location: `skills/gh-daily-timeline/`
 
-Reports your GitHub activity for a specific day using the `gh` CLI. Shows commits, issues, and activity timeline. Useful for tracking what you worked on, generating status updates, or reviewing your contributions.
+Reports your GitHub activity for a specific day using the `gh` CLI. Shows commits, issues, and a chronological activity timeline. Use when you need a detailed, event-by-event recap for one date.
+
+### gh-activity-summary
+
+Location: `skills/gh-activity-summary/`
+
+Generates a markdown-friendly summary of your GitHub work over a date range (default: last 7 days). Lists commits, PRs created/merged, reviews, and issues with summary counts. Use for status updates, retrospectives, or piping into an LLM.
 
 ### gh-cli
 
