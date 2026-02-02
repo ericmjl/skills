@@ -16,11 +16,11 @@ Use this structure for the final experiment report. **No hallucination**: only r
 
 ## Methods
 
-[Data: source, size, preprocessing, subset used for fast iteration if applicable. Model: architecture, hyperparameters. Training: procedure, epochs/steps, optimizer. Evaluation: metrics, splits. Cite script names and log file paths where relevant. If you ran both a quick (de-risking) run and a full run, note where each is stored (e.g. `quick/`, `full/`).]
+[Data: source, size, preprocessing, subset used for fast iteration if applicable. Model: architecture, hyperparameters. Training: procedure, epochs/steps, optimizer. Evaluation: metrics, splits. Cite script names and run paths (e.g. `runs/2025-02-02T14-30-00-de-risk`, `runs/2025-02-02T15-00-00-full`).]
 
 ## Results
 
-[Tables and figures with captions. Present numbers and plots only; no interpretation here. Reference specific log files and figure files for each run type (e.g. `quick/train.log`, `full/train.log`, `quick/loss_curve.webp`, `full/loss_curve.webp`).]
+[Tables and figures with captions. Present numbers and plots only; no interpretation here. Reference runs by path (e.g. `runs/2025-02-02T14-30-00-de-risk/logs/train.log`, `runs/2025-02-02T15-00-00-full/plots/loss_curve.webp`).]
 
 **Table 1.** [Caption describing the table.]
 
@@ -28,7 +28,7 @@ Use this structure for the final experiment report. **No hallucination**: only r
 |--------|-------|
 | …      | …     |
 
-**Figure 1.** [Caption describing the figure and the data source, e.g. "Training loss vs epoch (source: train.log)."]
+**Figure 1.** [Caption describing the figure and the data source, e.g. "Training loss vs epoch (source: runs/2025-02-02T15-00-00-full/logs/train.log)."]
 
 ## Discussion
 

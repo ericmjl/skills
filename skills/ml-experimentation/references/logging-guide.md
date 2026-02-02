@@ -1,6 +1,6 @@
 # Logging Guide
 
-Use **loguru** for logging. Write to plain-text **`.log`** files (e.g. `train.log`, `eval.log`). **Put logs in the run’s output directory** (e.g. `quick/train.log` for the de-risking run, `full/train.log` for the full run) so quick-run and full-run artifacts are kept separate. Log only what the **hypothesis and success criteria** need; avoid verbose or redundant logs.
+Use **loguru** for logging. Write to plain-text **`.log`** files in the run’s **`logs/`** directory (e.g. `runs/2025-02-02T14-30-00-de-risk/logs/train.log`, `runs/2025-02-02T15-00-00-full/logs/eval.log`). Each run is named **full ISO datetime + descriptive string** **`YYYY-MM-DDTHH-MM-SS-<descriptive-string>`** (time with hyphens for FS safety) under `runs/` with subdirs `logs/`, `plots/`, `checkpoints/`, `data/`; see [experiment-setup.md](experiment-setup.md) for the canonical tree. Log only what the **hypothesis and success criteria** need; avoid verbose or redundant logs.
 
 ## What to Log
 
@@ -22,7 +22,7 @@ Use **loguru** for logging. Write to plain-text **`.log`** files (e.g. `train.lo
 
 ## Loguru Setup
 
-Add `loguru` to your script dependencies (PEP723) and configure a sink to a `.log` file **in the run’s output directory** (e.g. `quick/` or `full/`):
+Add `loguru` to your script dependencies (PEP723) and configure a sink to a `.log` file **in the run’s `logs/` directory** (e.g. `runs/2025-02-02T14-30-00-de-risk/logs/`, `runs/2025-02-02T15-00-00-full/logs/`):
 
 ```python
 # /// script
@@ -33,12 +33,13 @@ from loguru import logger
 import sys
 from pathlib import Path
 
-# Run output dir: quick/ or full/ (e.g. from argv or env)
-out_dir = Path(sys.argv[1] if len(sys.argv) > 1 else "quick")
-out_dir.mkdir(parents=True, exist_ok=True)
+# Run dir: e.g. runs/2025-02-02T14-30-00-de-risk or runs/2025-02-02T15-00-00-full (from argv or env)
+run_dir = Path(sys.argv[1] if len(sys.argv) > 1 else "runs/2025-02-02T14-30-00-de-risk")
+logs_dir = run_dir / "logs"
+logs_dir.mkdir(parents=True, exist_ok=True)
 
 logger.remove()
-logger.add(out_dir / "train.log", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}")
+logger.add(logs_dir / "train.log", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}")
 logger.add(sys.stderr, format="{time:HH:mm:ss} | {message}")
 ```
 
@@ -50,7 +51,7 @@ logger.info("metric {}", json.dumps({"epoch": 0, "step": 0, "loss": 0.693, "accu
 logger.info("metric {}", json.dumps({"epoch": 0, "step": 100, "loss": 0.512, "accuracy": 0.71}))
 ```
 
-That yields a log file (e.g. `quick/train.log` or `full/train.log`) with plain-text lines; plotting scripts can grep for `"metric "` and parse the JSON to build curves.
+That yields a log file (e.g. `runs/2025-02-02T14-30-00-de-risk/logs/train.log` or `runs/2025-02-02T15-00-00-full/logs/train.log`) with plain-text lines; plotting scripts can grep for `"metric "` and parse the JSON to build curves.
 
 ## Schema Conventions
 
@@ -63,4 +64,4 @@ Keep keys short and consistent across scripts so the same plotting/report logic 
 
 ## Data-Backed Plots
 
-Only generate plots from **logged data**. If you log epoch and loss to e.g. `quick/train.log` or `full/train.log` (via the `metric` JSON lines above), you may plot loss vs epoch and save in the same run directory (e.g. `quick/loss_curve.webp`, `full/loss_curve.webp`). Do not plot quantities that were not logged; do not invent or interpolate data for display.
+Only generate plots from **logged data**. If you log epoch and loss to e.g. `runs/2025-02-02T15-00-00-full/logs/train.log` (via the `metric` JSON lines above), plot loss vs epoch and save in that run’s **`plots/`** directory (e.g. `runs/2025-02-02T15-00-00-full/plots/loss_curve.webp`). Do not plot quantities that were not logged; do not invent or interpolate data for display.

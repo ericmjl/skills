@@ -1,5 +1,14 @@
 # Experiment Setup
 
+## New Experiment vs New Run
+
+Before creating directories or running code, decide:
+
+- **New experiment** – You are trying to answer a **different question**. That means a new hypothesis (or a meaningfully different formulation). Start a **new experiment directory**: new `JOURNAL.md`, new canonical tree (`runs/`, etc.), new report. Do not mix hypotheses in one experiment.
+- **New run** – You are making **tweaks to answer the same question**. Same hypothesis; you’re changing config, data subset, hyperparameters, or code to better test it. Add a **new run** under the existing experiment: name the run **full ISO datetime + descriptive string** `YYYY-MM-DDTHH-MM-SS-<descriptive-string>` (e.g. `runs/2025-02-02T14-30-00-de-risk`, `runs/2025-02-02T15-00-00-full`, `runs/2025-02-03T09-00-00-retry`). Time uses hyphens for filesystem-safe directory names. Reuse the same experiment directory, JOURNAL.md, and scripts; only the run name and its outputs (logs, plots, checkpoints, data) are new.
+
+**Rule of thumb:** Same question → new run. Different question → new experiment.
+
 ## Hypothesis Scoping
 
 A good experiment tests **one** hypothesis. Before running anything:
@@ -9,56 +18,61 @@ A good experiment tests **one** hypothesis. Before running anything:
 3. **List metrics to log** – Only those needed to compute success/failure and to explain unexpected results.
 4. **Reject scope creep** – If the user describes multiple ideas, pick one or ask them to choose. Do not bundle several hypotheses into one experiment.
 
-### Project Structure
+### Canonical Directory Tree
 
-Create an experiment directory with at least:
+Experiments have **runs**; each run has **logs**, **plots**, **checkpoints**, and **data** as subfolders. Name each run **full ISO datetime + descriptive string**: **`YYYY-MM-DDTHH-MM-SS-<descriptive-string>`** (time with hyphens for filesystem-safe dirs) so you keep a chronological, readable running log without overwriting.
 
-- `JOURNAL.md` – Observations, anomalies, hunches, TODOs (read before each action). **One journal for the whole experiment**; it covers both quick and full runs. Optionally include a **“Ignored runs”** section listing runs to exclude from plots and the report.
-- **`IGNORED_RUNS.md`** (optional) – List of run paths or identifiers to exclude from plots and the report (failed or irrelevant runs). Keeps runs on disk; agent ignores them when analyzing. See “Ignoring failed or irrelevant runs” below.
-- Log files, plots, and any saved data – **Split by run type** (see below). Use **loguru** for logs; scripts are disposable, PEP723 + `uv run`, named by purpose (e.g. `train_small.py`, `eval.py`).
-- Final report – Scientific structure; see [report-template.md](report-template.md). The report can cite both quick-run and full-run artifacts (excluding any ignored runs).
-
-### Quick Run vs Full Run: Where to Store Logs, Plots, and Data
-
-**Both runs produce important information. Keep both; do not overwrite quick-run outputs when you do the full run.**
-
-Use **subdirectories** to separate artifacts:
-
-| Run type | Purpose | Store logs, plots, and data in |
-|----------|---------|--------------------------------|
-| **Quick / de-risking** | Fast iteration (&lt; 60 s), sanity checks, debugging | `quick/` (e.g. `quick/train.log`, `quick/eval.log`, `quick/loss_curve.webp`, `quick/` data subsets or checkpoints if saved) |
-| **Full / actual** | Final training and evaluation for the hypothesis | `full/` (e.g. `full/train.log`, `full/eval.log`, `full/loss_curve.webp`, `full/` checkpoints or exports) |
+```
+<experiment>/
+  JOURNAL.md
+  IGNORED_RUNS.md          # optional
+  report.md                # final scientific report
+  train.py
+  eval.py
+  generate_data.py         # optional: synthetic data generation
+  runs/
+    2025-02-02T14-30-00-de-risk/   # de-risking run (< 60 s)
+      logs/
+        train.log
+        eval.log
+      plots/
+        loss_curve.webp
+      checkpoints/         # optional
+      data/                # optional subsets, exports
+    2025-02-02T15-00-00-full/     # full run for hypothesis
+      logs/
+        train.log
+        eval.log
+      plots/
+        loss_curve.webp
+      checkpoints/
+      data/
+    2025-02-03T09-00-00-retry/    # another run, same structure
+      logs/
+      plots/
+      checkpoints/
+      data/
+```
 
 **Conventions:**
 
-- **Scripts**: Live at experiment root (e.g. `train_small.py`, `train_full.py` or one script that takes a `--quick` / `--outdir` flag). Point loguru and plot output paths at the chosen subdirectory (e.g. `quick/` or `full/`) so each run writes into its own folder.
-- **Logs**: Always write to the run’s subdirectory (e.g. `quick/train.log`, `full/train.log`). Same names inside each folder are fine; the parent directory identifies the run.
-- **Plots**: Generate from the logs in that run’s folder; save plots in the same folder (e.g. `quick/loss_curve.webp`, `full/loss_curve.webp`).
-- **Data**: If you save subsets, checkpoints, or exports, put them in the same run’s folder (e.g. `quick/` or `full/`) so it’s clear which run they belong to.
-- **Report**: Reference both when relevant (e.g. “Quick run (quick/train.log) confirmed the pipeline; full run (full/train.log) yielded …”). Methods can describe the quick run as de-risking; Results can focus on full run and optionally summarize quick run.
-
-If you prefer a **flat layout** instead of subdirectories, use **namespaced filenames** (e.g. `train_quick.log`, `train_full.log`, `loss_curve_quick.webp`, `loss_curve_full.webp`) and document the convention in JOURNAL.md. Either way, **never overwrite quick-run outputs with full-run outputs**; keep both for the record.
+- **Runs** – One directory per run under `runs/`. Name each run **`YYYY-MM-DDTHH-MM-SS-<descriptive-string>`** (full ISO datetime; time with hyphens for FS safety), e.g. `2025-02-02T14-30-00-de-risk`, `2025-02-02T15-00-00-full`, `2025-02-03T09-00-00-retry`. The datetime is when the run started; the string describes the run (de-risk, full, retry, lr-sweep, etc.). Keep a running log; never overwrite an existing run directory.
+- **Inside each run** – `logs/` (loguru `.log` files), `plots/` (e.g. `.webp` from logged data), `checkpoints/` (optional), `data/` (optional subsets or exports). Scripts write into the run’s subdirs (e.g. `runs/2025-02-02T14-30-00-de-risk/logs/train.log`, `runs/2025-02-02T15-00-00-full/plots/loss_curve.webp`).
+- **Scripts** – At experiment root (`train.py`, `eval.py`, optional `generate_data.py` for synthetic data, etc.). **Run with CWD = experiment directory** so paths like `runs/2025-02-02T14-30-00-de-risk`, `runs/2025-02-02T15-00-00-full` are relative to the experiment. Scripts **accept only the descriptive name** (e.g. `de-risk`, `full`); the run path is built with **auto-calculated current datetime** as `runs/YYYY-MM-DDTHH-MM-SS-<descriptive>`. The **training script** (`train.py`) **creates the run directory** (logs/, plots/, checkpoints/, data/) when run, so the experiment is **self-contained**: anyone running the experiment gets the exact same structure without relying on the skill or any external script. See [script-patterns.md](script-patterns.md) for the Typer-based train scaffold. Any **synthetic data generation** scripts also live in `<experiment>/` and run from there.
+- **Report** – Reference runs by path (e.g. `runs/2025-02-02T14-30-00-de-risk/logs/train.log`, `runs/2025-02-02T15-00-00-full/plots/loss_curve.webp`). Include whichever runs matter; exclude runs listed in `IGNORED_RUNS.md` (or JOURNAL.md “Ignored runs”).
 
 ### Ignoring Failed or Irrelevant Runs (Without Deleting)
 
-To have the coding agent **ignore** certain runs when building plots or the report—while **keeping** those runs on disk for the record—use one or both of the following.
-
-**1. Ignore list (recommended)**
-Maintain a file **`IGNORED_RUNS.md`** in the experiment root (or a section **`## Ignored runs`** in JOURNAL.md). List run identifiers or paths to exclude from analysis, one per line. Examples:
+To have the coding agent **ignore** certain runs when building plots or the report—while **keeping** those runs on disk for the record—maintain **`IGNORED_RUNS.md`** in the experiment root (or a section **`## Ignored runs`** in JOURNAL.md). List run paths to exclude from analysis, one per line. Examples:
 
 ```markdown
 # IGNORED_RUNS.md
-full/              # run failed; keep logs but exclude from plots/report
-full_20250101/     # aborted run; irrelevant
-quick_broken/      # quick run with wrong config
+runs/2025-02-02T15-00-00-full       # run failed; keep logs but exclude from plots/report
+runs/2025-02-03T10-00-00-full-abort # aborted run; irrelevant
+runs/2025-02-02T14-30-00-de-risk-bad # de-risk run with wrong config
 ```
 
-**Rule for the agent:** Before generating plots or writing the report, read `IGNORED_RUNS.md` (and JOURNAL.md’s “Ignored runs” section if present). Exclude any run whose path or identifier appears there. Do not delete those runs or their files; only omit them from plots, tables, and report narrative.
-
-**2. Ignored directory (optional)**
-Runs stored under a directory named **`ignored/`** (or **`_ignored/`**) are **excluded by default** from plots and the report. You can move or copy a run folder into `ignored/` (e.g. `ignored/full/`, `ignored/full_20250101/`) so the agent skips it without deleting anything. The agent should only consider runs under `quick/` and `full/` (or other non-ignored dirs); do not include contents of `ignored/` or `_ignored/` in analysis unless explicitly asked.
-
-Use the ignore list when you have many runs in the same folder and want to exclude specific ones by name. Use the `ignored/` directory when you prefer to exclude by moving runs into a single place.
+**Rule for the agent:** Before generating plots or writing the report, read `IGNORED_RUNS.md` (and JOURNAL.md’s “Ignored runs” section if present). Exclude any run whose path appears there. Do not delete those runs or their files; only omit them from plots, tables, and report narrative.
 
 ## Fast Iteration Checklist
 
