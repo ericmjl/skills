@@ -43,6 +43,7 @@ Use this skill when the user wants to run an ML experiment, test a model or idea
 - Sanity-check data loading, training loop, and evaluation on the scaled-down setup before committing to longer runs.
 - If something would take > 2 minutes, find a proxy that finishes in under 1 minute.
 - Before each run, verify the fast-iteration checklist in [references/experiment-setup.md](references/experiment-setup.md).
+- **Store quick-run and full-run outputs separately** (e.g. `quick/` and `full/` subdirectories for logs, plots, and data). Keep both; do not overwrite quick-run artifacts when running the full experiment. See [references/experiment-setup.md](references/experiment-setup.md) for the split.
 
 ### Phase 3: Script Execution
 
@@ -56,8 +57,8 @@ Use this skill when the user wants to run an ML experiment, test a model or idea
 - Required: metrics that determine success/failure (e.g. loss, accuracy, F1).
 - Optional: diagnostics that could explain unexpected results (e.g. per-batch stats, timing).
 - Avoid: verbose debug logs, full model state, gradients (unless the hypothesis is about them).
-- Use **JSON lines** (one JSON object per line) or **CSV** for machine-parseable logs.
-- See [references/logging-guide.md](references/logging-guide.md) for schemas and conventions.
+- Use **loguru** for logging; write to plain-text **`.log`** files (e.g. `train.log`, `eval.log`).
+- See [references/logging-guide.md](references/logging-guide.md) for loguru setup and conventions.
 
 ### Phase 5: JOURNAL.md Protocol
 
@@ -73,8 +74,8 @@ Use this skill when the user wants to run an ML experiment, test a model or idea
 
 - Generate **only** plots that correspond to **logged data**. Do not invent or assume data.
 - Examples: training curves (loss/accuracy vs step/epoch), metric distributions, comparison bars.
-- Save plots as PNG (or similar) next to the log files they use.
-- If you log `{"epoch": 1, "loss": 0.5, ...}`, you may generate e.g. `loss_curve.png` from that log; do not plot quantities that were not logged.
+- Save plots as WebP (e.g. `loss_curve.webp`) next to the log files they use.
+- If you log epoch and loss to e.g. `train.log`, you may generate `loss_curve.webp` from that log; do not plot quantities that were not logged.
 
 **Scientific Report**
 

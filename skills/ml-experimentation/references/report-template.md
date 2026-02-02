@@ -16,11 +16,11 @@ Use this structure for the final experiment report. **No hallucination**: only r
 
 ## Methods
 
-[Data: source, size, preprocessing, subset used for fast iteration if applicable. Model: architecture, hyperparameters. Training: procedure, epochs/steps, optimizer. Evaluation: metrics, splits. Cite script names and log file paths where relevant.]
+[Data: source, size, preprocessing, subset used for fast iteration if applicable. Model: architecture, hyperparameters. Training: procedure, epochs/steps, optimizer. Evaluation: metrics, splits. Cite script names and log file paths where relevant. If you ran both a quick (de-risking) run and a full run, note where each is stored (e.g. `quick/`, `full/`).]
 
 ## Results
 
-[Tables and figures with captions. Present numbers and plots only; no interpretation here. Reference specific log files (e.g. `train.jsonl`, `eval.jsonl`) and figure files (e.g. `loss_curve.png`).]
+[Tables and figures with captions. Present numbers and plots only; no interpretation here. Reference specific log files and figure files for each run type (e.g. `quick/train.log`, `full/train.log`, `quick/loss_curve.webp`, `full/loss_curve.webp`).]
 
 **Table 1.** [Caption describing the table.]
 
@@ -28,7 +28,7 @@ Use this structure for the final experiment report. **No hallucination**: only r
 |--------|-------|
 | …      | …     |
 
-**Figure 1.** [Caption describing the figure and the data source, e.g. "Training loss vs epoch (source: train.jsonl)."]
+**Figure 1.** [Caption describing the figure and the data source, e.g. "Training loss vs epoch (source: train.log)."]
 
 ## Discussion
 

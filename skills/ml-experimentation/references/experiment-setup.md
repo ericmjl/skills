@@ -13,11 +13,30 @@ A good experiment tests **one** hypothesis. Before running anything:
 
 Create an experiment directory with at least:
 
-- `JOURNAL.md` – Observations, anomalies, hunches, TODOs (read before each action).
-- Log files (e.g. `train.jsonl`, `eval.jsonl`) – Written by scripts; machine-parseable.
-- Scripts – Disposable; PEP723 + `uv run`. Name by purpose (e.g. `train_small.py`, `eval.py`).
-- Plots – Generated from logged data only; save alongside logs (e.g. `loss_curve.png`).
-- Final report – Scientific structure; see [report-template.md](report-template.md).
+- `JOURNAL.md` – Observations, anomalies, hunches, TODOs (read before each action). **One journal for the whole experiment**; it covers both quick and full runs.
+- Log files, plots, and any saved data – **Split by run type** (see below). Use **loguru** for logs; scripts are disposable, PEP723 + `uv run`, named by purpose (e.g. `train_small.py`, `eval.py`).
+- Final report – Scientific structure; see [report-template.md](report-template.md). The report can cite both quick-run and full-run artifacts.
+
+### Quick Run vs Full Run: Where to Store Logs, Plots, and Data
+
+**Both runs produce important information. Keep both; do not overwrite quick-run outputs when you do the full run.**
+
+Use **subdirectories** to separate artifacts:
+
+| Run type | Purpose | Store logs, plots, and data in |
+|----------|---------|--------------------------------|
+| **Quick / de-risking** | Fast iteration (&lt; 60 s), sanity checks, debugging | `quick/` (e.g. `quick/train.log`, `quick/eval.log`, `quick/loss_curve.webp`, `quick/` data subsets or checkpoints if saved) |
+| **Full / actual** | Final training and evaluation for the hypothesis | `full/` (e.g. `full/train.log`, `full/eval.log`, `full/loss_curve.webp`, `full/` checkpoints or exports) |
+
+**Conventions:**
+
+- **Scripts**: Live at experiment root (e.g. `train_small.py`, `train_full.py` or one script that takes a `--quick` / `--outdir` flag). Point loguru and plot output paths at the chosen subdirectory (e.g. `quick/` or `full/`) so each run writes into its own folder.
+- **Logs**: Always write to the run’s subdirectory (e.g. `quick/train.log`, `full/train.log`). Same names inside each folder are fine; the parent directory identifies the run.
+- **Plots**: Generate from the logs in that run’s folder; save plots in the same folder (e.g. `quick/loss_curve.webp`, `full/loss_curve.webp`).
+- **Data**: If you save subsets, checkpoints, or exports, put them in the same run’s folder (e.g. `quick/` or `full/`) so it’s clear which run they belong to.
+- **Report**: Reference both when relevant (e.g. “Quick run (quick/train.log) confirmed the pipeline; full run (full/train.log) yielded …”). Methods can describe the quick run as de-risking; Results can focus on full run and optionally summarize quick run.
+
+If you prefer a **flat layout** instead of subdirectories, use **namespaced filenames** (e.g. `train_quick.log`, `train_full.log`, `loss_curve_quick.webp`, `loss_curve_full.webp`) and document the convention in JOURNAL.md. Either way, **never overwrite quick-run outputs with full-run outputs**; keep both for the record.
 
 ## Fast Iteration Checklist
 

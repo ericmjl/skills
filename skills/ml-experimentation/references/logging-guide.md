@@ -1,6 +1,6 @@
 # Logging Guide
 
-Log only what the **hypothesis and success criteria** need. Avoid verbose or redundant logs.
+Use **loguru** for logging. Write to plain-text **`.log`** files (e.g. `train.log`, `eval.log`). **Put logs in the run’s output directory** (e.g. `quick/train.log` for the de-risking run, `full/train.log` for the full run) so quick-run and full-run artifacts are kept separate. Log only what the **hypothesis and success criteria** need; avoid verbose or redundant logs.
 
 ## What to Log
 
@@ -20,33 +20,37 @@ Log only what the **hypothesis and success criteria** need. Avoid verbose or red
 - Full model state or gradients unless the hypothesis is about them.
 - Intermediate checkpoints unless needed for analysis or reproducibility.
 
-## Format
+## Loguru Setup
 
-Use **JSON lines** (one JSON object per line) or **CSV** so logs are machine-parseable and easy to plot.
+Add `loguru` to your script dependencies (PEP723) and configure a sink to a `.log` file **in the run’s output directory** (e.g. `quick/` or `full/`):
 
-### JSONL Example
+```python
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["loguru", "torch", "numpy"]
+# ///
+from loguru import logger
+import sys
+from pathlib import Path
 
-```jsonl
-{"epoch": 0, "step": 0, "loss": 0.693, "accuracy": 0.52}
-{"epoch": 0, "step": 100, "loss": 0.512, "accuracy": 0.71}
-{"epoch": 1, "step": 200, "loss": 0.401, "accuracy": 0.78}
+# Run output dir: quick/ or full/ (e.g. from argv or env)
+out_dir = Path(sys.argv[1] if len(sys.argv) > 1 else "quick")
+out_dir.mkdir(parents=True, exist_ok=True)
+
+logger.remove()
+logger.add(out_dir / "train.log", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}")
+logger.add(sys.stderr, format="{time:HH:mm:ss} | {message}")
 ```
 
-- One line per record; no pretty-printing.
-- Use consistent keys across lines so plotting scripts can rely on them.
-- Save to a stable path (e.g. `train.jsonl`, `eval.jsonl`) so plots and the report can cite the file.
+For **metric records** that plotting scripts will parse, use a consistent one-line format per record (e.g. JSON) so you can extract them from the `.log` file:
 
-### CSV Example
-
-```csv
-epoch,step,loss,accuracy
-0,0,0.693,0.52
-0,100,0.512,0.71
-1,200,0.401,0.78
+```python
+import json
+logger.info("metric {}", json.dumps({"epoch": 0, "step": 0, "loss": 0.693, "accuracy": 0.52}))
+logger.info("metric {}", json.dumps({"epoch": 0, "step": 100, "loss": 0.512, "accuracy": 0.71}))
 ```
 
-- One header row; one row per record.
-- Use for small, tabular metrics; JSONL is often easier for nested or variable keys.
+That yields a log file (e.g. `quick/train.log` or `full/train.log`) with plain-text lines; plotting scripts can grep for `"metric "` and parse the JSON to build curves.
 
 ## Schema Conventions
 
@@ -59,4 +63,4 @@ Keep keys short and consistent across scripts so the same plotting/report logic 
 
 ## Data-Backed Plots
 
-Only generate plots from **logged data**. If you log `epoch` and `loss` to `train.jsonl`, you may plot `loss` vs `epoch` and save as e.g. `loss_curve.png`. Do not plot quantities that were not logged; do not invent or interpolate data for display.
+Only generate plots from **logged data**. If you log epoch and loss to e.g. `quick/train.log` or `full/train.log` (via the `metric` JSON lines above), you may plot loss vs epoch and save in the same run directory (e.g. `quick/loss_curve.webp`, `full/loss_curve.webp`). Do not plot quantities that were not logged; do not invent or interpolate data for display.
