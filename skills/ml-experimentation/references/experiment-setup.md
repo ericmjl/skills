@@ -13,9 +13,10 @@ A good experiment tests **one** hypothesis. Before running anything:
 
 Create an experiment directory with at least:
 
-- `JOURNAL.md` – Observations, anomalies, hunches, TODOs (read before each action). **One journal for the whole experiment**; it covers both quick and full runs.
+- `JOURNAL.md` – Observations, anomalies, hunches, TODOs (read before each action). **One journal for the whole experiment**; it covers both quick and full runs. Optionally include a **“Ignored runs”** section listing runs to exclude from plots and the report.
+- **`IGNORED_RUNS.md`** (optional) – List of run paths or identifiers to exclude from plots and the report (failed or irrelevant runs). Keeps runs on disk; agent ignores them when analyzing. See “Ignoring failed or irrelevant runs” below.
 - Log files, plots, and any saved data – **Split by run type** (see below). Use **loguru** for logs; scripts are disposable, PEP723 + `uv run`, named by purpose (e.g. `train_small.py`, `eval.py`).
-- Final report – Scientific structure; see [report-template.md](report-template.md). The report can cite both quick-run and full-run artifacts.
+- Final report – Scientific structure; see [report-template.md](report-template.md). The report can cite both quick-run and full-run artifacts (excluding any ignored runs).
 
 ### Quick Run vs Full Run: Where to Store Logs, Plots, and Data
 
@@ -37,6 +38,27 @@ Use **subdirectories** to separate artifacts:
 - **Report**: Reference both when relevant (e.g. “Quick run (quick/train.log) confirmed the pipeline; full run (full/train.log) yielded …”). Methods can describe the quick run as de-risking; Results can focus on full run and optionally summarize quick run.
 
 If you prefer a **flat layout** instead of subdirectories, use **namespaced filenames** (e.g. `train_quick.log`, `train_full.log`, `loss_curve_quick.webp`, `loss_curve_full.webp`) and document the convention in JOURNAL.md. Either way, **never overwrite quick-run outputs with full-run outputs**; keep both for the record.
+
+### Ignoring Failed or Irrelevant Runs (Without Deleting)
+
+To have the coding agent **ignore** certain runs when building plots or the report—while **keeping** those runs on disk for the record—use one or both of the following.
+
+**1. Ignore list (recommended)**
+Maintain a file **`IGNORED_RUNS.md`** in the experiment root (or a section **`## Ignored runs`** in JOURNAL.md). List run identifiers or paths to exclude from analysis, one per line. Examples:
+
+```markdown
+# IGNORED_RUNS.md
+full/              # run failed; keep logs but exclude from plots/report
+full_20250101/     # aborted run; irrelevant
+quick_broken/      # quick run with wrong config
+```
+
+**Rule for the agent:** Before generating plots or writing the report, read `IGNORED_RUNS.md` (and JOURNAL.md’s “Ignored runs” section if present). Exclude any run whose path or identifier appears there. Do not delete those runs or their files; only omit them from plots, tables, and report narrative.
+
+**2. Ignored directory (optional)**
+Runs stored under a directory named **`ignored/`** (or **`_ignored/`**) are **excluded by default** from plots and the report. You can move or copy a run folder into `ignored/` (e.g. `ignored/full/`, `ignored/full_20250101/`) so the agent skips it without deleting anything. The agent should only consider runs under `quick/` and `full/` (or other non-ignored dirs); do not include contents of `ignored/` or `_ignored/` in analysis unless explicitly asked.
+
+Use the ignore list when you have many runs in the same folder and want to exclude specific ones by name. Use the `ignored/` directory when you prefer to exclude by moving runs into a single place.
 
 ## Fast Iteration Checklist
 

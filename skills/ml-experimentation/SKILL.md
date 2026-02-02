@@ -44,6 +44,7 @@ Use this skill when the user wants to run an ML experiment, test a model or idea
 - If something would take > 2 minutes, find a proxy that finishes in under 1 minute.
 - Before each run, verify the fast-iteration checklist in [references/experiment-setup.md](references/experiment-setup.md).
 - **Store quick-run and full-run outputs separately** (e.g. `quick/` and `full/` subdirectories for logs, plots, and data). Keep both; do not overwrite quick-run artifacts when running the full experiment. See [references/experiment-setup.md](references/experiment-setup.md) for the split.
+- To **ignore failed or irrelevant runs** without deleting them: use `IGNORED_RUNS.md` (or a “Ignored runs” section in JOURNAL.md) to list runs to exclude from plots and the report; optionally move runs into an `ignored/` directory so they are excluded by default. See [references/experiment-setup.md](references/experiment-setup.md).
 
 ### Phase 3: Script Execution
 
@@ -72,6 +73,7 @@ Use this skill when the user wants to run an ML experiment, test a model or idea
 
 **Plots**
 
+- **Before plotting:** Read `IGNORED_RUNS.md` (and JOURNAL.md’s “Ignored runs” section if present); exclude any listed runs from plots. Do not include runs under `ignored/` or `_ignored/` unless asked.
 - Generate **only** plots that correspond to **logged data**. Do not invent or assume data.
 - Examples: training curves (loss/accuracy vs step/epoch), metric distributions, comparison bars.
 - Save plots as WebP (e.g. `loss_curve.webp`) next to the log files they use.
@@ -79,6 +81,7 @@ Use this skill when the user wants to run an ML experiment, test a model or idea
 
 **Scientific Report**
 
+- **Before writing:** Exclude runs listed in `IGNORED_RUNS.md` or JOURNAL.md “Ignored runs”, and runs under `ignored/` or `_ignored/`, from the report narrative and figures; do not delete those runs from disk.
 - Structure: **Abstract**, **Introduction**, **Methods**, **Results**, **Discussion**, **Conclusion**.
 - **No hallucination**: only refer to data that was actually collected (cite log files, tables, figures).
 - **No editorialization**: state what happened and what the data show; do not state what you wish had happened.
