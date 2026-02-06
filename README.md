@@ -91,6 +91,8 @@ The `name` field must match the directory name (lowercase with hyphens).
 
 These skills are compatible with:
 
-- **OpenCode** via the [opencode-skills](https://github.com/malhashemi/opencode-skills) plugin
-- **Claude Code** via native skills support
-- **Standalone use** by running the scripts directly
+- **Cursor**, **OpenCode**, **GitHub Copilot**, **Codex** — via the standard `.agents/skills` (repo) and `~/.agents/skills` (global) paths
+- **Claude Code** — via native skills support (`.claude/skills/`; not yet using `.agents/skills`)
+- **Standalone use** — by running the scripts directly
+
+For install paths and migration, see the **skill-installer** skill and `skills/skill-installer/references/harness-locations.md`.

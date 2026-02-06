@@ -52,6 +52,11 @@ Every skill consists of a required SKILL.md file and optional bundled resources.
 
 Skills can be stored either repo-locally (project-specific) or in machine-level locations, depending on the harness.
 
+**Standard paths** (supported by Cursor, OpenCode, GitHub Copilot, Codex, and others):
+
+- Repo: `.agents/skills/<skill-name>/SKILL.md`
+- Machine: `~/.agents/skills/<skill-name>/SKILL.md`
+
 In this repository, the canonical skill layout is:
 
 - `skills/<skill-name>/SKILL.md`
@@ -60,7 +65,7 @@ When you are installing a skill into a particular harness, use the location tabl
 
 - `skills/skill-installer/references/harness-locations.md`
 
-That table covers OpenCode, Claude Code, Copilot, Cursor, Gemini CLI, Amp, and other common harnesses, including repo-specific and machine-specific install paths.
+That table documents the standard paths, legacy/product-specific paths, and covers OpenCode, Claude Code, Copilot, Cursor, Gemini CLI, Amp, and other common harnesses.
 
 **Note:** This skill focuses on *creating* good skill content. For installation/migration across harnesses, use the `skill-installer` skill.
 
