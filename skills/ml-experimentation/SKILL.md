@@ -51,6 +51,7 @@ Use this skill when the user wants to run an ML experiment, test a model or idea
 
 - All Python scripts use **PEP723 inline script metadata** and are run with **`uv run script.py`** or, when pixi is the environment manager, **`pixi run python script.py`** (pixi uses `pyproject.toml` or `pixi.toml`). **Always run train/eval in a GPU-enabled environment when possible** (uv: CUDA index or jax[cuda*] in script block; pixi: GPU-enabled env in pyproject.toml or pixi.toml).
 - **Run scripts with CWD = experiment directory** so paths like `runs/2025-02-02T14-30-00-de-risk`, `runs/2025-02-02T15-00-00-full` are relative to the experiment. Scripts **accept only the descriptive name** (e.g. `uv run train.py de-risk` or `pixi run python train.py de-risk`); **datetime is auto-calculated**. The **training script** (`train.py`) **creates the run directory** (logs/, plots/, checkpoints/, data/) so the experiment is **self-contained**—no external scaffold; see [references/script-patterns.md](references/script-patterns.md) for the Typer-based train scaffold.
+- **Longer runs:** When executing a run that will take more than a minute or two, **pass a custom timeout** to the shell/bash tool used to run the script (e.g. the tool’s `timeout` parameter), otherwise the tool may hit its default execution timeout and the run may be killed before completion.
 - Scripts are **disposable**: they are experiment artifacts, not production code. Include any **synthetic data generation** scripts in `<experiment>/` (e.g. `generate_data.py`); run them with CWD = experiment directory.
 - **Train and eval scripts:** Use the user's chosen framework and **prefer GPU-enabled dependencies** (JAX GPU extras, PyTorch via `[[tool.uv.index]]` CUDA index when using uv; GPU deps in pyproject.toml/pixi.toml when using pixi) so runs are performant; fall back to CPU only when GPU is unavailable.
 - Use the patterns in [references/script-patterns.md](references/script-patterns.md) for data loading, training, and evaluation.
@@ -92,7 +93,7 @@ Use this skill when the user wants to run an ML experiment, test a model or idea
 
 ## Guardrails
 
-1. **No long runs without justification** – If a script would take > 2 minutes, either get explicit confirmation or propose a scaled-down run that finishes in under 1 minute.
+1. **No long runs without justification** – If a script would take > 2 minutes, either get explicit confirmation or propose a scaled-down run that finishes in under 1 minute. When running a longer run, **pass a custom timeout** to the shell/bash tool so it does not hit the default execution timeout.
 2. **Journal-first** – Always read JOURNAL.md before suggesting or taking the next action.
 3. **Data-backed plots only** – Never generate a plot without corresponding logged data; every curve or point must come from a specified log or file.
 4. **Report factuality** – Every claim in the report must be tied to a specific log file, table, or figure; no unsupported claims.
