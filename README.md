@@ -75,6 +75,12 @@ Location: `skills/agents-md-improver/`
 
 Keeps repo-local agent instructions consistent by proposing updates to `AGENTS.md` when a user corrects the coding agent or asks to change `AGENTS.md`, `CLAUDE.md`, `.claude/CLAUDE.md`, or `GEMINI.md`. Also proposes consolidation and follow-up delete/symlink/stub actions for repo-local `CLAUDE.md` files.
 
+### publish-to-google-docs
+
+Location: `skills/publish-to-google-docs/`
+
+Quickly publish markdown notes to styled Google Docs using pandoc and a Word template. Converts markdown to docx with template styling, then uploads to Google Drive. Use when you want to publish markdown content to Google Docs with consistent branding.
+
 ## Adding new skills
 
 Create a new directory under `skills/` with a `SKILL.md` file:
