@@ -70,11 +70,11 @@ uv run scripts/upload_to_drive.py --input OUTPUT.docx --title "Document Title"
 ## Example
 
 ```bash
-pandoc "Syngenta SOW2 Proposal.md" \
+pandoc "proposal.md" \
   --from markdown \
   --to docx \
-  --reference-doc="Syngenta Template.docx" \
-  --output="Syngenta SOW2 Proposal.docx"
+  --reference-doc="template.docx" \
+  --output="proposal.docx"
 ```
 
 ## Scripts
