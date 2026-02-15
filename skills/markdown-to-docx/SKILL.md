@@ -1,16 +1,10 @@
----
-name: markdown-to-docx
-description: Convert markdown files to styled Google Docs using pandoc and a Word template. Use when creating Google Docs from markdown notes, applying consistent branding to documents, or generating proposals and reports from Obsidian vault content.
-license: MIT
----
-
 # Markdown to Google Doc via Template
 
-Convert markdown notes to styled Google Docs using pandoc and a Word template.
+Convert Obsidian vault markdown notes to styled Google Docs using pandoc and a Word template.
 
 ## When to use
 
-- User wants to create a Google Doc from a markdown file
+- User wants to create a Google Doc from an Obsidian markdown note
 - User mentions "create a Google Doc", "convert to docx", or "generate a proposal document"
 - User wants to apply consistent branding/styling to documents
 
@@ -81,7 +75,7 @@ pandoc "proposal.md" \
 
 ### upload_to_drive.py
 
-Uploads a docx file to Google Drive and returns a shareable link.
+Uploads a docx file to Google Drive using OAuth2 user authentication.
 
 **Usage:**
 
@@ -89,10 +83,23 @@ Uploads a docx file to Google Drive and returns a shareable link.
 uv run scripts/upload_to_drive.py --input /path/to/file.docx --title "Document Title"
 ```
 
-**Requires:**
+**Setup (one-time):**
 
-- `GOOGLE_SERVICE_ACCOUNT_JSON` environment variable with service account credentials JSON string
-- Or a `credentials.json` file in the current directory
+1. Go to https://console.cloud.google.com/apis/credentials
+2. Create an OAuth 2.0 Client ID (Desktop app)
+3. Set environment variables:
+
+```bash
+export GOOGLE_CLIENT_ID='your-client-id.apps.googleusercontent.com'
+export GOOGLE_CLIENT_SECRET='your-client-secret'
+```
+
+**Features:**
+
+- Opens browser for Google login on first run
+- Saves credentials locally for future use
+- Use `--logout` to remove saved credentials
+- Use `--no-share` to keep document private
 
 ## Template Style Requirements
 

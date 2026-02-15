@@ -1,52 +1,106 @@
 #!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["pydrive2", "python-dotenv", "rich"]
+# dependencies = ["pydrive2", "rich"]
 # ///
 """
-Upload a docx file to Google Drive and return a shareable link.
+Upload a docx file to Google Drive using OAuth2 user authentication.
 
 Usage:
     uv run upload_to_drive.py --input FILE.docx [--title "Document Title"]
 
-Requirements:
-    - GOOGLE_SERVICE_ACCOUNT_JSON environment variable with service account JSON
-    - Or a credentials JSON file in the current directory
+On first run, opens a browser for you to log in to Google and authorize.
+Saves credentials locally for future use.
+
+Setup:
+    1. Go to https://console.cloud.google.com/apis/credentials
+    2. Create an OAuth 2.0 Client ID (Desktop app)
+    3. Set environment variables:
+       export GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
+       export GOOGLE_CLIENT_SECRET="your-client-secret"
 
 Example:
-    uv run upload_to_drive.py --input proposal.docx --title "Syngenta Proposal"
+    uv run upload_to_drive.py --input proposal.docx --title "My Proposal"
 """
 
 import argparse
 import os
-import tempfile
 from pathlib import Path
 
-from dotenv import load_dotenv
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 from rich import print
 
-load_dotenv()
+
+def get_credentials_dir():
+    """Get or create the credentials directory."""
+    creds_dir = Path.home() / ".config" / "markdown-to-docx"
+    creds_dir.mkdir(parents=True, exist_ok=True)
+    return creds_dir
 
 
-def get_credentials_path():
-    """Get credentials from environment or file."""
-    creds_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+def authenticate():
+    """Authenticate with Google using OAuth2 user flow."""
+    client_id = os.getenv("GOOGLE_CLIENT_ID")
+    client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
 
-    if creds_json:
-        fpath = tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False)
-        fpath.write(creds_json)
-        fpath.close()
-        return fpath.name
+    if not client_id or not client_secret:
+        print("[red]Error: OAuth client credentials not found.[/red]")
+        print("[yellow]Setup instructions:[/yellow]")
+        print("  1. Go to https://console.cloud.google.com/apis/credentials")
+        print("  2. Create an OAuth 2.0 Client ID (Desktop app)")
+        print("  3. Set environment variables:")
+        print(
+            "     export GOOGLE_CLIENT_ID='your-client-id.apps.googleusercontent.com'"
+        )
+        print("     export GOOGLE_CLIENT_SECRET='your-client-secret'")
+        raise ValueError("Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET")
 
-    local_creds = Path.cwd() / "credentials.json"
-    if local_creds.exists():
-        return str(local_creds)
+    creds_dir = get_credentials_dir()
 
-    raise ValueError(
-        "No credentials found. Set GOOGLE_SERVICE_ACCOUNT_JSON or provide credentials.json"
-    )
+    # Create settings for pydrive2
+    import json
+
+    settings = {
+        "client_config_backend": "settings",
+        "client_config": {
+            "client_id": client_id,
+            "client_secret": client_secret,
+        },
+        "save_credentials": True,
+        "save_credentials_backend": "file",
+        "save_credentials_file": str(creds_dir / "credentials.json"),
+        "get_refresh_token": True,
+        "oauth_scope": [
+            "https://www.googleapis.com/auth/drive.file",
+        ],
+    }
+
+    settings_file = creds_dir / "settings.yaml"
+    with open(settings_file, "w") as f:
+        json.dump(settings, f)
+
+    gauth = GoogleAuth(settings_file=str(settings_file))
+
+    # Try to load saved credentials
+    gauth.LoadCredentialsFile(str(creds_dir / "credentials.json"))
+
+    if gauth.credentials is None:
+        # Authenticate if no valid credentials
+        print("[blue]Opening browser for Google login...[/blue]")
+        gauth.LocalWebserverAuth()
+    elif gauth.access_token_expired:
+        # Refresh if expired
+        print("[blue]Refreshing Google credentials...[/blue]")
+        gauth.Refresh()
+    else:
+        # Use saved credentials
+        gauth.Authorize()
+
+    # Save credentials for next run
+    gauth.SaveCredentialsFile(str(creds_dir / "credentials.json"))
+
+    return gauth
 
 
 def upload_to_drive(input_path: str, title: str | None = None, share: bool = True):
@@ -59,16 +113,8 @@ def upload_to_drive(input_path: str, title: str | None = None, share: bool = Tru
     if not title:
         title = input_file.stem
 
-    creds_path = get_credentials_path()
-    cleanup_needed = "GOOGLE_SERVICE_ACCOUNT_JSON" in os.environ
-
     try:
-        settings = {
-            "client_config_backend": "service",
-            "service_config": {"client_json_file_path": creds_path},
-        }
-        gauth = GoogleAuth(settings=settings)
-        gauth.ServiceAuth()
+        gauth = authenticate()
         drive = GoogleDrive(gauth)
 
         print(f"[blue]Uploading {input_file.name} to Google Drive...[/blue]")
@@ -91,22 +137,52 @@ def upload_to_drive(input_path: str, title: str | None = None, share: bool = Tru
         print(f"[green]Link: {gfile['alternateLink']}[/green]")
         return gfile["alternateLink"]
 
-    finally:
-        if cleanup_needed:
-            os.unlink(creds_path)
+    except Exception as e:
+        print(f"[red]Error: {e}[/red]")
+        return None
+
+
+def logout():
+    """Remove saved credentials."""
+    creds_dir = get_credentials_dir()
+    creds_file = creds_dir / "credentials.json"
+    settings_file = creds_dir / "settings.yaml"
+
+    removed = False
+    if creds_file.exists():
+        creds_file.unlink()
+        removed = True
+    if settings_file.exists():
+        settings_file.unlink()
+        removed = True
+
+    if removed:
+        print("[green]Logged out successfully.[/green]")
+    else:
+        print("[yellow]No saved credentials found.[/yellow]")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Upload docx to Google Drive")
-    parser.add_argument("--input", "-i", required=True, help="Path to the docx file")
+    parser.add_argument("--input", "-i", help="Path to the docx file")
     parser.add_argument("--title", "-t", help="Document title (default: filename)")
     parser.add_argument(
         "--no-share",
         action="store_true",
         help="Don't make the document publicly editable",
     )
+    parser.add_argument(
+        "--logout", action="store_true", help="Remove saved Google credentials"
+    )
 
     args = parser.parse_args()
+
+    if args.logout:
+        logout()
+        return 0
+
+    if not args.input:
+        parser.error("--input is required (unless using --logout)")
 
     result = upload_to_drive(args.input, args.title, share=not args.no_share)
     return 0 if result else 1
