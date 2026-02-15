@@ -1,18 +1,24 @@
-# Markdown to Google Doc via Template
+---
+name: publish-to-google-docs
+description: Quickly publish markdown notes to styled Google Docs using pandoc and a Word template. Use when creating Google Docs from markdown, applying branding to documents, or pushing content to Drive for sharing.
+license: MIT
+---
 
-Convert Obsidian vault markdown notes to styled Google Docs using pandoc and a Word template.
+# Publish Markdown to Google Docs
+
+Quickly publish markdown notes to styled Google Docs using pandoc and a Word template.
 
 ## When to use
 
-- User wants to create a Google Doc from an Obsidian markdown note
-- User mentions "create a Google Doc", "convert to docx", or "generate a proposal document"
-- User wants to apply consistent branding/styling to documents
+- User wants to publish a markdown note to Google Docs
+- User says "publish to Google Docs", "create a Google Doc from markdown", or "push this to Drive"
+- User wants to apply consistent branding/styling to documents before sharing
 
 ## Prerequisites
 
 1. **pandoc** - Must be installed (see self-healing below)
 2. A Word template (.docx) with desired styles
-3. Google Cloud service account credentials (optional, for Drive upload)
+3. OAuth credentials for Google Drive (one-time setup)
 
 ## Self-healing: Installing pandoc
 
@@ -55,20 +61,20 @@ pandoc INPUT.md --from markdown --to docx --reference-doc=TEMPLATE.docx --output
 
 The `--reference-doc` flag applies the template's styles (fonts, headings, margins) to the output.
 
-### Step 3: Upload to Google Drive (optional)
+### Step 3: Upload to Google Drive
 
 ```bash
 uv run scripts/upload_to_drive.py --input OUTPUT.docx --title "Document Title"
 ```
 
+Returns a shareable Google Docs link.
+
 ## Example
 
 ```bash
-pandoc "proposal.md" \
-  --from markdown \
-  --to docx \
-  --reference-doc="template.docx" \
-  --output="proposal.docx"
+# Convert and upload
+pandoc "proposal.md" --from markdown --to docx --reference-doc="template.docx" --output="proposal.docx"
+uv run scripts/upload_to_drive.py --input "proposal.docx" --title "My Proposal"
 ```
 
 ## Scripts
