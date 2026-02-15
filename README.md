@@ -39,6 +39,12 @@ Location: `skills/gh-pr-code-review/`
 
 PR code review workflow: pull diff, two-pass findings, draft and prioritize comments, then optionally post via gh api. Use when reviewing pull requests and leaving actionable feedback.
 
+### markdown-to-docx
+
+Location: `skills/markdown-to-docx/`
+
+Convert markdown files to styled Google Docs using pandoc and a Word template. Use when creating Google Docs from markdown notes, applying consistent branding to documents, or generating proposals and reports from Obsidian vault content. Supports self-healing pandoc installation and optional Google Drive upload.
+
 ### ml-experimentation
 
 Location: `skills/ml-experimentation/`
