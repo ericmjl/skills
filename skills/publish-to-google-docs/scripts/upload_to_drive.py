@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["pydrive2", "rich"]
+# dependencies = ["pydrive2", "rich", "typer"]
 # ///
 """
 Upload a docx file to Google Drive using OAuth2 user authentication.
@@ -23,13 +23,15 @@ Example:
     uv run upload_to_drive.py --input proposal.docx --title "My Proposal"
 """
 
-import argparse
 import os
 from pathlib import Path
 
+import typer
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 from rich import print
+
+app = typer.Typer()
 
 
 def get_credentials_dir():
@@ -142,8 +144,7 @@ def upload_to_drive(input_path: str, title: str | None = None, share: bool = Tru
         return None
 
 
-def logout():
-    """Remove saved credentials."""
+def _do_logout():
     creds_dir = get_credentials_dir()
     creds_file = creds_dir / "credentials.json"
     settings_file = creds_dir / "settings.yaml"
@@ -162,31 +163,31 @@ def logout():
         print("[yellow]No saved credentials found.[/yellow]")
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Upload docx to Google Drive")
-    parser.add_argument("--input", "-i", help="Path to the docx file")
-    parser.add_argument("--title", "-t", help="Document title (default: filename)")
-    parser.add_argument(
-        "--no-share",
-        action="store_true",
-        help="Don't make the document publicly editable",
-    )
-    parser.add_argument(
-        "--logout", action="store_true", help="Remove saved Google credentials"
-    )
+@app.command()
+def upload(
+    input: Path = typer.Option(None, "--input", "-i", help="Path to the docx file"),
+    title: str = typer.Option(None, "--title", "-t", help="Document title"),
+    no_share: bool = typer.Option(
+        False, "--no-share", help="Don't make document publicly editable"
+    ),
+    logout: bool = typer.Option(
+        False, "--logout", help="Remove saved Google credentials"
+    ),
+):
+    """Upload a docx file to Google Drive."""
+    if logout:
+        _do_logout()
+        raise typer.Exit(0)
 
-    args = parser.parse_args()
-
-    if args.logout:
-        logout()
-        return 0
-
-    if not args.input:
-        parser.error("--input is required (unless using --logout)")
-
-    result = upload_to_drive(args.input, args.title, share=not args.no_share)
-    return 0 if result else 1
+    if input is None:
+        print("[red]Error: --input is required (unless using --logout)[/red]")
+        raise typer.Exit(1)
+    if not input.exists():
+        print(f"[red]Error: File not found: {input}[/red]")
+        raise typer.Exit(1)
+    result = upload_to_drive(str(input), title, share=not no_share)
+    raise typer.Exit(0 if result else 1)
 
 
 if __name__ == "__main__":
-    exit(main())
+    app()
