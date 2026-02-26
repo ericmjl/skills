@@ -77,6 +77,14 @@ Use this skill when the user provides one or more data files (CSV, FASTA, or oth
 - Write plot files into the session’s **`plots/`** directory. Name files descriptively (e.g. `distribution_response.webp`, `first_ten_records.webp`).
 - Reference these plots in the journal when you record what was done.
 
+### When EDA is in a Marimo notebook
+
+When the user conducts this EDA workflow in a **Marimo notebook** (instead of scripts in `scripts/`), follow the same phases above (context first, one step, journal, ask why). In addition:
+
+- **Markdown before and after code**: For each code cell in the notebook, add **markdown cells before and after** that explain what the code does and what the results mean. The markdown before sets up intent; the markdown after summarizes or interprets the output.
+
+See [references/marimo-notebook-eda.md](references/marimo-notebook-eda.md) for the canonical convention.
+
 ## Guardrails
 
 1. **Context before data** – Do not open or analyze the data until the problem context is stated and recorded in the session journal.
@@ -86,3 +94,4 @@ Use this skill when the user provides one or more data files (CSV, FASTA, or oth
 5. **Scripts only via uv run** – No ad-hoc Python; every script has PEP723 metadata and is run with `uv run script.py`.
 6. **WebP for plots** – Use WebP for matplotlib (and similar) output; do not save as PNG by default.
 7. **Suggest, don’t assume** – After each action, suggest one logical next step and wait for the user to confirm or change direction.
+8. **Marimo notebooks** – When EDA is in a Marimo notebook, add markdown cells before and after each code cell to explain intent and results (see [references/marimo-notebook-eda.md](references/marimo-notebook-eda.md)).
