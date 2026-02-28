@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What Are Agent Skills? — Overview</title>
+  <style>
+    /* ===== Fidelity-inspired theme (deep green, lime, tan/gold) ===== */
+    :root {
+      --bg: #f4f6f6;
+      --fg: #1a2522;
+      --heading: #006044;
+      --accent: #006044;
+      --accent2: #76A923;
+      --surface: #e2e8e6;
+      --surface2: #c8d4d0;
+      --muted: #5c6c68;
+      --border: #9fb5ae;
+      --code-bg: #e8eeec;
+      --code-fg: #1a2522;
+      --body-font: "Inter", "Segoe UI", system-ui, sans-serif;
+      --heading-font: "Inter", "Segoe UI", system-ui, sans-serif;
+      --mono-font: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+      --diagram-stroke: #006044;
+      --diagram-fill: #e2e8e6;
+      --diagram-text: #1a2522;
+      --diagram-highlight: #76A923;
+      --diagram-arrow: #5c6c68;
+    }
+
+    /* ===== Base Layout ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    body { background: var(--bg); color: var(--fg); font-family: var(--body-font); }
+    .deck { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 6vh 8vw;
+      opacity: 0; transition: opacity 0.5s ease;
+      pointer-events: none; overflow: hidden;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* ===== Typography ===== */
+    h1 { font-size: 3.5vw; font-family: var(--heading-font); color: var(--heading); margin-bottom: 2vh; }
+    h2 { font-size: 2.8vw; font-family: var(--heading-font); color: var(--heading); margin-bottom: 2vh; }
+    h3 { font-size: 2vw; font-family: var(--heading-font); color: var(--heading); margin-bottom: 1.5vh; }
+    p, li { font-size: 1.6vw; line-height: 1.7; margin-bottom: 1vh; }
+    ul, ol { padding-left: 2vw; }
+    li { list-style: none; }
+    li::before { content: "› "; color: var(--accent); font-weight: 600; }
+    code {
+      font-family: var(--mono-font); background: var(--surface);
+      padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em;
+    }
+    pre {
+      background: var(--surface); padding: 2vh 2vw;
+      border-radius: 8px; overflow-x: auto; border: 1px solid var(--border);
+    }
+    pre code { background: none; padding: 0; font-size: 1.2vw; line-height: 1.5; }
+    .nav-bar {
+      position: fixed; bottom: 2.5vh; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 12px; align-items: center; z-index: 100;
+    }
+    .progress { display: flex; gap: 6px; align-items: center; }
+    .progress-dot {
+      width: 8px; height: 8px; border-radius: 4px; background: var(--muted);
+      transition: width 0.35s ease, background 0.35s ease; cursor: pointer;
+    }
+    .progress-dot.active { width: 32px; background: var(--accent); }
+    .nav-arrow {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      width: 36px; height: 32px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--muted); cursor: pointer;
+      transition: color 0.2s, border-color 0.2s; user-select: none; flex-shrink: 0;
+    }
+    .nav-arrow:hover { color: var(--accent); border-color: var(--accent); }
+    .nav-arrow .arrow { font-size: 1vw; line-height: 1; font-family: var(--body-font); }
+    .nav-arrow .key { font-size: 0.55vw; font-family: var(--mono-font); opacity: 0.7; }
+    .overview-overlay {
+      position: fixed; inset: 0; background: var(--bg); z-index: 200;
+      display: none; align-items: center; justify-content: center; padding: 3vh 3vw; overflow: auto;
+    }
+    .overview-overlay.visible { display: flex; flex-direction: column; }
+    .overview-overlay .overview-hint { font-size: 1.2vw; color: var(--muted); margin-bottom: 2vh; }
+    .overview-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; max-width: 90vw;
+    }
+    .overview-card {
+      background: var(--surface); border: 2px solid var(--border); border-radius: 8px; padding: 1rem;
+      cursor: pointer; text-align: center; transition: border-color 0.2s, transform 0.2s;
+    }
+    .overview-card:hover { border-color: var(--accent); transform: scale(1.02); }
+    .overview-card.active { border-color: var(--accent); background: var(--surface2); }
+    .overview-card .num { font-size: 1.5vw; font-weight: 700; color: var(--accent); display: block; }
+    .overview-card .title {
+      font-size: 0.9vw; margin-top: 0.5rem; color: var(--fg); line-height: 1.3;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .big { font-size: 2.2vw; }
+    .dim { color: var(--muted); }
+    .accent { color: var(--accent); }
+
+    /* ===== Supplementary slides ===== */
+    .supp-label {
+      display: inline-block;
+      font-size: 0.85vw;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.2em 0.7em;
+      margin-bottom: 2vh;
+    }
+    .supp-link {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--accent);
+      cursor: pointer;
+    }
+    .supp-link:hover { border-bottom-style: solid; }
+    .progress-sep {
+      width: 1px;
+      height: 12px;
+      background: var(--border);
+      margin: 0 4px;
+      flex-shrink: 0;
+    }
+    .progress-dot.supplementary { opacity: 0.5; }
+    .progress-dot.supplementary.active { opacity: 1; }
+    .overview-card.supplementary { opacity: 0.7; }
+    .overview-card.supplementary .num::before { content: "⁺"; font-size: 0.8em; }
+    .diagram-node { fill: var(--diagram-fill); stroke: var(--diagram-stroke); stroke-width: 2; }
+    .diagram-highlight { fill: var(--diagram-highlight); stroke: var(--diagram-highlight); stroke-width: 2; }
+    .diagram-label { fill: var(--diagram-text); font-family: var(--body-font); font-size: 14px; text-anchor: middle; dominant-baseline: central; }
+    .diagram-label-inv { fill: var(--fg); font-family: var(--body-font); font-size: 14px; text-anchor: middle; dominant-baseline: central; }
+    .diagram-label-sm { fill: var(--muted); font-family: var(--body-font); font-size: 10px; text-anchor: middle; dominant-baseline: central; }
+    .diagram-edge { stroke: var(--diagram-arrow); stroke-width: 2; fill: none; }
+    .diagram-edge-accent { stroke: var(--diagram-stroke); stroke-width: 2; fill: none; }
+    .slide svg { max-width: 100%; height: auto; }
+    .slide .anim-fade { opacity: 0; transform: translateY(20px); }
+    .slide.active .anim-fade {
+      opacity: 1; transform: translateY(0);
+      transition: opacity 0.6s ease var(--delay, 0s), transform 0.6s ease var(--delay, 0s);
+    }
+    .slide .anim-draw { stroke-dasharray: var(--len, 1000); stroke-dashoffset: var(--len, 1000); }
+    .slide.active .anim-draw {
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1.2s ease-in-out var(--delay, 0s);
+    }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto-start-reverse">
+        <polygon points="0 0, 10 3.5, 0 7" fill="var(--diagram-arrow)" />
+      </marker>
+      <marker id="arrow-accent" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto-start-reverse">
+        <polygon points="0 0, 10 3.5, 0 7" fill="var(--diagram-stroke)" />
+      </marker>
+      <filter id="shadow" x="-5%" y="-5%" width="110%" height="120%">
+        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15" />
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="deck">
+
+    <section class="slide" id="title">
+      <h1 style="font-size:4vw;">What Are Agent Skills?</h1>
+      <p class="big dim" style="margin-top:2vh;">A simple, open format for giving agents new capabilities and expertise.</p>
+      <p style="margin-top:3vh; font-size:1.4vw;"><a href="https://agentskills.io" style="color:var(--accent);">agentskills.io</a> · <a href="https://github.com/agentskills/agentskills" style="color:var(--accent);">GitHub</a></p>
+    </section>
+
+    <section class="slide" id="definition">
+      <h2>Definition</h2>
+      <p class="anim-fade" style="--delay:0.2s">Agent Skills are <strong class="accent">folders of instructions, scripts, and resources</strong> that agents can discover and use to do things more accurately and efficiently.</p>
+      <p class="anim-fade dim" style="--delay:0.5s; margin-top:2vh;">At its core: a skill is a directory containing a <code>SKILL.md</code> file — metadata plus Markdown instructions that tell an agent how to perform a specific task.</p>
+      <p class="anim-fade" style="--delay:0.8s; margin-top:2vh;">Skills can also bundle <code>scripts/</code>, <code>references/</code>, and <code>assets/</code>.</p>
+    </section>
+
+    <section class="slide" id="why">
+      <h2>Why Agent Skills?</h2>
+      <p class="dim" style="margin-bottom:2vh;">Agents are capable but often lack the context to do real work reliably.</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:2.5vw; margin-top:2vh;">
+        <div class="anim-fade" style="--delay:0.2s; border:1px solid var(--border); border-radius:8px; padding:2vh 1.5vw;">
+          <h3 style="font-size:1.5vw;">For authors</h3>
+          <p style="font-size:1.3vw;">Build capabilities once, deploy across multiple agent products.</p>
+        </div>
+        <div class="anim-fade" style="--delay:0.4s; border:1px solid var(--border); border-radius:8px; padding:2vh 1.5vw;">
+          <h3 style="font-size:1.5vw;">For agents</h3>
+          <p style="font-size:1.3vw;">Extend capabilities based on the task; load skills on demand.</p>
+        </div>
+        <div class="anim-fade" style="--delay:0.6s; border:1px solid var(--border); border-radius:8px; padding:2vh 1.5vw;">
+          <h3 style="font-size:1.5vw;">For teams</h3>
+          <p style="font-size:1.3vw;">Capture organizational knowledge in portable, version-controlled packages.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="what-enable">
+      <h2>What Can Skills Enable?</h2>
+      <ul>
+        <li class="anim-fade" style="--delay:0.2s"><strong class="accent">Domain expertise</strong> — legal review, data pipelines, specialized workflows</li>
+        <li class="anim-fade" style="--delay:0.4s"><strong class="accent">New capabilities</strong> — creating presentations, building MCP servers, analyzing datasets</li>
+        <li class="anim-fade" style="--delay:0.6s"><strong class="accent">Repeatable workflows</strong> — multi-step tasks that are consistent and auditable</li>
+        <li class="anim-fade" style="--delay:0.8s"><strong class="accent">Interoperability</strong> — reuse the same skill across Cursor, Claude Code, VS Code, and other compatible tools</li>
+      </ul>
+    </section>
+
+    <section class="slide" id="when-used-artifacts">
+      <h2>When Skills Are Used &amp; What They Produce</h2>
+      <p class="dim" style="margin-bottom:2vh;">The <strong class="accent">coding agent</strong> uses skills in two main ways.</p>
+      <ul style="font-size:1.4vw;">
+        <li class="anim-fade" style="--delay:0.2s"><strong class="accent">Editing and executing code</strong> — One common case: the agent uses a skill while it is editing, manipulating, or executing source code (e.g. following a review workflow, running an EDA script, or iterating on an ML run). The skill guides how the agent behaves in that context.</li>
+        <li class="anim-fade" style="--delay:0.5s"><strong class="accent">Creating new things</strong> — Skills are also used to create new outputs: new scripts, HTML presentations, documents, configs, and so on. The agent follows the skill’s instructions to produce these.</li>
+        <li class="anim-fade" style="--delay:0.8s"><strong class="accent">Artifacts</strong> — Whatever a skill helps the agent produce — a slide deck, a Python script, a report, a diagram — is an <em>artifact</em>. Artifacts are the concrete results of using a skill.</li>
+      </ul>
+    </section>
+
+    <section class="slide" id="how-works">
+      <h2>How Skills Work: Progressive Disclosure</h2>
+      <svg viewBox="0 0 800 200" style="margin-top:2vh;">
+        <g class="anim-fade" style="--delay:0.1s">
+          <rect class="diagram-node" x="20" y="40" width="200" height="55" rx="8" filter="url(#shadow)" />
+          <text class="diagram-label" x="120" y="68" style="font-size:12px; font-weight:600">1. Discovery</text>
+          <text class="diagram-label-sm" x="120" y="86">Load name + description only (~100 tokens)</text>
+        </g>
+        <line class="diagram-edge anim-draw" style="--len:40; --delay:0.5s" x1="220" y1="68" x2="260" y2="68" marker-end="url(#arrow)" />
+        <g class="anim-fade" style="--delay:0.4s">
+          <rect class="diagram-node" x="260" y="40" width="200" height="55" rx="8" filter="url(#shadow)" />
+          <text class="diagram-label" x="360" y="68" style="font-size:12px; font-weight:600">2. Activation</text>
+          <text class="diagram-label-sm" x="360" y="86">Task matches → load full SKILL.md</text>
+        </g>
+        <line class="diagram-edge anim-draw" style="--len:40; --delay:0.8s" x1="460" y1="68" x2="500" y2="68" marker-end="url(#arrow)" />
+        <g class="anim-fade" style="--delay:0.7s">
+          <rect class="diagram-highlight" x="500" y="40" width="280" height="55" rx="8" filter="url(#shadow)" />
+          <text class="diagram-label-inv" x="640" y="68" style="font-size:12px; font-weight:600">3. Execution</text>
+          <text class="diagram-label-inv" x="640" y="86" style="font-size:10px">Follow instructions; load references/run scripts as needed</text>
+        </g>
+      </svg>
+      <p class="dim anim-fade" style="--delay:1s; margin-top:2vh; font-size:1.3vw;">Keeps agents fast while giving them deeper context on demand. <a class="supp-link" data-goto="supp-detail">Detail →</a></p>
+    </section>
+
+    <section class="slide" id="structure">
+      <h2>Skill Structure</h2>
+      <p class="dim" style="margin-bottom:2vh;">A skill is a directory. Minimum: <code>SKILL.md</code>. Optional: scripts, references, assets.</p>
+      <pre class="anim-fade" style="--delay:0.3s"><code>my-skill/
+├── SKILL.md          # Required: YAML frontmatter + Markdown instructions
+├── scripts/          # Optional: executable code (Python, Bash, etc.)
+├── references/       # Optional: docs the agent reads when needed
+└── assets/           # Optional: templates, data files, images</code></pre>
+      <p class="anim-fade" style="--delay:0.6s; margin-top:2vh; font-size:1.3vw;"><code>SKILL.md</code> needs <code>name</code> and <code>description</code> in frontmatter; the body is free-form instructions.</p>
+    </section>
+
+
+    <section class="slide" id="examples-repo">
+      <h2>Examples From This Repo</h2>
+      <p class="dim" style="margin-bottom:2vh;">This repository is a skills repo. Some of the skills in <code>skills/</code>:</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:2vw; font-size:1.35vw;">
+        <ul class="anim-fade" style="--delay:0.2s">
+          <li><code>html-presentations</code> — single-file slide decks</li>
+          <li><code>scientific-eda</code> — defensive EDA with journal &amp; uv</li>
+          <li><code>gh-cli</code> — GitHub CLI operations</li>
+          <li><code>gh-pr-code-review</code> — PR review workflow</li>
+          <li><code>skill-creator</code> — authoring new skills</li>
+        </ul>
+        <ul class="anim-fade" style="--delay:0.4s">
+          <li><code>publish-to-google-docs</code> — markdown → Google Docs</li>
+          <li><code>agents-md-improver</code> — AGENTS.md updates</li>
+          <li><code>ml-experimentation</code> — ML experiment tracking</li>
+          <li><code>youtube</code>, <code>debug-github-ci</code>, …</li>
+        </ul>
+      </div>
+      <p class="anim-fade dim" style="--delay:0.6s; margin-top:2vh;">Each has a <code>SKILL.md</code> with <code>name</code>, <code>description</code>, and instructions. Some add <code>references/</code> or <code>scripts/</code>.</p>
+    </section>
+
+    <section class="slide" id="spotlight-html-presentations" style="justify-content:center;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:4vw; align-items:center;">
+        <div>
+          <p class="dim anim-fade" style="--delay:0.1s; font-size:1vw; text-transform:uppercase; letter-spacing:0.2em; margin-bottom:1vh;">Spotlight</p>
+          <h2 class="anim-fade" style="--delay:0.2s; font-size:3.2vw;"><code style="background:var(--surface); padding:0.15em 0.4em; border-radius:6px;">html-presentations</code></h2>
+          <p class="anim-fade" style="--delay:0.4s; font-size:2.4vw; color:var(--accent); margin-top:2vh; line-height:1.3;">One file.<br>Any browser.<br>No framework.</p>
+          <div class="anim-fade" style="--delay:0.7s; display:flex; gap:0.8vw; flex-wrap:wrap; margin-top:3vh;">
+            <span style="background:var(--accent); color:white; padding:0.4em 1em; border-radius:999px; font-size:1.1vw; font-weight:600;">3 themes</span>
+            <span style="background:var(--surface); color:var(--fg); padding:0.4em 1em; border-radius:999px; font-size:1.1vw;">j / k nav</span>
+            <span style="background:var(--surface); color:var(--fg); padding:0.4em 1em; border-radius:999px; font-size:1.1vw;">Esc grid</span>
+            <span style="background:var(--surface); color:var(--fg); padding:0.4em 1em; border-radius:999px; font-size:1.1vw;">SVG diagrams</span>
+            <span style="background:var(--surface); color:var(--fg); padding:0.4em 1em; border-radius:999px; font-size:1.1vw;">uv run</span>
+          </div>
+        </div>
+        <div class="anim-fade" style="--delay:0.5s;">
+          <svg viewBox="0 0 380 320">
+            <rect class="diagram-node" x="20" y="20" width="160" height="110" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="100" y="65" style="font-size:16px; opacity:0.5">Slide 1</text>
+            <rect class="diagram-label" x="36" y="82" width="50" height="4" rx="2" style="fill:var(--muted); opacity:0.4" />
+            <rect class="diagram-label" x="36" y="92" width="80" height="4" rx="2" style="fill:var(--muted); opacity:0.3" />
+            <rect class="diagram-label" x="36" y="102" width="60" height="4" rx="2" style="fill:var(--muted); opacity:0.2" />
+
+            <rect class="diagram-node" x="200" y="20" width="160" height="110" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="280" y="65" style="font-size:16px; opacity:0.5">Slide 2</text>
+            <rect x="216" y="82" width="50" height="4" rx="2" style="fill:var(--muted); opacity:0.4" />
+            <rect x="216" y="92" width="80" height="4" rx="2" style="fill:var(--muted); opacity:0.3" />
+
+            <rect class="diagram-highlight" x="20" y="150" width="160" height="110" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label-inv" x="100" y="195" style="font-size:16px; font-weight:600">Slide 3</text>
+            <rect x="36" y="212" width="70" height="4" rx="2" style="fill:var(--bg); opacity:0.5" />
+            <rect x="36" y="222" width="90" height="4" rx="2" style="fill:var(--bg); opacity:0.4" />
+            <rect x="36" y="232" width="50" height="4" rx="2" style="fill:var(--bg); opacity:0.3" />
+
+            <rect class="diagram-node" x="200" y="150" width="160" height="110" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="280" y="195" style="font-size:16px; opacity:0.5">Slide 4</text>
+
+            <!-- Progress bar at bottom -->
+            <circle cx="140" cy="295" r="5" fill="var(--muted)" />
+            <circle cx="160" cy="295" r="5" fill="var(--muted)" />
+            <rect x="172" y="290" width="36" height="10" rx="5" fill="var(--accent)" />
+            <circle cx="220" cy="295" r="5" fill="var(--muted)" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="spotlight-scientific-eda" style="justify-content:center;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:4vw; align-items:center;">
+        <div>
+          <p class="dim anim-fade" style="--delay:0.1s; font-size:1vw; text-transform:uppercase; letter-spacing:0.2em; margin-bottom:1vh;">Spotlight</p>
+          <h2 class="anim-fade" style="--delay:0.2s; font-size:3.2vw;"><code style="background:var(--surface); padding:0.15em 0.4em; border-radius:6px;">scientific-eda</code></h2>
+          <p class="anim-fade" style="--delay:0.4s; font-size:2.4vw; color:var(--accent); margin-top:2vh; line-height:1.3;">Context first.<br>One plot at a time.</p>
+          <div class="anim-fade" style="--delay:0.7s; display:flex; gap:0.8vw; flex-wrap:wrap; margin-top:3vh;">
+            <span style="background:var(--accent); color:white; padding:0.4em 1em; border-radius:999px; font-size:1.1vw; font-weight:600;">Ask why</span>
+            <span style="background:var(--surface); color:var(--fg); padding:0.4em 1em; border-radius:999px; font-size:1.1vw;">uv run</span>
+            <span style="background:var(--surface); color:var(--fg); padding:0.4em 1em; border-radius:999px; font-size:1.1vw;">WebP plots</span>
+            <span style="background:var(--surface); color:var(--fg); padding:0.4em 1em; border-radius:999px; font-size:1.1vw;">Marimo</span>
+          </div>
+        </div>
+        <div class="anim-fade" style="--delay:0.5s;">
+          <svg viewBox="0 0 400 340">
+            <!-- Session folder -->
+            <rect style="fill:var(--surface); stroke:var(--border); stroke-width:1.5;" x="30" y="10" width="340" height="40" rx="6" />
+            <text class="diagram-label" x="200" y="33" style="font-size:12px; fill:var(--muted)">analysis/2025-02-05T14-30-protein-binding/</text>
+
+            <!-- Three child boxes -->
+            <line style="stroke:var(--border); stroke-width:1.5; stroke-dasharray:4,3;" x1="90" y1="50" x2="90" y2="75" />
+            <rect class="diagram-node" x="30" y="75" width="120" height="65" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="90" y="100" style="font-size:14px; font-weight:600">journal.md</text>
+            <text class="diagram-label-sm" x="90" y="118" style="font-size:10px">[SHAPE] [PLOT]</text>
+
+            <line style="stroke:var(--border); stroke-width:1.5; stroke-dasharray:4,3;" x1="200" y1="50" x2="200" y2="75" />
+            <rect class="diagram-node" x="140" y="75" width="120" height="65" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="200" y="100" style="font-size:14px; font-weight:600">plots/</text>
+            <text class="diagram-label-sm" x="200" y="118" style="font-size:10px">*.webp</text>
+
+            <line style="stroke:var(--border); stroke-width:1.5; stroke-dasharray:4,3;" x1="310" y1="50" x2="310" y2="75" />
+            <rect class="diagram-node" x="250" y="75" width="120" height="65" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="310" y="100" style="font-size:14px; font-weight:600">scripts/</text>
+            <text class="diagram-label-sm" x="310" y="118" style="font-size:10px">PEP 723</text>
+
+            <!-- Workflow -->
+            <rect class="diagram-node" x="30" y="180" width="100" height="50" rx="27" filter="url(#shadow)" />
+            <text class="diagram-label" x="80" y="205" style="font-size:12px">Context</text>
+
+            <line class="diagram-edge" x1="130" y1="205" x2="150" y2="205" marker-end="url(#arrow)" />
+
+            <rect class="diagram-node" x="150" y="180" width="100" height="50" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="200" y="205" style="font-size:12px">1 plot</text>
+
+            <line class="diagram-edge" x1="250" y1="205" x2="270" y2="205" marker-end="url(#arrow)" />
+
+            <rect class="diagram-highlight" x="270" y="180" width="100" height="50" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label-inv" x="320" y="200" style="font-size:12px; font-weight:600">Why?</text>
+            <text class="diagram-label-inv" x="320" y="216" style="font-size:10px">record</text>
+
+            <!-- Loop-back -->
+            <path class="diagram-edge-accent" d="M 370,205 C 395,205 395,270 370,270 L 80,270 C 50,270 30,250 30,230"
+                  fill="none" marker-end="url(#arrow-accent)" />
+            <text class="diagram-label" x="200" y="287" style="font-size:11px; fill:var(--accent)">suggest next step → repeat</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="spotlight-ml-experimentation" style="justify-content:center;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:4vw; align-items:center;">
+        <div>
+          <p class="dim anim-fade" style="--delay:0.1s; font-size:1vw; text-transform:uppercase; letter-spacing:0.2em; margin-bottom:1vh;">Spotlight</p>
+          <h2 class="anim-fade" style="--delay:0.2s; font-size:2.8vw;"><code style="background:var(--surface); padding:0.15em 0.4em; border-radius:6px;">ml-experimentation</code></h2>
+          <p class="anim-fade" style="--delay:0.4s; font-size:2.4vw; color:var(--accent); margin-top:2vh; line-height:1.3;">One hypothesis.<br>Fast runs.<br>Real reports.</p>
+          <div class="anim-fade" style="--delay:0.7s; display:flex; gap:0.8vw; flex-wrap:wrap; margin-top:3vh;">
+            <span style="background:var(--accent); color:white; padding:0.4em 1em; border-radius:999px; font-size:1.1vw; font-weight:600;">&lt; 60 s runs</span>
+            <span style="background:var(--surface); color:var(--fg); padding:0.4em 1em; border-radius:999px; font-size:1.1vw;">uv / pixi</span>
+            <span style="background:var(--surface); color:var(--fg); padding:0.4em 1em; border-radius:999px; font-size:1.1vw;">GPU</span>
+            <span style="background:var(--surface); color:var(--fg); padding:0.4em 1em; border-radius:999px; font-size:1.1vw;">No hallucination</span>
+          </div>
+        </div>
+        <div class="anim-fade" style="--delay:0.5s;">
+          <svg viewBox="0 0 400 340">
+            <!-- Phase labels on left -->
+            <text style="fill:var(--muted); font-family:var(--body-font); font-size:10px; text-anchor:end;" x="42" y="50">Plan</text>
+            <text style="fill:var(--muted); font-family:var(--body-font); font-size:10px; text-anchor:end;" x="42" y="130">De-risk</text>
+            <text style="fill:var(--muted); font-family:var(--body-font); font-size:10px; text-anchor:end;" x="42" y="210">Run</text>
+            <text style="fill:var(--muted); font-family:var(--body-font); font-size:10px; text-anchor:end;" x="42" y="290">Report</text>
+
+            <!-- Phase 1: Plan -->
+            <rect class="diagram-node" x="55" y="28" width="130" height="44" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="120" y="50" style="font-size:13px; font-weight:600">Hypothesis</text>
+            <line class="diagram-edge" x1="185" y1="50" x2="205" y2="50" marker-end="url(#arrow)" />
+            <rect class="diagram-node" x="205" y="28" width="80" height="44" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="245" y="50" style="font-size:12px">Criteria</text>
+            <line class="diagram-edge" x1="285" y1="50" x2="305" y2="50" marker-end="url(#arrow)" />
+            <rect class="diagram-node" x="305" y="28" width="80" height="44" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="345" y="50" style="font-size:12px">Metrics</text>
+
+            <!-- Connector down -->
+            <line class="diagram-edge" x1="120" y1="72" x2="120" y2="108" marker-end="url(#arrow)" />
+
+            <!-- Phase 2: De-risk -->
+            <rect class="diagram-node" x="55" y="108" width="130" height="44" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="120" y="125" style="font-size:12px">Scale down</text>
+            <text class="diagram-label-sm" x="120" y="140" style="font-size:9px">data · epochs · model</text>
+            <line class="diagram-edge" x1="185" y1="130" x2="205" y2="130" marker-end="url(#arrow)" />
+            <rect style="fill:var(--accent2); stroke:var(--accent2); stroke-width:2;" x="205" y="108" width="100" height="44" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label-inv" x="255" y="130" style="font-size:12px; font-weight:600">&lt; 60 s</text>
+
+            <!-- Connector down -->
+            <line class="diagram-edge" x1="120" y1="152" x2="120" y2="188" marker-end="url(#arrow)" />
+
+            <!-- Phase 3: Run -->
+            <rect class="diagram-node" x="55" y="188" width="90" height="44" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="100" y="210" style="font-size:12px">Script</text>
+            <line class="diagram-edge" x1="145" y1="210" x2="165" y2="210" marker-end="url(#arrow)" />
+            <rect class="diagram-node" x="165" y="188" width="90" height="44" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="210" y="210" style="font-size:12px">Log</text>
+            <line class="diagram-edge" x1="255" y1="210" x2="275" y2="210" marker-end="url(#arrow)" />
+            <rect class="diagram-node" x="275" y="188" width="110" height="44" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label" x="330" y="205" style="font-size:12px">JOURNAL.md</text>
+            <text class="diagram-label-sm" x="330" y="221">observe &amp; record</text>
+
+            <!-- Connector down -->
+            <line class="diagram-edge" x1="120" y1="232" x2="120" y2="268" marker-end="url(#arrow)" />
+
+            <!-- Phase 4: Report -->
+            <rect class="diagram-highlight" x="55" y="268" width="330" height="44" rx="8" filter="url(#shadow)" />
+            <text class="diagram-label-inv" x="220" y="290" style="font-size:14px; font-weight:600">Scientific Report — abstract · methods · results · discussion</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" id="spec">
+      <h2>Specification at a Glance</h2>
+      <ul>
+        <li class="anim-fade" style="--delay:0.2s"><strong class="accent">name</strong> — required; lowercase, hyphens; must match directory name; max 64 chars</li>
+        <li class="anim-fade" style="--delay:0.35s"><strong class="accent">description</strong> — required; what it does + when to use it; max 1024 chars</li>
+        <li class="anim-fade" style="--delay:0.5s"><strong class="accent">license</strong>, <strong class="accent">compatibility</strong>, <strong class="accent">metadata</strong> — optional</li>
+        <li class="anim-fade" style="--delay:0.65s">Body: Markdown instructions; no strict format; keep under ~500 lines, use references for detail</li>
+      </ul>
+      <p class="anim-fade dim" style="--delay:0.8s; margin-top:2vh;">Full spec: <a href="https://agentskills.io/specification" style="color:var(--accent);">agentskills.io/specification</a>. Validate with <code>skills-ref validate &lt;path&gt;</code>.</p>
+    </section>
+
+    <section class="slide" id="adoption">
+      <h2>Adoption &amp; Open Development</h2>
+      <p class="anim-fade" style="--delay:0.2s">Agent Skills are supported by many AI development tools (Cursor, Claude Code, VS Code, and others).</p>
+      <p class="anim-fade" style="--delay:0.5s; margin-top:2vh;">The format was originally developed by <strong class="accent">Anthropic</strong>, released as an open standard, and is adopted by a growing ecosystem. The standard is open to contributions.</p>
+      <p class="anim-fade" style="--delay:0.8s; margin-top:2vh;"><a href="https://github.com/agentskills/agentskills" style="color:var(--accent);">github.com/agentskills/agentskills</a></p>
+    </section>
+
+    <section class="slide" id="get-started">
+      <h2>Get Started</h2>
+      <ul>
+        <li class="anim-fade" style="--delay:0.2s"><a href="https://agentskills.io/what-are-skills" style="color:var(--accent);">What are skills?</a> — deeper intro</li>
+        <li class="anim-fade" style="--delay:0.35s"><a href="https://agentskills.io/specification" style="color:var(--accent);">Specification</a> — full format</li>
+        <li class="anim-fade" style="--delay:0.5s"><a href="https://agentskills.io/integrate-skills" style="color:var(--accent);">Integrate skills</a> — add support to your agent</li>
+        <li class="anim-fade" style="--delay:0.65s"><a href="https://github.com/anthropics/skills" style="color:var(--accent);">Example skills</a> — browse on GitHub</li>
+        <li class="anim-fade" style="--delay:0.8s"><a href="https://agentskills.io/llms.txt" style="color:var(--accent);">llms.txt</a> — doc index for agents</li>
+      </ul>
+    </section>
+
+    <section class="slide" id="acknowledgments" style="justify-content:center;">
+      <h2>Acknowledgments</h2>
+      <ul style="font-size:1.4vw; margin-top:2vh;">
+        <li class="anim-fade" style="--delay:0.2s"><strong class="accent">Anthropic</strong> — for developing and open-sourcing the Agent Skills specification</li>
+        <li class="anim-fade" style="--delay:0.4s"><strong class="accent">Agent skills community</strong> — contributors and early adopters across Cursor, Claude Code, VS Code, and more</li>
+        <li class="anim-fade" style="--delay:0.6s"><strong class="accent">This repository</strong> — built and maintained as a living example of skills in practice</li>
+      </ul>
+      <p class="anim-fade dim" style="--delay:0.8s; margin-top:3vh; font-size:1.3vw;">Presentation built with the <code>html-presentations</code> skill.</p>
+    </section>
+
+    <section class="slide" id="thank-you" style="justify-content:center; align-items:center; text-align:center;">
+      <h1 style="font-size:4.5vw;">Thank You</h1>
+      <p class="big dim" style="margin-top:2vh;">Questions?</p>
+      <p style="margin-top:3vh; font-size:1.3vw;"><a href="https://agentskills.io" style="color:var(--accent);">agentskills.io</a> · <a href="https://github.com/agentskills/agentskills" style="color:var(--accent);">GitHub</a></p>
+      <p class="dim" style="margin-top:4vh; font-size:1.1vw;">Supplementary slides follow: <a class="supp-link" data-goto="supp-detail">Detail</a> · <a class="supp-link" data-goto="supp-harness">Harness FAQ</a> · <a class="supp-link" data-goto="supp-where-installed">Install paths FAQ</a></p>
+    </section>
+
+    <!-- ===== Supplementary slides (after Thank You) ===== -->
+
+    <section class="slide" id="supp-detail" data-supplementary>
+      <span class="supp-label">Supplementary</span>
+      <h2>Loading, Activation &amp; Execution</h2>
+      <ul style="font-size:1.35vw;">
+        <li class="anim-fade" style="--delay:0.2s"><strong class="accent">Loading (discovery)</strong> — At startup, the harness scans configured skill directories. For each skill it parses only the <em>frontmatter</em> of <code>SKILL.md</code> (name, description) and injects that metadata into the agent&#x2019;s system prompt (~50&#x2013;100 tokens per skill). For filesystem-based agents, a path to <code>SKILL.md</code> is included so the model can request the file when needed.</li>
+        <li class="anim-fade" style="--delay:0.45s"><strong class="accent">Activation</strong> — When the user&#x2019;s task matches a skill&#x2019;s description, the agent (or harness) loads the <em>entire</em> <code>SKILL.md</code> into context. Keep the main file under ~500 lines; put long reference material in <code>references/</code>.</li>
+        <li class="anim-fade" style="--delay:0.7s"><strong class="accent">Execution</strong> — The agent follows instructions step by step. It may read files from <code>references/</code>, run scripts from <code>scripts/</code>, or use <code>assets/</code> only when told. Script execution is typically via shell commands (e.g. <code>uv run script.py</code>).</li>
+      </ul>
+    </section>
+
+    <section class="slide" id="supp-harness" data-supplementary>
+      <span class="supp-label">Supplementary &middot; FAQ</span>
+      <h2>What Is a Coding Agent Harness?</h2>
+      <p class="anim-fade" style="--delay:0.2s">The <strong class="accent">agent harness</strong> is the software infrastructure that wraps around an LLM or AI agent — everything except the model itself.</p>
+      <p class="anim-fade dim" style="--delay:0.4s; margin-top:1.5vh;">It manages the lifecycle of context: intent capture, tool orchestration, execution, verification, persistence.</p>
+      <ul class="anim-fade" style="--delay:0.6s; margin-top:2vh;">
+        <li><strong>Context management</strong> — state across sessions, checkpointing</li>
+        <li><strong>Tool orchestration</strong> — API calls, timeouts, retries</li>
+        <li><strong>Error recovery</strong> — hallucinations, invalid responses, network failures</li>
+        <li><strong>State persistence</strong> — save progress between sessions</li>
+      </ul>
+      <p class="anim-fade dim" style="--delay:0.9s; margin-top:2vh; font-size:1.3vw;">Skills are <em>loaded by</em> the harness. The harness discovers skills in configured directories and injects their metadata (or full content) into the agent&#x2019;s context.</p>
+    </section>
+
+    <section class="slide" id="supp-where-installed" data-supplementary>
+      <span class="supp-label">Supplementary &middot; FAQ</span>
+      <h2>Where Are Agent Skills Installed?</h2>
+      <p class="dim" style="margin-bottom:2vh;">Skills live in directories that the <strong class="accent">harness</strong> (Cursor, Claude Code, etc.) scans at startup. Common locations:</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:3vw;">
+        <div class="anim-fade" style="--delay:0.2s">
+          <h3 style="font-size:1.5vw; margin-bottom:1vh;">Project-level</h3>
+          <ul style="font-size:1.3vw;">
+            <li><code>.cursor/skills/</code></li>
+            <li><code>.agents/skills/</code></li>
+            <li><code>.claude/skills/</code></li>
+            <li><code>.codex/skills/</code></li>
+          </ul>
+        </div>
+        <div class="anim-fade" style="--delay:0.4s">
+          <h3 style="font-size:1.5vw; margin-bottom:1vh;">User-level (global)</h3>
+          <ul style="font-size:1.3vw;">
+            <li><code>~/.cursor/skills/</code></li>
+            <li><code>~/.claude/skills/</code></li>
+            <li><code>~/.codex/skills/</code></li>
+          </ul>
+        </div>
+      </div>
+      <p class="anim-fade dim" style="--delay:0.6s; margin-top:2vh; font-size:1.3vw;">Each path contains skill <em>folders</em> (e.g. <code>~/.cursor/skills/html-presentations/</code> with <code>SKILL.md</code> inside). Exact set depends on the product.</p>
+    </section>
+
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-arrow nav-prev"><span class="arrow">&#8249;</span><span class="key">j</span></div>
+    <div class="progress"></div>
+    <div class="nav-arrow nav-next"><span class="arrow">&#8250;</span><span class="key">k</span></div>
+  </div>
+
+  <div class="overview-overlay" id="overview" aria-label="Slide overview">
+    <p class="overview-hint">Click a slide to jump · Esc to close</p>
+    <div class="overview-grid"></div>
+  </div>
+
+  <script>
+    (function () {
+      var slides = document.querySelectorAll('.slide');
+      var current = 0;
+      var total = slides.length;
+      var progress = document.querySelector('.progress');
+      var prevBtn = document.querySelector('.nav-prev');
+      var nextBtn = document.querySelector('.nav-next');
+      var overview = document.getElementById('overview');
+      var overviewGrid = overview.querySelector('.overview-grid');
+
+      var suppInserted = false;
+      for (var i = 0; i < total; i++) {
+        if (!suppInserted && slides[i].hasAttribute('data-supplementary')) {
+          var sep = document.createElement('div');
+          sep.className = 'progress-sep';
+          progress.appendChild(sep);
+          suppInserted = true;
+        }
+        var dot = document.createElement('div');
+        dot.className = 'progress-dot';
+        if (slides[i].hasAttribute('data-supplementary')) dot.classList.add('supplementary');
+        dot.dataset.index = i;
+        dot.addEventListener('click', function () { show(parseInt(this.dataset.index)); });
+        progress.appendChild(dot);
+      }
+      var dots = progress.querySelectorAll('.progress-dot');
+
+      for (var i = 0; i < total; i++) {
+        var card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'overview-card';
+        if (slides[i].hasAttribute('data-supplementary')) card.classList.add('supplementary');
+        card.dataset.index = i;
+        var titleEl = slides[i].querySelector('h1, h2, h3');
+        var title = titleEl ? titleEl.textContent.trim() : 'Slide ' + (i + 1);
+        card.innerHTML = '<span class="num">' + (i + 1) + '</span><span class="title">' + title.replace(/</g, '&lt;') + '</span>';
+        card.addEventListener('click', function () {
+          show(parseInt(this.dataset.index));
+          overview.classList.remove('visible');
+        });
+        overviewGrid.appendChild(card);
+      }
+      var overviewCards = overviewGrid.querySelectorAll('.overview-card');
+
+      var slideIdMap = {};
+      for (var i = 0; i < total; i++) {
+        if (slides[i].id) slideIdMap[slides[i].id] = i;
+      }
+
+      function show(idx) {
+        if (idx < 0 || idx >= total) return;
+        slides[current].classList.remove('active');
+        dots[current].classList.remove('active');
+        if (overviewCards[current]) overviewCards[current].classList.remove('active');
+        current = idx;
+        slides[current].classList.add('active');
+        dots[current].classList.add('active');
+        if (overviewCards[current]) overviewCards[current].classList.add('active');
+      }
+
+      document.addEventListener('click', function (e) {
+        var link = e.target.closest('[data-goto]');
+        if (link) {
+          e.preventDefault();
+          var target = link.getAttribute('data-goto');
+          if (slideIdMap[target] !== undefined) show(slideIdMap[target]);
+        }
+      });
+
+      prevBtn.addEventListener('click', function () { show(current - 1); });
+      nextBtn.addEventListener('click', function () { show(current + 1); });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          overview.classList.toggle('visible');
+          if (overview.classList.contains('visible')) {
+            for (var i = 0; i < overviewCards.length; i++) {
+              overviewCards[i].classList.toggle('active', i === current);
+            }
+          }
+          return;
+        }
+        if (overview.classList.contains('visible')) return;
+        switch (e.key) {
+          case ' ': e.preventDefault(); show(current + (e.shiftKey ? -1 : 1)); break;
+          case 'ArrowRight': case 'k': show(current + 1); break;
+          case 'ArrowLeft': case 'j': show(current - 1); break;
+        }
+      });
+
+      show(0);
+    })();
+  </script>
+</body>
+</html>

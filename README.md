@@ -2,6 +2,8 @@
 
 This repository contains custom skills following the [Anthropic Agent Skills Specification](https://github.com/anthropics/skills).
 
+**[What are agent skills?](docs/agent-skills-overview.html)** — Single-file HTML overview (open in a browser): definition, how they work, FAQ, and spotlights on selected skills.
+
 ## What are skills?
 
 Skills are folders of instructions, scripts, and resources that AI agents load dynamically to improve performance on specialized tasks. Each skill teaches an agent how to complete specific tasks in a repeatable way.

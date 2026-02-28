@@ -1,0 +1,36 @@
+/* Nord theme — Arctic, north-bluish palette */
+:root {
+  --bg: #2e3440;
+  --fg: #d8dee9;
+  --heading: #88c0d0;
+  --accent: #88c0d0;
+  --accent2: #81a1c1;
+  --surface: #3b4252;
+  --surface2: #434c5e;
+  --muted: #4c566a;
+  --border: #434c5e;
+  --code-bg: #3b4252;
+  --code-fg: #e5e9f0;
+
+  --body-font: "Inter", "Segoe UI", system-ui, sans-serif;
+  --heading-font: "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono-font: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+
+  /* Diagram tokens */
+  --diagram-stroke: #88c0d0;
+  --diagram-fill: #3b4252;
+  --diagram-text: #d8dee9;
+  --diagram-highlight: #ebcb8b;
+  --diagram-arrow: #4c566a;
+
+  /* Extended Nord palette for multi-color diagrams */
+  --frost-1: #8fbcbb;
+  --frost-2: #88c0d0;
+  --frost-3: #81a1c1;
+  --frost-4: #5e81ac;
+  --aurora-red: #bf616a;
+  --aurora-orange: #d08770;
+  --aurora-yellow: #ebcb8b;
+  --aurora-green: #a3be8c;
+  --aurora-purple: #b48ead;
+}

@@ -1,0 +1,55 @@
+/* Terminal theme — green phosphor on black, monospace everything */
+:root {
+  --bg: #0a0a0a;
+  --fg: #33ff33;
+  --heading: #33ff33;
+  --accent: #33ff33;
+  --accent2: #00cc88;
+  --surface: #111;
+  --surface2: #1a1a1a;
+  --muted: #227722;
+  --border: #1a3a1a;
+  --code-bg: #0c0c0c;
+  --code-fg: #33ff33;
+
+  --body-font: "SF Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
+  --heading-font: "SF Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
+  --mono-font: "SF Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
+
+  /* Diagram tokens */
+  --diagram-stroke: #33ff33;
+  --diagram-fill: #111;
+  --diagram-text: #33ff33;
+  --diagram-highlight: #00cc88;
+  --diagram-arrow: #227722;
+}
+
+/* Subtle scanline overlay (purely cosmetic, disable by removing this rule) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  z-index: 9999;
+}
+
+/* Glow effect on headings */
+h1, h2, h3 {
+  text-shadow: 0 0 8px rgba(51, 255, 51, 0.4);
+}
+
+/* Cursor-blink on title slide subtitle */
+.slide#title p::after {
+  content: "█";
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}

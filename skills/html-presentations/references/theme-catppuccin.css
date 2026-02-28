@@ -1,0 +1,35 @@
+/* Catppuccin Mocha theme — pastels on warm dark base */
+:root {
+  --bg: #1e1e2e;
+  --fg: #cdd6f4;
+  --heading: #cba6f7;
+  --accent: #cba6f7;
+  --accent2: #f5c2e7;
+  --surface: #313244;
+  --surface2: #45475a;
+  --muted: #6c7086;
+  --border: #45475a;
+  --code-bg: #181825;
+  --code-fg: #cdd6f4;
+
+  --body-font: "Inter", "Segoe UI", system-ui, sans-serif;
+  --heading-font: "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono-font: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+
+  /* Diagram tokens */
+  --diagram-stroke: #cba6f7;
+  --diagram-fill: #313244;
+  --diagram-text: #cdd6f4;
+  --diagram-highlight: #f5c2e7;
+  --diagram-arrow: #6c7086;
+
+  /* Extended Catppuccin Mocha palette for multi-color diagrams */
+  --red: #f38ba8;
+  --peach: #fab387;
+  --yellow: #f9e2af;
+  --green: #a6e3a1;
+  --teal: #94e2d5;
+  --sky: #89dceb;
+  --blue: #89b4fa;
+  --lavender: #b4befe;
+}
