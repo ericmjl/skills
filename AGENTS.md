@@ -27,6 +27,7 @@ No build or test system. Skills are markdown instructions with optional scripts.
 - Include `requires-python` and `dependencies` in the metadata block
 - Always run scripts with `uv run script.py` (document this in SKILL.md)
 - Example metadata block:
+
   ```python
   # /// script
   # requires-python = ">=3.11"
