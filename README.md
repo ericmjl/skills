@@ -59,12 +59,6 @@ Location: `skills/skill-creator/`
 
 Guide for creating effective skills. Use when you want to create a new skill (or update an existing skill) that extends an agent with specialized workflows, tool integrations, or repo conventions. Includes init, edit, and package workflow.
 
-### skill-installer
-
-Location: `skills/skill-installer/`
-
-Install and migrate skills across harnesses (OpenCode, Claude Code, Cursor, etc.). Use when installing a skill into a particular product or moving skills between repo-specific and machine-specific locations. See `references/harness-locations.md` for paths.
-
 ### youtube
 
 Location: `skills/youtube/`
@@ -101,6 +95,15 @@ Instructions for the agent to follow when this skill is active.
 
 The `name` field must match the directory name (lowercase with hyphens).
 
+## Installing these skills
+
+To install skills from this repository, you need either `uv` or `npm`:
+
+| Method | Command |
+|--------|---------|
+| uv | `uvx deno -A npm:skills add ericmjl/skills` |
+| npm | `npx skills add ericmjl/skills` |
+
 ## Using these skills
 
 These skills are compatible with:
@@ -108,5 +111,3 @@ These skills are compatible with:
 - **Cursor**, **OpenCode**, **GitHub Copilot**, **Codex** — via the standard `.agents/skills` (repo) and `~/.agents/skills` (global) paths
 - **Claude Code** — via native skills support (`.claude/skills/`; not yet using `.agents/skills`)
 - **Standalone use** — by running the scripts directly
-
-For install paths and migration, see the **skill-installer** skill and `skills/skill-installer/references/harness-locations.md`.
