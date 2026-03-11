@@ -21,12 +21,28 @@ None. Output is a single `.html` file. Works in any modern browser (Chrome, Fire
 1. **Single file** — All CSS, JS, SVG diagrams, and content in one `.html` file
 2. **Themed** — Three color presets: terminal.css (default), catppuccin, nord
 3. **Keyboard navigation** — Space/Right/k forward, Shift+Space/Left/j backward; **Escape** opens a visual grid of all slides to jump to any slide
-4. **SVG diagrams** — Flowcharts, architecture diagrams, pipelines, comparisons — all themed via CSS custom properties
-5. **SVG animations** — Path drawing, sequential fade-in, pulse/glow, flow — triggered when a slide becomes active
+4. **URL hash persistence** — The current slide index is stored in the URL hash (e.g. `#5`). Refreshing the page keeps you on the same slide; sharing a link with a hash opens that slide directly
+5. **SVG diagrams** — Flowcharts, architecture diagrams, pipelines, comparisons — all themed via CSS custom properties
+6. **SVG animations** — Path drawing, sequential fade-in, pulse/glow, flow — triggered when a slide becomes active
 
 ## How It Works
 
-**Example to study first:** read [assets/example-agent-skills-overview.html](assets/example-agent-skills-overview.html) — a complete, polished presentation that demonstrates the spotlight layout, two-column grids, rich SVG diagrams, pill badges, progress nav, and overview grid. Use it as a quality benchmark when generating new presentations.
+### Exemplars: what’s possible
+
+Study these full presentations to see what the skill can produce:
+
+1. **[assets/example-agent-skills-overview.html](assets/example-agent-skills-overview.html)** — Polished overview with spotlight layout, two-column grids, rich SVG diagrams, pill badges, progress nav, and overview grid. Use it as a quality benchmark for structure and visuals.
+
+2. **[assets/canvas-chat-overview.html](assets/canvas-chat-overview.html)** — Product overview with **interactive, looping slide demos**:
+   - **Mini-canvases** — Draggable nodes and live-updating SVG edges on the slide
+   - **Chat & Reply** — Simulated typing, node reveal, edge draw; loops automatically
+   - **Highlight & Branch** — Simulated text selection, excerpt node, source highlight; loops
+   - **Multi-Select** — Simulated node selection, reply, “Thinking…”, merged node; loops
+   - **Auto-Layout** — Simulated cursor moving to a toolbar “Layout” button, sunburst/rays on click, nodes animate from messy to clean; resets and loops
+   - **Navigate** — Simulated cursor and scroll hint; semantic zoom in (full node content) and zoom out (summary view); loops
+   - **URL hash persistence** — Refreshing keeps the current slide; `slidechange` dispatched with `setTimeout(0)` so demo scripts can run on load
+
+Use the Canvas Chat overview when the user wants **automated, looping demos** (cursor, click effects, zoom, or step-by-step UI simulation) instead of static diagrams.
 
 ### Step 0: Ask the user (before building)
 
@@ -397,6 +413,23 @@ Use this skeleton. The three sections — **theme CSS**, **base layout CSS**, an
         if (slides[i].id) slideIdMap[slides[i].id] = i;
       }
 
+      function getSlideIndexFromHash() {
+        var hash = window.location.hash;
+        if (!hash || hash.length < 2) return 0;
+        var n = parseInt(hash.slice(1), 10);
+        if (isNaN(n) || n < 0 || n >= total) return 0;
+        return n;
+      }
+
+      function updateHashForSlide(idx) {
+        var url = window.location.pathname + window.location.search + '#' + idx;
+        if (window.history.replaceState) {
+          window.history.replaceState(null, '', url);
+        } else {
+          window.location.hash = idx;
+        }
+      }
+
       function show(idx) {
         if (idx < 0 || idx >= total) return;
         slides[current].classList.remove('active');
@@ -406,6 +439,7 @@ Use this skeleton. The three sections — **theme CSS**, **base layout CSS**, an
         slides[current].classList.add('active');
         dots[current].classList.add('active');
         if (overviewCards[current]) overviewCards[current].classList.add('active');
+        updateHashForSlide(current);
       }
 
       document.addEventListener('click', function (e) {
@@ -445,7 +479,12 @@ Use this skeleton. The three sections — **theme CSS**, **base layout CSS**, an
         }
       });
 
-      show(0);
+      window.addEventListener('hashchange', function () {
+        var idx = getSlideIndexFromHash();
+        if (idx !== current) show(idx);
+      });
+
+      show(getSlideIndexFromHash());
     })();
   </script>
 </body>
@@ -574,6 +613,7 @@ Required JS additions (already in the base script above):
 - On `data-goto` link click: `show(slideIdMap[target])`.
 - When building progress dots, insert a `.progress-sep` `<div>` before the first supplementary slide.
 - Add `.supplementary` class to dots and overview cards for `data-supplementary` slides.
+- **URL hash persistence:** Store the current slide index in the URL hash (e.g. `#5`). On load, call `show(getSlideIndexFromHash())` instead of `show(0)` so that refreshing the page keeps the user on the same slide. In `show(idx)`, call `updateHashForSlide(current)` (using `history.replaceState` when available) so the URL always reflects the current slide. Add a `hashchange` listener to sync the deck when the user edits the URL or uses browser back/forward.
 
 Every `<section>` must have a unique `id`.
 
