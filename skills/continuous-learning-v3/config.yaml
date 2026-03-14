@@ -1,0 +1,26 @@
+version: "3.0"
+
+storage:
+  base_dir: "${AGENT_LEARNING_HOME:-~/.agent-learning}"
+
+observer:
+  enabled: false
+  run_interval_minutes: 5
+  min_observations_to_analyze: 20
+
+hooks:
+  default_format: generic
+  
+  formats:
+    claude-code: claude-v1
+    cursor: cursor-v1
+    gemini: gemini-v1
+    opencode: opencode-v1
+
+promotion:
+  confidence_threshold: 0.8
+  min_projects: 2
+
+logging:
+  level: INFO
+  file: "${AGENT_LEARNING_HOME:-~/.agent-learning}/observer.log"
