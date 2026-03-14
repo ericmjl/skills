@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Fetch YouTube video transcript."""
+# /// script
+# dependencies = ["youtube-transcript-api"]
+# ///
+"""Fetch YouTube video transcript.
+
+Usage:
+    uv run fetch_transcript.py <video_id>
+"""
 
 import sys
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -7,7 +14,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: fetch_transcript.py <video_id>", file=sys.stderr)
+        print("Usage: uv run fetch_transcript.py <video_id>", file=sys.stderr)
         sys.exit(1)
 
     video_id = sys.argv[1]
