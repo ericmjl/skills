@@ -19,10 +19,10 @@ Ingest YouTube videos into your vault by fetching transcripts and creating struc
 
 ### Fetching transcripts
 
-Run the transcript fetcher script:
+Run the transcript fetcher script (uses PEP723 inline metadata):
 
 ```bash
-uvx --with youtube-transcript-api python3 ~/.agents/skills/youtube-ingestion/scripts/fetch_transcript.py <video_id>
+uv run <path-to-skill>/scripts/fetch_transcript.py <video_id>
 ```
 
 The script outputs the transcript text to stdout.
