@@ -42,8 +42,15 @@ def validate_skill(skill_path):
     except yaml.YAMLError as e:
         return False, f"Invalid YAML in frontmatter: {e}"
 
-    # Define allowed properties
-    ALLOWED_PROPERTIES = {"name", "description", "license", "allowed-tools", "metadata"}
+    # Define allowed properties (align with Agent Skills spec + common harness fields)
+    ALLOWED_PROPERTIES = {
+        "name",
+        "description",
+        "license",
+        "compatibility",
+        "allowed-tools",
+        "metadata",
+    }
 
     # Check for unexpected properties (excluding nested keys under metadata)
     unexpected_keys = set(frontmatter.keys()) - ALLOWED_PROPERTIES
@@ -98,6 +105,32 @@ def validate_skill(skill_path):
                 False,
                 f"Description is too long ({len(description)} characters). Maximum is 1024 characters.",
             )
+        # Minimum length: short descriptions are usually missing trigger context (spec minimum is 1;
+        # this repo enforces a higher bar for discoverability)
+        min_len = 80
+        if len(description) < min_len:
+            return (
+                False,
+                f"Description is too short ({len(description)} characters). "
+                f"Use at least {min_len}: include what the skill does and imperative "
+                '"Use when ..." triggers (user phrasings, files, tools). '
+                "See skills/skill-creator/references/skill-description-triggers.md",
+            )
+        desc_lower = description.lower()
+        placeholder_hints = (
+            "[todo",
+            "[remove this placeholder",
+            "not shippable",
+            "complete and informative explanation",
+        )
+        for hint in placeholder_hints:
+            if hint in desc_lower:
+                return (
+                    False,
+                    "Description still contains a placeholder or init-skill boilerplate. "
+                    "Replace it with final trigger text (see "
+                    "skills/skill-creator/references/skill-description-triggers.md).",
+                )
 
     return True, "Skill is valid!"
 

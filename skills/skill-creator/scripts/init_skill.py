@@ -19,7 +19,7 @@ from pathlib import Path
 
 SKILL_TEMPLATE = """---
 name: {skill_name}
-description: [TODO: Complete and informative explanation of what the skill does and when to use it. Include WHEN to use this skill - specific scenarios, file types, or tasks that trigger it.]
+description: "[REMOVE THIS PLACEHOLDER — not shippable] Replace the entire line: (1) what the skill does, (2) 'Use when ...' with user phrasings, files, tools, URLs, (3) optional near-miss boundaries. Target 80–1024 characters. Do not ship TODO text. See skills/skill-creator/references/skill-description-triggers.md."
 ---
 
 # {skill_title}
@@ -267,11 +267,15 @@ def init_skill(skill_name, path):
     # Print next steps
     print(f"\n✅ Skill '{skill_name}' initialized successfully at {skill_dir}")
     print("\nNext steps:")
-    print("1. Edit SKILL.md to complete the TODO items and update the description")
     print(
-        "2. Customize or delete the example files in scripts/, references/, and assets/"
+        "1. Replace the description placeholder FIRST — it is the skill trigger; "
+        "packaging will fail until it is real (see skill-creator references/skill-description-triggers.md)"
     )
-    print("3. Run the validator when ready to check the skill structure")
+    print("2. Edit SKILL.md body: complete remaining TODO items")
+    print(
+        "3. Customize or delete the example files in scripts/, references/, and assets/"
+    )
+    print("4. Run quick_validate.py before packaging")
 
     return skill_dir
 
