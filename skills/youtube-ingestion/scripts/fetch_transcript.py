@@ -35,9 +35,8 @@ def extract_video_id(url_or_id: str) -> str:
     raise ValueError(f"Could not extract video ID from: {url_or_id}")
 
 
-def get_metadata(video_id: str) -> dict:
+def get_metadata(url: str) -> dict:
     """Fetch video metadata as JSON."""
-    url = f"https://www.youtube.com/watch?v={video_id}"
     result = subprocess.run(
         ["uvx", "yt-dlp", "--dump-json", "--no-download", url],
         capture_output=True,
@@ -133,8 +132,7 @@ def main():
             )
             sys.exit(1)
         url = sys.argv[2]
-        video_id = extract_video_id(url)
-        metadata = get_metadata(video_id)
+        metadata = get_metadata(url)
         print(json.dumps(metadata, indent=2))
     else:
         url = sys.argv[1]
