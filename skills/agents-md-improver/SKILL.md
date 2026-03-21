@@ -1,6 +1,6 @@
 ---
 name: agents-md-improver
-description: Keeps repo-local agent instructions consistent by proposing updates to AGENTS.md when a user corrects the coding agent or asks to change AGENTS.md, CLAUDE.md, .claude/CLAUDE.md, or GEMINI.md.
+description: Proposes updates to AGENTS.md so repo-local coding-agent instructions stay accurate, non-contradictory, and consolidated. Use when the user corrects the agent (e.g. do not do X, always do Y, from now on, remember this), asks to edit or sync AGENTS.md, CLAUDE.md, .claude/CLAUDE.md, or GEMINI.md, wants one canonical instruction file or to deduplicate agent docs, or flags conflicting or outdated repository agent rules.
 license: MIT
 ---
 
@@ -12,9 +12,9 @@ This skill helps keep repository instructions accurate and consistent. When a us
 
 Use this skill anytime the user:
 
-- Corrects the agent ("don't do X", "do Y instead", "from now on...").
-- Asks to update instruction files like `AGENTS.md`, `CLAUDE.md`, `.claude/CLAUDE.md`, or `GEMINI.md`.
-- Notices contradictions between instructions.
+- Corrects the agent ("don't do X", "do Y instead", "from now on...", "remember to...", "add a rule that...").
+- Asks to update instruction files like `AGENTS.md`, `CLAUDE.md`, `.claude/CLAUDE.md`, or `GEMINI.md`, or to align or consolidate those files.
+- Notices contradictions, duplication, or drift between repository instruction files.
 
 ## Requirements
 
