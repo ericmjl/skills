@@ -92,6 +92,71 @@ resource "aws_security_group_rule" "example" {
 | Error responses include stack traces | Information disclosure | API8 |
 | Deprecated API versions still routable | Exploiting old vulns | API9 |
 
+## SSRF (Server-Side Request Forgery) — Deep Coverage
+
+SSRF is API7 in OWASP API Security Top 10. In cloud environments the full kill chain is:
+
+> User-controlled URL → server fetches it → reaches cloud metadata endpoint → returns IAM credentials
+
+### SSRF Kill Chain
+
+```
+1. Attacker supplies URL: http://169.254.169.254/latest/meta-data/iam/security-credentials/role-name
+2. Server blindly fetches the URL (requests.get(url), urllib.request.urlopen(url), etc.)
+3. Cloud IMDS (Instance Metadata Service) returns temporary AWS/GCP/Azure credentials
+4. Attacker uses credentials to exfiltrate data, pivot to other services, or achieve RCE
+```
+
+Cloud metadata endpoints to block/detect:
+- AWS: `169.254.169.254`, `fd00:ec2::254`, `169.254.170.2` (ECS task metadata)
+- GCP: `metadata.google.internal`, `169.254.169.254`
+- Azure: `169.254.169.254`, `fd00:ec2::254`
+
+### SSRF Grep Patterns
+
+| Pattern | Risk |
+|---------|------|
+| `requests\.get\(.*request\.(GET\|POST\|args\|form\|json)` | Python SSRF — user URL passed to requests |
+| `urllib\.request\.urlopen\(.*request` | Python SSRF — urllib with user input |
+| `axios\.get\(.*req\.(query\|body\|params)` | Node.js SSRF — axios with user input |
+| `fetch\(.*req\.(query\|body\|params)` | Node.js SSRF — fetch with user input |
+| `HttpClient.*new URL\(.*getParam` | Java SSRF — HttpClient with user URL |
+| `169\.254\.169\.254` | Direct IMDS reference in code or configs |
+| `metadata\.google\.internal` | GCP metadata endpoint reference |
+| `http\.Get\(.*r\.(URL\|FormValue\|Query)` | Go SSRF — http.Get with user input |
+
+### SSRF Prevention
+
+```python
+from urllib.parse import urlparse
+import ipaddress
+
+ALLOWED_SCHEMES = {"https"}
+BLOCKLISTED_HOSTS = {
+    "169.254.169.254",   # AWS/GCP/Azure IMDS
+    "metadata.google.internal",
+    "169.254.170.2",     # ECS task metadata
+}
+
+def is_safe_url(url: str) -> bool:
+    parsed = urlparse(url)
+    if parsed.scheme not in ALLOWED_SCHEMES:
+        return False
+    host = parsed.hostname or ""
+    if host in BLOCKLISTED_HOSTS:
+        return False
+    # Block private/loopback ranges
+    try:
+        addr = ipaddress.ip_address(host)
+        if addr.is_private or addr.is_loopback or addr.is_link_local:
+            return False
+    except ValueError:
+        pass  # hostname, not IP — resolve and re-check in production
+    return True
+```
+
+Also consider: enforce `IMDSv2` (AWS) to require PUT token before metadata access; use VPC endpoint policies to block outbound to IMDS from application subnets.
+
 ## CWE Reference
 
 ### Configuration
@@ -115,7 +180,8 @@ resource "aws_security_group_rule" "example" {
 
 ## References
 
-- OWASP Top 10 A05:2021 Security Misconfiguration: https://owasp.org/Top10/2021/A05_2021-Security_Misconfiguration/
+- OWASP Top 10 A02:2025 Security Misconfiguration: https://owasp.org/Top10/2025/en/A02_2025-Security_Misconfiguration/
+- OWASP Top 10 A05:2021 Security Misconfiguration (archived): https://owasp.org/Top10/2021/A05_2021-Security_Misconfiguration/
 - OWASP API Security Top 10 (2023): https://owasp.org/API-Security/editions/2023/en/0x11-t10/
 - OWASP REST Security Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html
 - OWASP Mass Assignment Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html

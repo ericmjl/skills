@@ -145,7 +145,8 @@ token = uuid.uuid1()  # FLAGGED: time+MAC based, predictable
 
 ## References
 
-- OWASP Top 10 A02:2021 Cryptographic Failures: https://owasp.org/Top10/A02_2021-Cryptographic_Failures/
+- OWASP Top 10 A04:2025 Cryptographic Failures: https://owasp.org/Top10/2025/en/A04_2025-Cryptographic_Failures/
+- OWASP Top 10 A02:2021 Cryptographic Failures (archived): https://owasp.org/Top10/2021/A02_2021-Cryptographic_Failures/
 - OWASP Cryptographic Storage Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html
 - OWASP Password Storage Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
 - OWASP Transport Layer Security Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Security_Cheat_Sheet.html

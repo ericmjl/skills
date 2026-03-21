@@ -182,6 +182,8 @@ if (fd >= 0) {
 - OWASP Error Handling Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html
 - OWASP Logging Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html
 - OWASP Logging Vocabulary Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Application_Logging_Vocabulary_Cheat_Sheet.html
-- OWASP Top 10 A09:2021 Security Logging and Monitoring Failures: https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/
+- OWASP Top 10 A09:2025 Security Logging and Alerting Failures: https://owasp.org/Top10/2025/en/A09_2025-Security_Logging_and_Alerting_Failures/
+- OWASP Top 10 A09:2021 Security Logging and Monitoring Failures (archived): https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/
+- OWASP Top 10 A10:2025 Mishandling of Exceptional Conditions: https://owasp.org/Top10/2025/en/A10_2025-Mishandling_of_Exceptional_Conditions/
 - NIST SP 800-92 Log Management Guide: https://csrc.nist.gov/publications/nistpubs/800-92/SP800-92.pdf
 - RFC 7807 Problem Details for HTTP APIs: https://www.rfc-editor.org/rfc/rfc7807

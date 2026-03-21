@@ -104,4 +104,5 @@
 - OWASP XSS Prevention: https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
 - OWASP OS Command Injection Defense: https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html
 - OWASP Deserialization Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html
-- OWASP Top 10 A03:2021 Injection: https://owasp.org/Top10/A03_2021-Injection/
+- OWASP Top 10 A05:2025 Injection: https://owasp.org/Top10/2025/en/A05_2025-Injection/
+- OWASP Top 10 A03:2021 Injection (archived): https://owasp.org/Top10/2021/A03_2021-Injection/

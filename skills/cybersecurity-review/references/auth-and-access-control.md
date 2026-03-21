@@ -143,7 +143,9 @@ response['Access-Control-Allow-Credentials'] = 'true'
 - OWASP Authentication Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
 - OWASP Authorization Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html
 - OWASP Session Management Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
-- OWASP Top 10 A01:2021 Broken Access Control: https://owasp.org/Top10/2021/A01_2021-Broken_Access_Control/
-- OWASP Top 10 A07:2021 Identification & Auth Failures: https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/
+- OWASP Top 10 A01:2025 Broken Access Control: https://owasp.org/Top10/2025/en/A01_2025-Broken_Access_Control/
+- OWASP Top 10 A07:2025 Authentication Failures: https://owasp.org/Top10/2025/en/A07_2025-Authentication_Failures/
+- OWASP Top 10 A01:2021 Broken Access Control (archived): https://owasp.org/Top10/2021/A01_2021-Broken_Access_Control/
+- OWASP Top 10 A07:2021 Identification & Auth Failures (archived): https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/
 - OWASP Password Storage Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
 - NIST SP 800-63B Digital Identity Guidelines: https://pages.nist.gov/800-63-4/sp800-63b.html
