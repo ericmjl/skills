@@ -132,7 +132,8 @@ def main():
             )
             sys.exit(1)
         url = sys.argv[2]
-        metadata = get_metadata(url)
+        video_id = extract_video_id(url)
+        metadata = get_metadata(video_id)
         print(json.dumps(metadata, indent=2))
     else:
         url = sys.argv[1]
