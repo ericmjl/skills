@@ -52,7 +52,6 @@ High-level system architecture.
 # Shopping App - High-Level Design
 
 **Created**: 2025-01-15
-**Status**: Approved
 
 ## Problem Statement
 
