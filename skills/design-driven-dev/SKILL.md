@@ -1,6 +1,6 @@
 ---
 name: design-driven-dev
-description: Guide for design-driven development with prescribed folder structure. New features use full workflow (HLD → LLD → EARS → Plan). Bug fixes skip doc creation but verify intent coherence.
+description: Guide for design-driven development with prescribed folder structure. New features use full workflow (HLD → LLD → EARS). Bug fixes skip doc creation but verify intent coherence.
 ---
 
 # Design-Driven Development
@@ -60,7 +60,6 @@ docs/
 1. **High-Level Design (HLD)** - Project vision and architecture → `DOCS_DIR/high-level-design.md`
 2. **Low-Level Design (LLD)** - Feature-specific technical design → `DOCS_DIR/designs/<feature>/LLD.md`
 3. **EARS Specifications** - Sub-feature requirements → `DOCS_DIR/designs/<feature>/<subfeature>-EARS.md`
-4. **Implementation Plan** - Execution phases with checkboxes
 
 See [hld-template.md](references/hld-template.md) for HLD structure guidance.
 
@@ -145,20 +144,6 @@ Generate requirements using EARS (Easy Approach to Requirements Syntax). Create 
 See [ears-syntax.md](references/ears-syntax.md) for full EARS syntax, semantic ID format, and scope disambiguation guidance.
 
 **Stop and get user approval before proceeding.**
-
-## Phase 4: Implementation Plan
-
-**File:** `DOCS_DIR/planning/<feature>-implementation-plan.<date>.md`
-
-Create execution plan with:
-- Phases with clear deliverables
-- Checkboxes for tracking progress
-- Spec ID references tying to EARS requirements
-- Definition of Done with verification criteria
-
-Move completed plans to `DOCS_DIR/planning/old/` when finished.
-
-See [plan-template.md](references/plan-template.md) for structure guidance.
 
 ## Cross-Document Linking Rules
 
