@@ -6,6 +6,46 @@ High-Level Designs (HLDs) document the project vision, architecture, and key dec
 
 `DOCS_DIR/high-level-design.md`
 
+## Standard Structure
+
+```markdown
+# [Project Name] - High-Level Design
+
+**Created**: YYYY-MM-DD
+
+## Problem Statement
+
+What problem are we solving? Why does this project exist?
+
+## Goals
+
+1. **[Goal 1]** - Brief description
+2. **[Goal 2]** - Brief description
+
+## Non-Goals
+
+What is explicitly **NOT** in scope?
+
+## Target Users
+
+Who is this for?
+
+## Architecture Overview
+
+High-level system architecture.
+
+## Key Design Decisions
+
+### Decision 1: [Title]
+
+**Choice**: [What was chosen]
+**Rationale**: Why this choice was made
+
+## Related Designs
+
+- [Feature LLD](../designs/feature/LLD.md)
+```
+
 ## Example: Complete HLD
 
 ```markdown

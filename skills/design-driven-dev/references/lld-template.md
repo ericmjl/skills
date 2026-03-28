@@ -6,6 +6,52 @@ Low-Level Designs (LLDs) document feature-specific technical decisions. There is
 
 `DOCS_DIR/designs/<feature-name>/LLD.md`
 
+## Standard Structure
+
+```markdown
+# [Feature Name] - Low-Level Design
+
+**Created**: YYYY-MM-DD
+**HLD Link**: ../../high-level-design.md
+
+## Overview
+
+Brief description of this feature and its role.
+
+## Data Models
+
+### [Model Name]
+
+| Field | Type | Description |
+|-------|------|-------------|
+| field1 | String | Description |
+
+## API Contracts
+
+| Endpoint | Method | Request | Response |
+|----------|--------|---------|----------|
+| /api/feature | GET | - | FeatureResponse |
+
+## Error Handling
+
+| Code | Condition | Message |
+|------|-----------|---------|
+| 400 | Invalid input | "Error" |
+
+## Edge Cases
+
+- **Edge case 1**: How handled
+
+## Dependencies
+
+- Service: Purpose
+
+## Related Documents
+
+- [High-Level Design](../../high-level-design.md)
+- [Sub-feature EARS](./subfeature-EARS.md)
+```
+
 ## When to Use Narrative vs. Structured Format
 
 ### Use Narrative Format For:
