@@ -132,7 +132,6 @@ transactions to ensure atomic updates across Orders, Inventory, and Shipping.
 # Authentication - Low-Level Design
 
 **Created**: 2025-01-16
-**Status**: Approved
 **HLD Link**: ../../high-level-design.md
 
 ## Overview
