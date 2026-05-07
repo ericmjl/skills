@@ -2,6 +2,14 @@
 
 This reference summarizes Slack CLI help and command-reference documentation to speed up command selection.
 
+## Source-of-truth order
+
+1. Installed CLI `--help` output (runtime truth for the current machine)
+2. Official Slack CLI docs (latest documented behavior)
+3. This skill reference (maintained summary)
+
+When they disagree, report the mismatch and adapt recommendations accordingly.
+
 ## Base command shape
 
 ```bash
@@ -12,8 +20,11 @@ slack <command> <subcommand> [flags]
 
 ```bash
 slack help
-slack <subcommand> --help
+slack SUBCOMMAND --help
+slack SUBCOMMAND SUBCOMMAND --help
 ```
+
+Use this as a progressive drill-down pattern: broad command list first, then subcommand-specific options.
 
 ## Core global flags
 
@@ -74,3 +85,29 @@ Before any state-changing command, confirm:
 1. Correct target app (`--app`) and workspace (`--team`).
 2. Whether action is reversible.
 3. Whether user asked for help-only exploration.
+
+## Version checks and upgrade guidance
+
+- Validate installed version with:
+
+```bash
+slack version
+```
+
+- If local CLI appears older than docs or missing documented flags/subcommands:
+  - recommend local Slack CLI upgrade
+  - re-run help discovery after upgrade
+  - refresh this skill if command behavior changed
+
+## Skill maintenance checklist
+
+Update this skill when any of the following is observed:
+
+- A command/flag in docs does not exist in local help output
+- A command/flag in local help is missing from this reference
+- Command syntax changes (new required args, renamed subcommands, deprecated flags)
+
+When updating, modify both:
+
+- `skills/slack-cli/SKILL.md` (workflow and trigger guidance)
+- `skills/slack-cli/references/command-map.md` (concise command summary)
