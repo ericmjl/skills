@@ -1,6 +1,6 @@
 ---
 name: gh-cli
-description: Use GitHub CLI (gh) for common operations like creating PRs, viewing GitHub Actions logs, managing issues, reviewing PRs, and more. Use this when you need to interact with GitHub repositories directly from the command line.
+description: Use GitHub CLI (gh) for common operations like creating PRs, viewing GitHub Actions logs, managing issues, reviewing PRs, and more. When merging PRs via gh, prefer rebase merge over squash or merge commits unless repo policy or the user explicitly requests otherwise.
 license: MIT
 ---
 
@@ -14,6 +14,10 @@ This skill provides quick access to common GitHub CLI operations for managing re
 - Run `gh auth login` if not already authenticated
 
 ## Common operations
+
+### Merge policy (PRs)
+
+When merging with `gh pr merge`, **prefer rebase merge** (`--rebase`): it reapplies the PR commits on top of the base branch for a linear history. **Do not** default to squash (`--squash`) or a merge commit (`--merge` / plain merge) unless the user or repo policy explicitly asks for that style.
 
 ### Pull requests
 
@@ -70,19 +74,19 @@ gh pr review 123 --request-changes --body "Please fix the typo"
 gh pr review 123 --comment --body "Looks good overall"
 ```
 
-**Merge a PR**:
+**Merge a PR** (default to rebase; see [Merge policy](#merge-policy-prs)):
 ```bash
-# Merge with merge commit
-gh pr merge 123
-
-# Squash and merge
-gh pr merge 123 --squash
-
-# Rebase and merge
+# Preferred: rebase and merge (linear history)
 gh pr merge 123 --rebase
 
-# Auto-merge when checks pass
-gh pr merge 123 --auto --squash
+# Auto-merge when checks pass (still use rebase)
+gh pr merge 123 --auto --rebase
+
+# Only when explicitly desired: merge commit
+gh pr merge 123 --merge
+
+# Only when explicitly desired: squash and merge
+gh pr merge 123 --squash
 ```
 
 ### GitHub Actions
