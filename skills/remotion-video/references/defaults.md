@@ -125,3 +125,17 @@ For final render:
 ```bash
 npx remotion render <composition-id> out/video.mp4
 ```
+
+For transparent overlay (lower thirds, overlays):
+
+```bash
+npx remotion render <composition-id> out/overlay.webm --transparent
+```
+
+## Git Workflow
+
+Use git commits as "saves" between builds — similar to autosave in traditional video editors. Commit after each working scene or major change. This lets the user revert to any earlier version.
+
+```
+git add -A && git commit -m "feat: scene 3 animation complete"
+```

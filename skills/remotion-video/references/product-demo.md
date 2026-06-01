@@ -6,11 +6,17 @@ Create a product demo and launch video from any product URL. Scrape real brandin
 
 User provides a product URL (e.g., `https://your-product-url.com`).
 
+**Variant — multi-product catalog**: If the user provides a catalog/store page with multiple products, see [Multi-Product Mode](#multi-product-mode) below.
+
+## Prerequisites
+
+- **Playwright MCP** for web scraping — see [integrations.md](integrations.md) for setup
+
 ## Workflow
 
 ### Step 1: Research & Asset Download
 
-Visit the URL. Extract:
+Use Playwright MCP to visit the URL. Extract:
 
 - **Product name and logo** — download logo/favicon to `public/`
 - **Brand colors** — pull from the site's CSS or visible design
@@ -85,3 +91,19 @@ Use dark theme from `defaults.md`, but adapt accent colors to match the product'
 
 - Remotion composition at 1080x1920, 30fps
 - Launch `npx remotion studio` for preview
+
+## Multi-Product Mode
+
+When the user provides a catalog or store page (e.g., a product listing page with multiple items), generate a separate Remotion composition for each product instead of one combined video.
+
+**Pattern**:
+1. Use Playwright MCP to scrape all product cards on the page
+2. For each product, extract: name, price, key specs, image URL, screenshot of product card
+3. Store as an array of product data objects
+4. Create one shared `ProductCard` React component that accepts product props (name, price, image, specs)
+5. Create one Remotion composition per product, each using the shared component
+6. Each composition appears as a separate entry in Remotion Studio
+
+**When to use**: The user says "create a video for each product" or provides a page with 3+ products.
+
+**Key insight**: Build a reusable template component first, then instantiate it. This avoids duplicating scene code across compositions.
