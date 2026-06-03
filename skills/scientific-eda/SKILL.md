@@ -75,6 +75,15 @@ The `lab_notebook.md` is a **co-authored document** — the user and the agent b
 5. **Data shape**: after loading or inspecting data, the agent records columns (and types if relevant), row count, and structure in the Methods section. Do this as soon as shape is known and after any major data step.
 6. Use **timestamps** per entry (e.g. `YYYY-MM-DD`).
 
+**Update triggers (when to write to `lab_notebook.md`):**
+
+The lab notebook must serve as a **resumption artifact** — any agent or human should be able to pick up the analysis from `lab_notebook.md` alone. Update it at these points:
+
+1. **After Phase 1 (plan established):** Write Goals, Background, and an initial Methods outline/plan before touching data.
+2. **After every new finding:** Append to Results with the plot reference and interpretation immediately after generating a plot or summary.
+3. **After any dead end or direction change:** Record what was tried, why it didn't work, and the new direction in Methods.
+4. **At natural pauses or before session ends:** Append a "Next steps" note to Methods describing what should be done next, so another agent or future session can resume without loss of context.
+
 ### Phase 4: Understand shape, then one first step
 
 - **Shape of the data**: Before proposing or making plots, ensure the agent (and user) knows: what columns/fields exist, how many rows/records, and any critical structure. Record this in `lab_notebook.md`.
@@ -107,8 +116,10 @@ The analysis folder supports multiple notebook formats at its root:
 
 When the user conducts EDA in a **marimo notebook** (`.py` file), it lives at the analysis folder root. Follow the same phases above (context first, one step, lab notebook, ask why). In addition:
 
-- **Cell ordering**: The **first cell** contains all package imports. The **second cell** (after the analysis goal markdown) defines all paths and key variables.
-- **Markdown before and after code**: For each code cell, add **markdown cells before and after** that explain what the code does and what the results mean. The markdown before sets up intent; the markdown after summarizes or interprets the output.
+- **Cell ordering**: The **first cell** contains all package imports. The **second cell** (after the analysis goal markdown) defines all paths and key variables — **including all plot output paths** so they are visible and editable at the top.
+- **No variable reassignment**: Marimo does not allow reassignment across cells. Wrap logic in functions within the cell. Do **not** use underscore-prefixed variables (e.g., `_df`) as a workaround.
+- **Plots: save and display**: Every plot must (1) save to WebP in `plots/` and (2) return the figure object from the cell for inline display. Plot paths are defined in the paths cell, not inline.
+- **Markdown before and after code**: For each code cell, add **markdown cells before and after** that explain what the code does and what the results mean.
 
 See [references/marimo-notebook-eda.md](references/marimo-notebook-eda.md) for the canonical convention.
 
@@ -133,6 +144,6 @@ When the agent has additional clarifying or follow-up questions during an analys
 5. **Scripts via uv run** – No ad-hoc Python; run scripts with `uv run script.py`. Only add PEP723 metadata when the script needs dependencies outside the project environment.
 6. **WebP for plots** – Use WebP for matplotlib (and similar) output; do not save as PNG by default.
 7. **Suggest, don't assume** – After each action, suggest one logical next step and wait for the user to confirm or change direction.
-8. **Marimo notebooks** – When EDA is in a marimo notebook, add markdown cells before and after each code cell to explain intent and results (see [references/marimo-notebook-eda.md](references/marimo-notebook-eda.md)).
+8. **Marimo notebooks** – When EDA is in a marimo notebook, add markdown cells before and after each code cell to explain intent and results. Never use underscore-prefixed variables to work around reassignment restrictions — use functions instead. All plot paths go in the paths cell at the top (see [references/marimo-notebook-eda.md](references/marimo-notebook-eda.md)).
 9. **Rmarkdown notebooks** – When EDA is in an Rmarkdown notebook, state Goal and Background at the top; reference findings in the lab notebook.
 10. **Notebooks at root, scripts in `scripts/`** – Notebooks are primary analytical artifacts and live at the analysis folder root. Disposable scripts go in `scripts/`.

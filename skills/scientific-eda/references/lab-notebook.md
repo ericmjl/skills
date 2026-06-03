@@ -52,6 +52,15 @@ Key takeaways from the analysis. Written by the user, optionally drafted by the 
 5. **Data shape**: after loading or inspecting data, the agent records columns (and types if relevant), row count, and structure in the Methods section.
 6. **Timestamps**: use `YYYY-MM-DD` per entry.
 
+## Update triggers
+
+The lab notebook must serve as a **resumption artifact** — any agent or human should be able to pick up the analysis from `lab_notebook.md` alone. Write to it at these specific points:
+
+1. **After plan is established (before touching data):** Write Goals, Background, and an initial Methods outline/plan.
+2. **After every new finding:** Append to Results with the plot reference and interpretation immediately after generating a plot or summary.
+3. **After any dead end or direction change:** Record what was tried, why it didn't work, and the new direction in Methods.
+4. **At natural pauses or before session ends:** Append a "Next steps" note to Methods describing what should be done next, so another agent or future session can resume without loss of context.
+
 ## Example skeleton
 
 ```markdown
