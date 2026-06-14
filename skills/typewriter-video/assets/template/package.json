@@ -8,7 +8,7 @@
     "still": "remotion still Typewriter --frame=0 --output=out/still.png"
   },
   "dependencies": {
-    "@remotion/cli": "^4.0.428",
+    "@remotion/cli": "^4.0.477",
     "@remotion/fonts": "^4.0.428",
     "@remotion/google-fonts": "^4.0.428",
     "react": "^19.2.4",
