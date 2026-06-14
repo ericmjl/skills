@@ -1,0 +1,24 @@
+{
+  "name": "typewriter-video",
+  "version": "1.0.0",
+  "description": "VS Code-style typewriter animation video — built on Remotion",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render Typewriter out/typewriter.mp4",
+    "still": "remotion still Typewriter --frame=0 --output=out/still.png"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.428",
+    "@remotion/fonts": "^4.0.428",
+    "@remotion/google-fonts": "^4.0.428",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.428",
+    "roughjs": "^4.6.6"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3"
+  }
+}

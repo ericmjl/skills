@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Remotion outputs
+out/
+
+# Rendered videos
+*.mp4
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
