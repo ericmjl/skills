@@ -7,10 +7,10 @@ description: >
   "create a competition submission," or pair-program an interactive research
   explainer on molab. Covers: what makes a notebook engaging (intuition game,
   real experiment, novel extension, design system), paper selection, narrative
-  arc and proportions, custom anywidget patterns, wigglystuff CellTour, GPU as
-  measurement instrument, memory-efficient training (fused STE, gradient
-  checkpointing), parallel review subagents, walkthrough video scripts, and a
-  pre-publication polish checklist. CRITICAL: mo is auto-injected (import in
+  arc and proportions, custom anywidget patterns, wigglystuff CellTour,
+  effective GPU usage, memory-efficient training (fused STE, gradient
+  checkpointing), parallel review subagents, and a pre-publication polish
+  checklist. CRITICAL: mo is auto-injected (import in
   ONE cell); every top-level name must be unique across ALL cells; custom
   anywidget needs model.save_changes(); use mo.output.replace() for live charts;
   guard all torch.cuda calls for CPU-only machines.
@@ -253,11 +253,11 @@ Always guard `torch.cuda.*` calls with `DEVICE.type == "cuda"` — readers may
 open the notebook on CPU-only machines, and an unguarded `get_device_name(0)`
 crashes mid-narrative.
 
-### GPU as measurement instrument
+### Using GPU compute effectively
 
-The most compelling GPU angle: load a real pretrained model and *empirically
-measure* the paper's core claim on its internals (activation distributions,
-throughput, FLOPs, memory). Don't just train — *instrument*. Present as:
+Go beyond "I trained on GPU." The most compelling angle: load a real
+pretrained model and *empirically measure* the paper's core claim on its
+internals — activation distributions, throughput, FLOPs, memory. Present as:
 "The paper predicted this. Here it is, measured."
 
 Other strong GPU moves:
@@ -347,31 +347,7 @@ They report findings; you consolidate and apply fixes.
 
 ---
 
-## Phase 7: Walkthrough video
-
-A short walkthrough video dramatically increases a notebook's reach. Structure
-the script around the CellTour stops — the tour provides visual structure, the
-narration provides depth.
-
-**Voice:**
-- Curiosity-driven ("I was curious about...") but vary openers (2-3 uses max).
-- **Claim extensions explicitly**: "My first extension," not "I stumbled into."
-- **Perform the interactions**: "Click a precision — watch the histogram
-  collapse, accuracy crater, then snap back."
-- **Mention the GPU** if the notebook uses one — readers want to know real
-  compute happened.
-- **Mention the tools** that made it possible (marimo, molab) — it helps the
-  ecosystem and signals craft.
-
-**Length:** ~500-550 words for ~5 minutes (~110 wpm). Shorter is better.
-
-For detailed analysis of effective walkthrough video patterns (openers,
-demo techniques, closing lines), see
-[references/walkthrough-video-patterns.md](references/walkthrough-video-patterns.md).
-
----
-
-## Phase 8: Polish
+## Phase 7: Polish
 
 ### Pre-publication checklist
 
@@ -384,7 +360,6 @@ demo techniques, closing lines), see
 - [ ] **LaTeX renders** — use raw strings; check `\text`, `\times`.
 - [ ] **CPU guards** on all `torch.cuda.*` calls.
 - [ ] **VRAM note** — if a cell needs >40 GB, note it + add graceful skip.
-- [ ] **Walkthrough video** — CellTour-aligned, curiosity-driven, ~5 min.
 - [ ] **AI disclosure** — note in the close cell if AI tools were used.
 
 ### Biggest engagement-killers
