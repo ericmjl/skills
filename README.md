@@ -17,6 +17,12 @@ Each skill lives in its own directory under `skills/` with:
 
 ## Available skills
 
+### awesome-marimo-notebook
+
+Location: `skills/awesome-marimo-notebook/`
+
+Build an awesome marimo notebook that brings a research paper or dataset to life — for competitions, tutorials, demos, or blog companions. Covers narrative arc, custom anywidget patterns, wigglystuff CellTour, GPU as measurement instrument, memory-efficient training, parallel review subagents, and walkthrough video scripts.
+
 ### gh-daily-timeline
 
 Location: `skills/gh-daily-timeline/`
