@@ -44,6 +44,23 @@ Match the level of specificity to the task's fragility and variability:
 
 Think of Claude as exploring a path: a narrow bridge with cliffs needs specific guardrails (low freedom), while an open field allows many routes (high freedom).
 
+### Strip derivation fingerprints when generalizing from specific exemplars
+
+When a skill is derived from studying a specific source — a competition's winners, a tutorial, a particular project's conventions — and is intended to be **general-purpose**, critically assess whether it is over-indexed on that source, then strip the fingerprints that betray its origin. A general skill that still reads as "the competition skill" or "the X-project skill" is under-generalized.
+
+Self-check before publishing: would a reader with no knowledge of the source context find the framing universal, or immediately infer where it came from? If the latter, generalize.
+
+Fingerprints to remove or reframe in source-neutral terms:
+
+- "winning formula", "round-1 winners", 1st/2nd/3rd rankings → reframe as craft principles
+- judge/judging language ("judges can only score…", "DISQUALIFIED") → reframe as a quality bar
+- the source's specific rubric with its weights → drop, or reframe as a general quality checklist
+- "competition differentiator" → reframe as a tool and when it matters
+- reference files named after the source's artifacts (e.g. "Winning Video Patterns") → rename generically
+- submission-specific requirements (e.g. `auto_download=['html']`) → drop unless universally relevant
+
+Keep the underlying principles; strip the derivation. The user values honest critical assessment of over-indexing over cheerleading — proactively flag when a skill is over-fit to its source. Distinct from deciding WHERE a skill lives (public vs private repo); this governs CONTENT de-identification of a genuinely-general skill.
+
 ### Anatomy of a Skill
 
 Every skill consists of a required SKILL.md file and optional bundled resources.
