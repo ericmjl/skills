@@ -217,6 +217,61 @@ The `steps` list accepts either `{"cell": <int-index>, ...}` or
 Verify all references resolve to existing cells — stale refs silently break
 the tour.
 
+#### Code tour description voice
+
+The tour is an **onboarding tool** — the first thing a reader sees when they
+open a notebook. Write descriptions that orient, not summarize. The test:
+*if someone just opened this notebook for the first time, does this sentence
+tell them what section they're in, what their role is, and what to pay
+attention to?*
+
+Rules:
+
+1. **Label the section type.** Tell the reader what kind of cell this is:
+   "Background section," "Hands-on section," "Reflection section,"
+   "Try-it-yourself section," "Wrap-up." This helps them calibrate attention.
+2. **Point at what's on screen.** "Look at the two answers above" — not
+   "Specialization trades simplicity for focus." The reader has the output
+   right in front of them; direct their eyes.
+3. **Tell them what to do.** "Fill in blanks to connect the searcher and
+   synthesizer" — not "Implement the specialist pipeline." Use plain language
+   a first-time reader understands.
+4. **Never spoil the punchline.** Discussion and reflection cells should set
+   up a question, not hand the conclusion. "Did the extra cost buy better
+   evidence?" — not "Specialization improves quality at higher cost."
+5. **One to two sentences max.** The tour widget has limited space. If you
+   can't say it in two sentences, the cell's markdown should carry the
+   detail.
+6. **Reference the arc.** Connect back to earlier context: "the
+   `search_corpus` tool from Part 3," "the same question from Exercise 4."
+   This anchors the notebook in its narrative.
+
+Example (good):
+
+```python
+{
+    "cell_name": "ex1_header",
+    "title": "Exercise 1: wire the specialists",
+    "description": "Hands-on section. You fill in blanks to connect two "
+        "specialized agents — one that searches, one that synthesizes — "
+        "into a single pipeline. The pieces are from Part 5.",
+}
+```
+
+Example (bad — don't do this):
+
+```python
+{
+    "cell_name": "ex1_header",
+    "title": "Exercise 1: wire the specialists",
+    "description": "Implement run_specialist_pipeline — wire SearcherAgent "
+        "and SynthesizerAgent into a ResearchOrchestrator.",
+}
+```
+
+The bad version drops raw class names the reader hasn't seen yet, doesn't
+label the section type, and reads like a docstring instead of a guide.
+
 ### Live-updating charts
 
 ```python
@@ -381,3 +436,28 @@ This skill assumes:
   (CellTour — install via `ctx.packages.add("wigglystuff")`), `plotly`
   (charts), `torch` (GPU experiments), `transformers` (language model
   experiments)
+
+## celltour-granularity
+
+- CellTour GRANULARITY: target **~7-12 stops at "main beats" granularity** — NOT
+  15-25 (that range was tried and rejected as "going too overboard"). The
+  evolution on Network-Analysis-Made-Simple (07-12): 6 steps → too few ("the
+  tour should follow the story of the notebook"); 23 steps → too many ("now
+  that's going too overboard. we want main points, coherent narrative flipping
+  through stops"); 9-12 stops → "ok, great, this granularity is much better."
+  Each stop is a MAIN NARRATIVE BEAT (hero, dataset intro, core concept, key
+  exercise, generalization, distribution/viz, key insight, optional extension,
+  recap), never a micro-step.
+
+- CellTour AUTHORING RULES (from Network-Analysis-Made-Simple 07-12): (1) Cell 0
+  is ALWAYS the hero (first stop); (2) Cell 1 is ALWAYS the CellTour itself
+  (SKIP it — never reference it as a tour stop); (3) Target markdown section
+  headers, key code cells, exercises, and interactive widgets; (4) Each
+  description = ONE sentence about what the reader should learn at that stop;
+  (5) Steps follow the notebook's reading order, not jumping around.
+
+- CellTour VERIFICATION: after writing steps, dump each cell index + first
+  meaningful line (a script counting `@app.cell` decorators from 0) to confirm
+  every cell index matches its title/description. When asked to populate
+  CellTours across a series of notebooks, apply these rules consistently to ALL
+  notebooks in the series.

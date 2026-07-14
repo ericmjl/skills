@@ -1,6 +1,6 @@
 ---
 name: gh-cli
-description: Use GitHub CLI (gh) for common operations like creating PRs, viewing GitHub Actions logs, managing issues, reviewing PRs, and more. When merging PRs via gh, prefer rebase merge over squash or merge commits unless repo policy or the user explicitly requests otherwise.
+description: Use GitHub CLI (gh) for common operations like creating PRs, viewing GitHub Actions logs, managing issues, reviewing PRs, and more. Use this when you need to interact with GitHub repositories directly from the command line.
 license: MIT
 ---
 
@@ -14,10 +14,6 @@ This skill provides quick access to common GitHub CLI operations for managing re
 - Run `gh auth login` if not already authenticated
 
 ## Common operations
-
-### Merge policy (PRs)
-
-When merging with `gh pr merge`, **prefer rebase merge** (`--rebase`): it reapplies the PR commits on top of the base branch for a linear history. **Do not** default to squash (`--squash`) or a merge commit (`--merge` / plain merge) unless the user or repo policy explicitly asks for that style.
 
 ### Pull requests
 
@@ -35,6 +31,28 @@ gh pr create --fill
 ```bash
 gh pr create --draft --title "WIP: Feature X"
 ```
+
+
+
+**Create a PR with a rich markdown body (shell-escaping workaround)**:
+PR bodies with backticks, parentheses (), dollar signs, or other shell-special
+characters fail when passed inline via `--body "..."` because zsh/bash
+interprets them. This is the most common failure when creating PRs with code
+blocks, markdown links like `[text](url)`, or any non-trivial formatting.
+
+Use `--body-file` instead — write the body to a temp file first:
+```bash
+cat > /tmp/pr-body.md <<'EOF'
+## Summary
+Rich markdown with `backticks` and [links](https://example.com) here.
+EOF
+gh pr create --title "Title" --body-file /tmp/pr-body.md
+```
+
+The `--body-file` flag is supported by `gh pr create`, `gh pr edit`,
+`gh issue create`, `gh issue comment`, and `gh pr review`. Use it as the
+DEFAULT whenever the body is more than a simple one-liner — it avoids all
+shell-escaping surprises.
 
 **List PRs**:
 ```bash
@@ -74,19 +92,19 @@ gh pr review 123 --request-changes --body "Please fix the typo"
 gh pr review 123 --comment --body "Looks good overall"
 ```
 
-**Merge a PR** (default to rebase; see [Merge policy](#merge-policy-prs)):
+**Merge a PR**:
 ```bash
-# Preferred: rebase and merge (linear history)
+# Merge with merge commit
+gh pr merge 123
+
+# Squash and merge
+gh pr merge 123 --squash
+
+# Rebase and merge
 gh pr merge 123 --rebase
 
-# Auto-merge when checks pass (still use rebase)
-gh pr merge 123 --auto --rebase
-
-# Only when explicitly desired: merge commit
-gh pr merge 123 --merge
-
-# Only when explicitly desired: squash and merge
-gh pr merge 123 --squash
+# Auto-merge when checks pass
+gh pr merge 123 --auto --squash
 ```
 
 ### GitHub Actions
