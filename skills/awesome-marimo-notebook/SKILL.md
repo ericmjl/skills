@@ -399,6 +399,17 @@ They report findings; you consolidate and apply fixes.
   become a tab.
 - **Add CPU guards** — `if DEVICE.type == "cuda"` before all `torch.cuda.*`.
 - **Verify CellTour** — all `cell_name` references resolve.
+- **Merge related visuals into one plot** — when two cells show DIFFERENT but
+  related aspects of the SAME underlying diagram (e.g. a point-marker selection
+  AND a window band on the same ruler plot, both driven by the same controls),
+  combine them into ONE cell/plot so the viewer sees the relationship. Splitting
+  related aspects across cells fragments understanding; one combined plot makes
+  the interaction cohesive. (User correction, 07-15.)
+- **Verify SVG label/axis clipping** — in hand-authored SVG (row labels, axis
+  ticks), `text-anchor="end"` labels extend LEFTWARD from the anchor and clip
+  if the left margin is narrower than the label width (`response_locked` shows
+  as `ponse_locked`); bottom axis labels need bottom padding. Always check the
+  RENDERED output for clipped text, not just the SVG source. (07-15.)
 
 ---
 
