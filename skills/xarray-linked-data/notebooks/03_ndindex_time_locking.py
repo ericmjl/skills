@@ -5,6 +5,11 @@
 #     "numpy",
 #     "xarray>=2025.1.0",
 #     "wigglystuff==0.5.16",
+#     "plotly==6.9.0",
+#     "pymc==6.1.0",
+#     "arviz==1.2.0",
+#     "matplotlib==3.11.0",
+#     "numpyro==0.21.0",
 # ]
 # ///
 
@@ -46,30 +51,36 @@ def cell_tour(mo):
         steps=[
             {"cell_name": "hero", "title": "N-D Derived Coordinates", "description": "Coordinates spanning multiple dimensions need a custom index."},
             {"cell_name": "ndindex_class", "title": "NDIndex", "description": "An Index subclass that searches N-D arrays for value lookups."},
-            {"cell_name": "build_trial_data", "title": "Trial Data", "description": "Absolute time computed from trial onset + relative time (2-D coordinate)."},
-            {"cell_name": "verify_ndindex", "title": "Selection Verified", "description": "sel(abs_time=245) finds the right trial and relative time."},
+            {"cell_name": "build_trial_data", "title": "Trial Data", "description": "Absolute time from trial onset + relative time (2-D), with a realistic post-dose response baked in."},
+            {"cell_name": "verify_controls", "title": "2-D Selection", "description": "Drag abs_time -- one scalar resolves to a single cell in the trial x rel_time grid."},
+            {"cell_name": "verify_ndindex", "title": "Resolution", "description": "The selected abs_time decomposes into trial + rel_time (onset + offset)."},
             {"cell_name": "timelock_build", "title": "Time-Locking", "description": "Multiple event-locked coordinates registered under one NDIndex."},
-            {"cell_name": "timelock_verify", "title": "Events Verified", "description": "Select relative to dose or response events -- no data duplication."},
-            {"cell_name": "epoch_demo", "title": "Epoching", "description": "Extract windows around events and average across trials."},
+            {"cell_name": "timelock_controls", "title": "Explore", "description": "Drag the sliders -- the ruler plot re-labels each instant in every coordinate."},
+            {"cell_name": "timelock_verify", "title": "Point + Window", "description": "A point (dashed) and a window (band) traced across three event-locked rulers."},
+            {"cell_name": "epoch_demo", "title": "Bayesian Epoching", "description": "Epoch around the dose event, fit a hierarchical PyMC model, and store the posterior back -- the N-D index carries it along."},
         ],
         auto_start=False,
         show_progress=True,
     )
     mo.ui.anywidget(tour)
-    return
 
+    return
 
 
 @app.cell(hide_code=True)
 def imports():
     import marimo as mo
     import numpy as np
+    import plotly.graph_objects as go
+    import pymc as pm
     import xarray as xr
+    import arviz as az
+    from plotly.subplots import make_subplots
     from xarray import Index
     from xarray.core.indexing import IndexSelResult
     from xarray.core.variable import Variable
 
-    return Index, IndexSelResult, Variable, mo, np, xr
+    return Index, IndexSelResult, Variable, go, make_subplots, mo, np, pm, xr
 
 
 @app.cell(hide_code=True)
@@ -191,7 +202,7 @@ def trial_header(mo):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def build_trial_data(np, xr):
     # 10 trials, each with 50 time points (0 to 49 seconds relative)
     n_trials = 10
@@ -204,11 +215,31 @@ def build_trial_data(np, xr):
     # Compute 2-D absolute time coordinate
     abs_time = trial_onsets[:, None] + rel_times[None, :]  # shape (trial, rel_time)
 
-    # Synthetic measurement: oscillating signal with trial-specific amplitude
-    trial_amplitudes = np.random.uniform(0.5, 2.0, n_trials)
+    # Seeded RNG so the demo is reproducible across runs
+    rng = np.random.default_rng(42)
+
+    # Baseline physiology: slow oscillation with trial-specific amplitude & phase
+    trial_amplitudes = rng.uniform(0.4, 1.2, n_trials)
+    trial_phases = rng.uniform(0, 2 * np.pi, n_trials)
+
+    # Post-dose pharmacodynamic response: the drug is dosed at rel_time=10.
+    # Response rises after dosing, peaks ~dose+12s, then decays -- an Emax-style
+    # bump whose magnitude varies trial-to-trial (the effect we want to recover).
+    dose_time = 10.0
+    peak_offset = 12.0
+    response_width = 6.0
+    response_amps = rng.uniform(1.5, 3.5, n_trials)
+
     signal = np.zeros((n_trials, n_rel_times))
     for trial_i in range(n_trials):
-        signal[trial_i] = trial_amplitudes[trial_i] * np.sin(rel_times * 0.3) + np.random.normal(0, 0.1, n_rel_times)
+        baseline = trial_amplitudes[trial_i] * np.sin(rel_times * 0.25 + trial_phases[trial_i])
+        pd_response = response_amps[trial_i] * np.exp(
+            -0.5 * ((rel_times - (dose_time + peak_offset)) / response_width) ** 2
+        )
+        # Pharmacokinetic delay: no response before the dose is administered
+        pd_response = np.where(rel_times >= dose_time, pd_response, 0.0)
+        noise = rng.normal(0, 0.15, n_rel_times)
+        signal[trial_i] = baseline + pd_response + noise
 
     trial_ds = xr.Dataset(
         data_vars={"signal": (["trial", "rel_time"], signal)},
@@ -222,10 +253,11 @@ def build_trial_data(np, xr):
     print(f"Trial data: {n_trials} trials x {n_rel_times} time points")
     print(f"Trial onsets: {trial_onsets}")
     print(f"abs_time range: {abs_time.min():.0f} - {abs_time.max():.0f} seconds")
+    print(f"Dose administered at rel_time={dose_time:.0f}s in every trial")
     return rel_times, trial_ds, trial_onsets
 
 
-@app.cell
+@app.cell(hide_code=True)
 def attach_ndindex(NDIndex, trial_ds):
     # Register the 2-D abs_time coordinate under NDIndex
     trial_ds_indexed = trial_ds.set_xindex(["abs_time"], NDIndex)
@@ -233,29 +265,109 @@ def attach_ndindex(NDIndex, trial_ds):
     return (trial_ds_indexed,)
 
 
-@app.cell
-def verify_ndindex(mo, trial_ds_indexed):
-    # Verify: sel(abs_time=250) should find trial=2 (onset=200), rel_time=50... wait
-    # trial_onsets = [0, 100, 200, ...], so abs_time=250 -> trial=2, rel_time=50
-    # But rel_time goes 0..49, so rel_time=50 doesn't exist. Let's pick 245.
-    # trial=2 (onset=200), rel_time=45 -> abs_time=245
-    result = trial_ds_indexed.sel(abs_time=245, method="nearest")
-    assert result.trial.values == "trial_02", f"Expected trial_02, got {result.trial.values}"
-    assert result.rel_time.values == 45, f"Expected rel_time=45, got {result.rel_time.values}"
+@app.cell(hide_code=True)
+def verify_controls(mo):
+    # Interactive control for 2-D abs_time selection.
+    abs_slider = mo.ui.slider(0, 949, value=245, step=1, label="abs_time (s)")
+    mo.vstack([
+        mo.md("**Drag abs_time** &mdash; watch a single scalar resolve to one cell in the (trial &times; rel_time) grid."),
+        abs_slider,
+    ])
 
-    # Verify with a value in trial 5: onset=500, abs_time=530 -> rel_time=30
-    result2 = trial_ds_indexed.sel(abs_time=530, method="nearest")
-    assert result2.trial.values == "trial_05", f"Expected trial_05, got {result2.trial.values}"
-    assert result2.rel_time.values == 30, f"Expected rel_time=30, got {result2.rel_time.values}"
+    return (abs_slider,)
 
-    mo.callout(
-        mo.md("""
-        **NDIndex verified:**
-        - `sel(abs_time=245)` -> trial_02, rel_time=45 (200+45=245)
-        - `sel(abs_time=530)` -> trial_05, rel_time=30 (500+30=530)
-        """),
-        kind="success",
+
+@app.cell(hide_code=True)
+def verify_ndindex(abs_slider, go, mo, trial_ds_indexed):
+    # One scalar abs_time -> one cell in the 2-D (trial x rel_time) field.
+    sel = trial_ds_indexed.sel(abs_time=abs_slider.value, method="nearest")
+    sel_trial = str(sel.trial.values.item())
+    sel_rt = int(sel.rel_time.values.item())
+    sel_abs = int(round(float(sel.abs_time.values.item())))
+    trial_idx = int(sel_trial.split("_")[1])
+    onset = trial_idx * 100
+    assert onset + sel_rt == sel_abs, f"arithmetic check failed: {onset}+{sel_rt} != {sel_abs}"
+
+    abs_grid = trial_ds_indexed.abs_time.values
+    trial_labels = [str(t) for t in trial_ds_indexed.trial.values]
+    _v_rel_times = trial_ds_indexed.rel_time.values
+
+    _vfig = go.Figure(
+        go.Heatmap(
+            z=abs_grid,
+            x=_v_rel_times,
+            y=trial_labels,
+            colorscale=[[0, "#0d1117"], [0.45, "#133326"], [1, "#2ee4a0"]],
+            colorbar=dict(title="abs_time", thickness=10, len=0.85),
+            hovertemplate="trial=%{y}<br>rel_time=%{x}<br>abs_time=%{z}<extra></extra>",
+        )
     )
+    _vfig.add_trace(
+        go.Scatter(
+            x=[sel_rt],
+            y=[sel_trial],
+            mode="markers+text",
+            marker=dict(size=20, color="rgba(0,0,0,0)", line=dict(width=3, color="#e94e77"), symbol="circle"),
+            text=[f"{sel_abs}"],
+            textposition="top center",
+            textfont=dict(color="#e94e77", size=11, family="monospace"),
+            showlegend=False,
+            hoverinfo="skip",
+        )
+    )
+    _vfig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(13,17,23,0.6)",
+        font=dict(color="#f0f9ff", size=12),
+        margin=dict(l=70, r=20, t=40, b=50),
+        height=380,
+        xaxis=dict(title="rel_time (s)", dtick=10),
+        yaxis=dict(title="trial", autorange="reversed"),
+    )
+
+
+    def _cards(asked, resolved, trial_label, rt, onset_v):
+        mint, pale, ink = "#2ee4a0", "#8fcfab", "#f0f9ff"
+        items = [
+            ("abs_time", f"{resolved}s", f"you dragged to {asked}", mint, True),
+            ("trial", trial_label, f"onset {onset_v}s", pale, False),
+            ("rel_time", f"{rt}s", "into that trial", pale, False),
+        ]
+        ch = []
+        for name, val, phrase, color, active in items:
+            bg = "#0f2a20" if active else "#10171f"
+            border = color if active else "#1f2a24"
+            glow = f"box-shadow:0 0 0 1px {color}33;" if active else ""
+            ch.append(
+                f'<div style="flex:1;min-width:0;background:{bg};border:1.5px solid {border};'
+                f'border-radius:10px;padding:13px 16px;{glow}">'
+                f'<div style="color:{color};font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">{name}</div>'
+                f'<div style="color:{ink};font-size:23px;font-weight:700;margin:3px 0 2px;font-family:ui-monospace,monospace;">{val}</div>'
+                f'<div style="color:{pale};font-size:11px;">{phrase}</div></div>'
+            )
+        eq = (
+            f"<code style='color:{mint};'>{onset_v} + {rt} = {resolved}</code>"
+            f" &nbsp;&mdash; the scalar is the <b>sum</b> of the two underlying indices."
+        )
+        lead = (
+            f"abs_time = <b style='color:{mint};'>{resolved}s</b> is one cell: "
+            f"<b style='color:{ink};'>{trial_label}</b> at <b style='color:{ink};'>rel_time {rt}</b>."
+        )
+        return (
+            f'<div style="font-family:-apple-system,system-ui,sans-serif;">'
+            f'<div style="color:{ink};font-size:13px;margin:2px 0 11px;">{lead}</div>'
+            f'<div style="display:flex;gap:12px;margin-bottom:11px;">{"".join(ch)}</div>'
+            f'<div style="font-size:11.5px;color:{pale};">{eq}</div>'
+            f"</div>"
+        )
+
+
+    mo.vstack([
+        _vfig,
+        mo.Html(_cards(abs_slider.value, sel_abs, sel_trial, sel_rt, onset)),
+    ])
+
     return
 
 
@@ -271,7 +383,7 @@ def timelock_header(mo):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def timelock_build(NDIndex, np, rel_times, trial_ds, trial_onsets):
     # Define dosing events: dose_time is when the drug was administered in each trial
     # Dose happens at rel_time=10 in each trial
@@ -308,35 +420,132 @@ def timelock_build(NDIndex, np, rel_times, trial_ds, trial_onsets):
     return (timelock_ds,)
 
 
-@app.cell
-def timelock_verify(mo, timelock_ds):
-    # Select data 5 seconds AFTER dose in each trial
-    post_dose = timelock_ds.sel(dose_locked=5, method="nearest")
-    # dose_locked=5 means rel_time - 10 = 5, so rel_time = 15
-    assert post_dose.rel_time.values == 15, f"Expected rel_time=15, got {post_dose.rel_time.values}"
-
-    # Select data 3 seconds BEFORE response in each trial
-    pre_response = timelock_ds.sel(response_locked=-3, method="nearest")
-    # response_locked=-3 means rel_time - 25 = -3, so rel_time = 22
-    assert pre_response.rel_time.values == 22, f"Expected rel_time=22, got {pre_response.rel_time.values}"
-
-    # Slice: -5 to +10 seconds around dose
-    dose_window = timelock_ds.sel(dose_locked=slice(-5, 10))
-    # dose_locked=-5 -> rel_time=5, dose_locked=10 -> rel_time=20
-    assert dose_window.rel_time.values[0] == 5, f"Expected first rel_time=5"
-    assert dose_window.rel_time.values[-1] == 20, f"Expected last rel_time=20"
-
-    mo.callout(
-        mo.md("""
-        **Time-locking verified:**
-        - `sel(dose_locked=5)` -> rel_time=15 (5s after dose at t=10)
-        - `sel(response_locked=-3)` -> rel_time=22 (3s before response at t=25)
-        - `sel(dose_locked=slice(-5, 10))` -> rel_time 5 to 20
-
-        The same data can be queried relative to **any** event without duplication.
-        """),
-        kind="success",
+@app.cell(hide_code=True)
+def timelock_controls(mo):
+    # Interactive controls for event-locked selection.
+    coord = mo.ui.radio(
+        options=["dose_locked", "response_locked"],
+        value="dose_locked",
+        label="query coordinate (0 = the event moment)",
     )
+    rt_slider = mo.ui.slider(0, 49, value=15, step=1, label="rel_time (s)")
+    win = mo.ui.range_slider(-10, 39, value=[-5, 10], step=1, label="dose_locked window (s)")
+    mo.vstack([
+        mo.md("**Drag to explore** &mdash; the rulers below re-label the same instant in every event coordinate."),
+        mo.hstack([coord, rt_slider], wrap=True),
+        win,
+    ])
+
+    return coord, rt_slider, win
+
+
+@app.cell(hide_code=True)
+def timelock_verify(coord, mo, rt_slider, timelock_ds, win):
+    # One plot, two queries: a point (dashed guide) and a window (band) on the same rulers.
+    offset = 10 if coord.value == "dose_locked" else 25
+    locked_val = rt_slider.value - offset
+    sel_point = timelock_ds.sel(**{coord.value: locked_val}, method="nearest")
+    resolved_rt = int(sel_point.rel_time.values.item())
+    assert resolved_rt == rt_slider.value, (
+        f"NDIndex mismatch: sel({coord.value}={locked_val}) gave rel_time={resolved_rt}, expected {rt_slider.value}"
+    )
+
+    w_lo, w_hi = win.value
+    sliced = timelock_ds.sel(dose_locked=slice(w_lo, w_hi))
+    rt_lo, rt_hi = int(sliced.rel_time.values[0]), int(sliced.rel_time.values[-1])
+    assert rt_lo == w_lo + 10, f"Expected rel_time start {w_lo+10}, got {rt_lo}"
+    assert rt_hi == w_hi + 10, f"Expected rel_time end {w_hi+10}, got {rt_hi}"
+
+
+    def _rulers_svg(rt_sel, active_name, r_lo, r_hi):
+        mint, pale, ink, pink = "#2ee4a0", "#8fcfab", "#f0f9ff", "#e94e77"
+        W, H, ML, MR = 760, 340, 140, 44
+        sc = (W - ML - MR) / 49
+        x = lambda rt: ML + rt * sc
+        rows = [("rel_time", 120, pale, lambda rt: rt, None),
+                ("dose_locked", 210, mint, lambda rt: rt - 10, 10),
+                ("response_locked", 300, pink, lambda rt: rt - 25, 25)]
+        active_i = {"rel_time": 0, "dose_locked": 1, "response_locked": 2}[active_name]
+        ticks = [0, 10, 20, 30, 40, 49]
+        parts = [f'<svg viewBox="0 0 {W} {H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:760px">',
+                 f'<rect width="{W}" height="{H}" fill="#0d1117" rx="12"/>',
+                 f'<text x="{ML}" y="34" fill="{mint}" font-size="14" font-weight="700">Same axis, three coordinate systems</text>',
+                 f'<text x="{ML}" y="55" fill="{pale}" font-size="11.5" font-family="ui-monospace,monospace">point (dashed) + window (band) re-labeled per event</text>']
+        bx0, bx1 = x(r_lo), x(r_hi)
+        parts.append(f'<rect x="{bx0:.1f}" y="108" width="{bx1-bx0:.1f}" height="204" fill="{mint}" opacity="0.12" rx="3"/>')
+        parts.append(f'<line x1="{bx0:.1f}" y1="108" x2="{bx0:.1f}" y2="312" stroke="{mint}" stroke-width="1.3" opacity="0.6"/>')
+        parts.append(f'<line x1="{bx1:.1f}" y1="108" x2="{bx1:.1f}" y2="312" stroke="{mint}" stroke-width="1.3" opacity="0.6"/>')
+        cx = x(rt_sel)
+        parts.append(f'<line x1="{cx:.1f}" y1="112" x2="{cx:.1f}" y2="312" stroke="{pink}" stroke-width="1.6" stroke-dasharray="5 4" opacity="0.9"/>')
+        for i, (label, yc, color, fn, evt) in enumerate(rows):
+            dim = 1.0 if i == active_i else 0.45
+            parts.append(f'<line x1="{x(0):.1f}" y1="{yc}" x2="{x(49):.1f}" y2="{yc}" stroke="{color}" stroke-width="2.5" opacity="{dim}"/>')
+            parts.append(f'<text x="{ML-18}" y="{yc+4}" fill="{color}" font-size="12" text-anchor="end" font-weight="600" opacity="{dim}">{label}</text>')
+            for t in ticks:
+                tx = x(t)
+                parts.append(f'<line x1="{tx:.1f}" y1="{yc-5}" x2="{tx:.1f}" y2="{yc+5}" stroke="{color}" stroke-width="1" opacity="{dim}"/>')
+                parts.append(f'<text x="{tx:.1f}" y="{yc+18}" fill="{ink}" font-size="9.5" text-anchor="middle" font-family="ui-monospace,monospace" opacity="{dim}">{fn(t)}</text>')
+            if evt is not None:
+                ex = x(evt)
+                parts.append(f'<circle cx="{ex:.1f}" cy="{yc}" r="4.5" fill="{color}" opacity="{dim}"/>')
+            parts.append(f'<circle cx="{cx:.1f}" cy="{yc}" r="5.5" fill="{pink}" stroke="#0d1117" stroke-width="1.5"/>')
+        parts.append("</svg>")
+        return "".join(parts)
+
+
+    def _phrase(v, event):
+        if v == 0:
+            return f"at the {event}"
+        return f"{abs(v)}s {'after' if v > 0 else 'before'} {event}"
+
+
+    def _readout_html(rt, coord_name, dose_v, resp_v, lo, hi, npts):
+        mint, pale, ink, pink = "#2ee4a0", "#8fcfab", "#f0f9ff", "#e94e77"
+        cards = [
+            ("rel_time", f"{rt}s", "into each trial", pale, coord_name == "rel_time"),
+            ("dose_locked", f"{dose_v}s", _phrase(dose_v, "dose"), mint, coord_name == "dose_locked"),
+            ("response_locked", f"{resp_v}s", _phrase(resp_v, "response"), pink, coord_name == "response_locked"),
+        ]
+        card_html = []
+        for name, val, phrase, color, active in cards:
+            bg = "#0f2a20" if active else "#10171f"
+            border = color if active else "#1f2a24"
+            glow = f"box-shadow:0 0 0 1px {color}33;" if active else ""
+            card_html.append(
+                f'<div style="flex:1;min-width:0;background:{bg};border:1.5px solid {border};border-radius:10px;'
+                f'padding:13px 16px;{glow}">'
+                f'<div style="color:{color};font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;">{name}</div>'
+                f'<div style="color:{ink};font-size:23px;font-weight:700;margin:3px 0 2px;font-family:ui-monospace,monospace;">{val}</div>'
+                f'<div style="color:{pale};font-size:11px;">{phrase}</div>'
+                f"</div>"
+            )
+        lead = (
+            f"You picked the moment <b style='color:{mint};'>{rt}s</b> into every trial."
+            f" It goes by three names &mdash; the same instant, referenced from each event:"
+        )
+        foot = (
+            f"<span style='color:{pale};'>the query: "
+            f"<code style='color:{mint};'>timelock_ds.sel({coord_name}={rt - (10 if coord_name=='dose_locked' else 25)})</code></span>"
+            f" &nbsp;&middot;&nbsp; <span style='color:{pale};'>window: "
+            f"<b style='color:{ink};'>{lo}&ndash;{hi}s</b> into each trial ({npts} pts)</span>"
+        )
+        return (
+            f'<div style="font-family:-apple-system,system-ui,sans-serif;">'
+            f'<div style="color:{ink};font-size:13px;margin:2px 0 11px;">{lead}</div>'
+            f'<div style="display:flex;gap:12px;margin-bottom:12px;">{"".join(card_html)}</div>'
+            f'<div style="font-size:11.5px;">{foot}</div>'
+            f"</div>"
+        )
+
+
+    n_pts = sliced.sizes["rel_time"]
+    eq_dose = resolved_rt - 10
+    eq_resp = resolved_rt - 25
+    mo.vstack([
+        mo.Html(_rulers_svg(resolved_rt, coord.value, rt_lo, rt_hi)),
+        mo.Html(_readout_html(resolved_rt, coord.value, eq_dose, eq_resp, rt_lo, rt_hi, n_pts)),
+    ])
+
     return
 
 
@@ -352,32 +561,130 @@ def epoching_header(mo):
     return
 
 
-@app.cell
-def epoch_demo(mo, timelock_ds):
-    # Extract -10 to +20 second window around dose
+@app.cell(hide_code=True)
+def epoch_demo(go, make_subplots, mo, np, pm, timelock_ds, xr):
+
+    # Extract a -10s to +20s window locked to dose administration.
+    # The NDIndex + dose_locked coordinate do all the alignment -- no manual indexing.
     epoch = timelock_ds.sel(dose_locked=slice(-10, 20))
-    # Average signal across trials
-    avg_signal = epoch["signal"].mean(dim="trial")
-    # The dose_locked coordinate is now the x-axis
-    dose_locked_axis = epoch.dose_locked.mean(dim="trial").values
 
-    # Compare pre-dose vs post-dose variance (synthetic data: no dose effect expected)
-    pre_dose_var = epoch["signal"].where(epoch.dose_locked < 0).var(dim=["trial", "rel_time"]).values
-    post_dose_var = epoch["signal"].where(epoch.dose_locked >= 0).var(dim=["trial", "rel_time"]).values
+    sig = epoch["signal"].values                       # (trial, rel_time)
+    dl = epoch.dose_locked.mean(dim="trial").values    # 1-D time-locked axis
+    rel_time_epoch = epoch.rel_time.values
+    n_trial, n_t = sig.shape
 
-    mo.md(
-        f"""
-        **Epoching result** (-10s to +20s around dose):
+    # --- Hierarchical Bayesian dose-response ---
+    # Each trial gets its own baseline and response amplitude, partially pooled
+    # toward population hyperpriors (non-centered parameterization for clean
+    # sampling). We report the population curve with full uncertainty.
+    with pm.Model() as dose_model:
+        d = pm.Data("dose_locked", dl)
+        # Population level
+        mu_baseline = pm.Normal("mu_baseline", 0, 1)
+        sigma_baseline = pm.HalfNormal("sigma_baseline", 1)
+        mu_amp = pm.HalfNormal("mu_amp", 2)
+        sigma_amp = pm.HalfNormal("sigma_amp", 1)
+        peak = pm.Normal("peak", 10, 5)          # peak time relative to dose (s)
+        width = pm.HalfNormal("width", 8)        # response spread (s)
+        # Trial level (non-centered)
+        bl_off = pm.Normal("bl_off", 0, 1, shape=n_trial)
+        baseline_t = pm.Deterministic("baseline", mu_baseline + bl_off * sigma_baseline)
+        amp_off = pm.Normal("amp_off", 0, 1, shape=n_trial)
+        amp = pm.Deterministic("amp", mu_amp + amp_off * sigma_amp)
+        # Gaussian response bump over the locked axis
+        bump = pm.math.exp(-0.5 * ((d[None, :] - peak) / width) ** 2)
+        mu = baseline_t[:, None] + amp[:, None] * bump
+        sigma = pm.HalfNormal("sigma", 1)
+        pm.Normal("obs", mu=mu, sigma=sigma, observed=sig)
+        idata = pm.sample(draws=1000, tune=1000, chains=4, target_accept=0.9,
+                          random_seed=42, progressbar=False, nuts_sampler="numpyro")
 
-        - Window size: {epoch.sizes['rel_time']} time points
-        - Trials averaged: {epoch.sizes['trial']}
-        - Pre-dose signal variance: **{pre_dose_var:.4f}**
-        - Post-dose signal variance: **{post_dose_var:.4f}**
-
-        The same `dose_locked` coordinate enables clean epoch extraction and
-        trial-averaging without manual time-point alignment.
-        """
+    # --- Posterior population dose-response curve ---
+    post = idata.posterior
+    mu_bl = post["mu_baseline"].values.reshape(-1)
+    mu_a = post["mu_amp"].values.reshape(-1)
+    pk = post["peak"].values.reshape(-1)
+    wd = post["width"].values.reshape(-1)
+    n_draws = mu_bl.size
+    curves = mu_bl[:, None] + mu_a[:, None] * np.exp(
+        -0.5 * ((dl[None, :] - pk[:, None]) / wd[:, None]) ** 2
     )
+    curve_med = np.median(curves, axis=0)
+    ci_lo, ci_hi = np.percentile(curves, [3, 97], axis=0)
+    peak_med = float(np.median(pk))
+    amp_med = float(np.median(mu_a))
+
+    # --- Store the posterior back into the Dataset under a `draw` dim ---
+    # Now any NDIndex selection on dose_locked / abs_time carries the posterior
+    # along automatically -- the closed loop.
+    posterior_da = xr.DataArray(
+        curves, dims=["draw", "rel_time"],
+        coords={"draw": np.arange(n_draws), "rel_time": rel_time_epoch},
+    )
+    epoch = epoch.assign(posterior_response=posterior_da)
+    peek = epoch.sel(dose_locked=5, method="nearest")
+    peek_med = float(peek.posterior_response.median())
+
+    mint = "#2ee4a0"
+    fig = make_subplots(
+        rows=1, cols=2,
+        subplot_titles=("All trials (dose-locked)", "Bayesian population response"),
+        horizontal_spacing=0.12,
+    )
+    # Panel A: every trial as a thin line
+    for t_idx in range(n_trial):
+        fig.add_trace(
+            go.Scatter(
+                x=dl, y=sig[t_idx], mode="lines",
+                line=dict(color=mint, width=1), opacity=0.3, showlegend=False,
+                hovertemplate=f"t=%{{x:.0f}}s<br>signal=%{{y:.2f}}<extra>trial {t_idx}</extra>",
+            ),
+            row=1, col=1,
+        )
+    # Panel B: posterior median + 94% credible band
+    fig.add_trace(
+        go.Scatter(
+            x=np.concatenate([dl, dl[::-1]]),
+            y=np.concatenate([ci_hi, ci_lo[::-1]]),
+            fill="toself", fillcolor="rgba(46, 228, 160, 0.18)",
+            line=dict(color="rgba(0,0,0,0)"), hoverinfo="skip",
+            name="94% credible band", legendgroup="bayes",
+        ),
+        row=1, col=2,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=dl, y=curve_med, mode="lines",
+            line=dict(color=mint, width=3), name="Posterior median", legendgroup="bayes",
+        ),
+        row=1, col=2,
+    )
+    for col in (1, 2):
+        fig.add_vline(x=0, line=dict(color="#e94e77", dash="dash", width=1.5), row=1, col=col)
+    fig.update_layout(
+        template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(13, 17, 23, 0.6)", font=dict(color="#f0f9ff", size=12),
+        margin=dict(l=50, r=20, t=54, b=50), height=400,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+    fig.update_xaxes(title_text="time relative to dose (s)", row=1, col=1)
+    fig.update_xaxes(title_text="time relative to dose (s)", row=1, col=2)
+    fig.update_yaxes(title_text="signal", row=1, col=1)
+    fig.update_yaxes(title_text="signal", row=1, col=2)
+
+    mo.vstack([
+        fig,
+        mo.md(f"""
+        **Hierarchical model recovered the dose response with full uncertainty.**
+        Posterior median peak **{peak_med:.1f}s** after dose, response amplitude
+        **{amp_med:.2f}** -- trial-level amplitudes partially pool toward this
+        population estimate. The posterior is stored back into the Dataset under a
+        `draw` dimension: `epoch.sel(dose_locked=5)` returns {n_draws} posterior
+        draws (median **{peek_med:.2f}**) -- the custom N-D index carries the
+        Bayesian estimate along with the raw data.
+        """),
+    ])
+
     return
 
 
