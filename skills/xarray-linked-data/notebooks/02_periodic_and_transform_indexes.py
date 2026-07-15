@@ -2,11 +2,12 @@
 # requires-python = ">=3.12"
 # dependencies = [
 #     "marimo",
-#     "numpy",
-#     "xarray>=2025.1.0",
+#     "numpy==2.5.1",
+#     "xarray==2026.7.0",
 #     "scipy",
 #     "matplotlib",
 #     "wigglystuff==0.5.16",
+#     "plotly==6.9.0",
 # ]
 # ///
 
@@ -46,20 +47,23 @@ def cell_tour(mo):
 
     tour = wigglystuff.CellTour(
         steps=[
-            {"cell_name": "hero", "title": "Custom Indexes", "description": "Two patterns for when PandasIndex is not enough."},
+            {"cell_name": "hero", "title": "Custom Indexes", "description": "Two patterns for when PandasIndex is not enough: an Index subclass and a CoordinateTransform."},
             {"cell_name": "periodic_index_class", "title": "PeriodicIndex", "description": "An Index subclass with hand-written sel() for wrapping/angular coordinates."},
-            {"cell_name": "periodic_verify", "title": "Wrapping Verified", "description": "350deg finds 345deg, 370deg wraps to 15deg -- no gaps on the circle."},
+            {"cell_name": "periodic_verify", "title": "Wrapping Verified", "description": "350\u00b0 finds 345\u00b0, 370\u00b0 wraps to 15\u00b0 \u2014 no gaps on the circle."},
+            {"cell_name": "periodic_plot", "title": "Try it: drag past 360\u00b0", "description": "Polar view \u2014 drag the query angle across the seam and watch PeriodicIndex resolve the true nearest neighbour, versus a plain no-wrap index."},
             {"cell_name": "zstack_transform_class", "title": "ZStackTransform", "description": "A CoordinateTransform: just write forward() and reverse(), xarray builds the index."},
             {"cell_name": "zstack_verify", "title": "Depth Selection", "description": "sel(depth_nm=500) computes the reverse transform and finds slice 125."},
-            {"cell_name": "massspec_transform", "title": "MassSpecTransform", "description": "Nonlinear calibration curve (quadratic) as a CoordinateTransform."},
-            {"cell_name": "massspec_verify", "title": "m/z Selection", "description": "Select by mass-to-charge ratio; the transform handles the TOF-to-mz mapping."},
+            {"cell_name": "zstack_plot", "title": "Try it: scan the depth", "description": "The depth_nm axis is never stored \u2014 drag it and watch the z-slice materialise on demand."},
+            {"cell_name": "massspec_transform", "title": "MassSpecTransform", "description": "A nonlinear calibration (mz = 100\u00b7\u221atof + 10) expressed as a CoordinateTransform."},
+            {"cell_name": "massspec_verify", "title": "m/z Selection", "description": "Select by mass-to-charge; the transform inverts the nonlinear TOF\u2194mz mapping. (CoordinateTransformIndex needs a DataArray indexer + method='nearest'.)"},
+            {"cell_name": "massspec_plot", "title": "Try it: query a mass", "description": "Data is stored as TOF bins, queried as m/z \u2014 drag to resolve any mass to its bin via the \u221a calibration."},
         ],
         auto_start=False,
         show_progress=True,
     )
     mo.ui.anywidget(tour)
-    return
 
+    return
 
 
 @app.cell(hide_code=True)
@@ -74,6 +78,8 @@ def imports():
         CoordinateTransform,
         CoordinateTransformIndex,
     )
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
 
     return (
         CoordinateTransform,
@@ -82,6 +88,8 @@ def imports():
         Index,
         IndexSelResult,
         PandasIndex,
+        go,
+        make_subplots,
         mo,
         np,
         xr,
@@ -193,12 +201,133 @@ def periodic_verify(flow_ds, mo, xr):
     mo.callout(
         mo.md("""
         **PeriodicIndex verified:**
-        - `sel(angle=350)` -> 345deg (wrapping distance = 5deg)
-        - `sel(angle=370)` -> 15deg (370 wraps to 10, nearest is 15)
-        - Vectorized: [5, 355, 361] -> [0, 0, 15]
+        - `sel(angle=350)` -> 345\u00b0 (wrapping distance = 5\u00b0)
+        - `sel(angle=370)` -> 15\u00b0 (370 wraps to 10, nearest is 15)
+        - Vectorized: [5, 355, 370] -> [0, 0, 15]
         """),
         kind="success",
     )
+
+    return
+
+
+@app.cell(hide_code=True)
+def periodic_query(mo):
+    angle_query = mo.ui.slider(
+        0, 720, value=355, step=5,
+        label="Query angle (\u00b0) \u2014 drag past 360\u00b0 to trigger wrapping",
+    )
+    mo.vstack([
+        mo.md("**Drag the query angle.** Past 360\u00b0 a plain index cannot cope; the `PeriodicIndex` wraps it onto the circle (0\u201345\u00b0, every 15\u00b0) and finds the true nearest neighbour."),
+        angle_query,
+    ])
+
+    return (angle_query,)
+
+
+@app.cell(hide_code=True)
+def periodic_plot(angle_query, flow_ds, go, mo, np):
+    _q = angle_query.value
+    _qmod = _q % 360
+    _resolved = flow_ds.sel(angle=_q, method="nearest")
+    _res_angle = float(np.asarray(_resolved.angle.values).reshape(-1)[0])
+    _dd = abs(_qmod - _res_angle)
+    _wrap_dist = float(min(_dd, 360 - _dd))
+
+    _angles = flow_ds.angle.values
+    _mean_int = flow_ds.scatter_intensity.mean("particle").values
+    _naive_idx = int(np.argmin(np.abs(_angles - _q)))
+    _naive_angle = float(_angles[_naive_idx])
+    _naive_dist = float(abs(_q - _naive_angle))
+    _disagree = not np.isclose(_naive_angle, _res_angle)
+
+    _pfig = go.Figure()
+    _pfig.add_trace(go.Barpolar(
+        r=_mean_int,
+        theta=_angles,
+        marker=dict(
+            color=["#e94560" if np.isclose(a, _res_angle) else "#39465a" for a in _angles],
+            line=dict(color="#0d1117", width=1),
+        ),
+        hovertemplate="angle=%{theta:.0f}\u00b0<br>mean scatter=%{r:.1f}<extra></extra>",
+        name="mean scatter (40 particles)",
+    ))
+    _pfig.add_trace(go.Scatterpolar(
+        r=[0.0, float(_mean_int.max()) * 1.10],
+        theta=[_qmod, _qmod],
+        mode="lines+markers+text",
+        line=dict(color="#f0f9ff", width=2, dash="dot"),
+        marker=dict(size=9, color="#f0f9ff"),
+        text=[None, f"ask {_q}\u00b0"],
+        textposition="top center",
+        textfont=dict(color="#f0f9ff", size=11),
+        hoverinfo="skip",
+        showlegend=False,
+    ))
+    _pfig.update_layout(
+        template="plotly_dark",
+        polar=dict(
+            bgcolor="rgba(13,17,23,0.6)",
+            angularaxis=dict(rotation=90, direction="clockwise", dtick=45, tickfont=dict(size=9)),
+            radialaxis=dict(showticklabels=True, tickfont=dict(size=9), gridcolor="#2a3340"),
+        ),
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#f0f9ff", size=12),
+        margin=dict(l=30, r=30, t=20, b=20),
+        height=430,
+        showlegend=False,
+    )
+
+
+    def _cards(q, qmod, resolved, wdist, naive_a, naive_d, disagree):
+        accent, pale, ink = "#e94560", "#d98a96", "#f0f9ff"
+        if disagree:
+            items = [
+                ("query", f"{q}\u00b0", f"\u2261 {qmod:.0f}\u00b0 on the circle", pale, False),
+                ("PeriodicIndex", f"{resolved:.0f}\u00b0", f"{wdist:.0f}\u00b0 \u2014 true nearest (wraps)", accent, True),
+                ("no-wrap index", f"{naive_a:.0f}\u00b0", f"{naive_d:.0f}\u00b0 \u2014 ignores the seam", pale, False),
+            ]
+            lead = (
+                f"Asking for <b style='color:{accent};'>{q}\u00b0</b> resolves to "
+                f"<b style='color:{ink};'>{resolved:.0f}\u00b0</b> by wrapping \u2014 "
+                f"a plain index would pick <b style='color:{pale};'>{naive_a:.0f}\u00b0</b> ({naive_d:.0f}\u00b0 off)."
+            )
+        else:
+            items = [
+                ("query", f"{q}\u00b0", f"\u2261 {qmod:.0f}\u00b0 on the circle", pale, False),
+                ("PeriodicIndex", f"{resolved:.0f}\u00b0", f"{wdist:.0f}\u00b0 nearest measured", accent, True),
+                ("no-wrap index", f"{naive_a:.0f}\u00b0", "agrees here (not near the seam)", pale, False),
+            ]
+            lead = (
+                f"Asking for <b style='color:{accent};'>{q}\u00b0</b> resolves to "
+                f"<b style='color:{ink};'>{resolved:.0f}\u00b0</b>. Drag near the 0\u00b0/345\u00b0 seam "
+                f"or past 360\u00b0 to see wrapping beat a plain index."
+            )
+        ch = []
+        for nm, val, phrase, color, active in items:
+            bg = "#2a1016" if active else "#10171f"
+            border = color if active else "#2a2226"
+            glow = f"box-shadow:0 0 0 1px {color}55;" if active else ""
+            ch.append(
+                f'<div style="flex:1;min-width:150px;background:{bg};border:1.5px solid {border};'
+                f'border-radius:10px;padding:12px 14px;{glow}">'
+                f'<div style="color:{color};font-size:9.5px;text-transform:uppercase;letter-spacing:1.1px;font-weight:700;">{nm}</div>'
+                f'<div style="color:{ink};font-size:22px;font-weight:700;margin:3px 0 2px;font-family:ui-monospace,monospace;">{val}</div>'
+                f'<div style="color:{pale};font-size:10.5px;">{phrase}</div></div>'
+            )
+        return (
+            f'<div style="font-family:-apple-system,system-ui,sans-serif;">'
+            f'<div style="color:{ink};font-size:13px;margin:2px 0 11px;">{lead}</div>'
+            f'<div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap;">{"".join(ch)}</div>'
+            f'</div>'
+        )
+
+
+    mo.vstack([
+        _pfig,
+        mo.Html(_cards(_q, _qmod, _res_angle, _wrap_dist, _naive_angle, _naive_dist, _disagree)),
+    ])
+
     return
 
 
@@ -246,10 +375,27 @@ def zstack_build_data(
     np,
     xr,
 ):
-    # Synthetic microscopy: 200 z-slices, 4nm each, 2 channels (nuclei + membrane)
+    # Synthetic microscopy: 200 z-slices (4 nm each), 2 channels.
+    # A single cell sits near the middle of the stack (z~125, depth ~500 nm):
+    #   nuclei   = a bright filled disk,
+    #   membrane = a surrounding ring.
+    # Away from that z-band the slices are pure shot noise, so dragging the depth
+    # slider flies you through the cell -- noise on one side, a circle at the cell.
     n_slices = 200
     slice_thickness = 4.0  # nm per slice
-    image_data = np.random.poisson(50, (n_slices, 128, 128, 2)).astype(float)
+    _zs_yy, _zs_xx = np.mgrid[0:128, 0:128]
+    _zs_r2 = (_zs_yy - 64.0) ** 2 + (_zs_xx - 64.0) ** 2  # radial sq in the y-x plane
+    _zs_zprof = np.exp(-((np.arange(n_slices) - 125.0) / 12.0) ** 2)  # cell fades in/out around z=125
+
+    _zs_nuc = np.random.poisson(50, (n_slices, 128, 128)).astype(float)
+    _zs_mem = np.random.poisson(50, (n_slices, 128, 128)).astype(float)
+    # nuclei: filled disk (radius 22), modulated by the z-profile
+    _zs_nuc += 240.0 * (_zs_r2[None, :, :] < 22.0 ** 2) * _zs_zprof[:, None, None]
+    # membrane: ring (annulus 18..26), modulated by the z-profile
+    _zs_ring = (_zs_r2[None, :, :] > 18.0 ** 2) & (_zs_r2[None, :, :] < 26.0 ** 2)
+    _zs_mem += 260.0 * _zs_ring * _zs_zprof[:, None, None]
+
+    image_data = np.stack([_zs_nuc, _zs_mem], axis=-1)
 
     zstack_da = xr.DataArray(
         image_data,
@@ -265,39 +411,152 @@ def zstack_build_data(
         name="fluorescence",
     )
     print(f"Z-stack: {n_slices} slices x {slice_thickness} nm/slice = {n_slices * slice_thickness:.0f} nm total depth")
+    print("One synthetic cell centered at z=125 (depth ~500 nm): nuclei disk + membrane ring.")
     print(f"depth_nm coordinate is LAZY (never materialized): {zstack_da.depth_nm[:3].values} ...")
-    return (zstack_da,)
+
+    return slice_thickness, zstack_da
 
 
 @app.cell
-def zstack_verify(mo, xr, zstack_da):
-    # Verify: depth_nm=500 should map to slice 125 (500/4=125)
+def zstack_verify(mo, np, xr, zstack_da):
+    # sel by physical depth must return exactly the slice the transform maps to.
+    # (z is the transform's input dim and is dropped on selection, so verify by
+    #  data-equivalence against isel rather than reading a .z coordinate.)
     result = zstack_da.sel(depth_nm=500, method="nearest")
-    assert result.z.values == 125, f"Expected slice 125, got {result.z.values}"
+    assert np.array_equal(result.values, zstack_da.isel(z=125).values), "depth_nm=500 should be slice 125"
 
-    # Verify: depth_nm=0 maps to slice 0
     result_0 = zstack_da.sel(depth_nm=0, method="nearest")
-    assert result_0.z.values == 0
+    assert np.array_equal(result_0.values, zstack_da.isel(z=0).values), "depth_nm=0 should be slice 0"
 
-    # Verify vectorized: query multiple depths
+    # Vectorized: three depths -> three slices
     probe_depths = xr.DataArray([100, 200, 300], dims="probe")
     probed = zstack_da.sel(depth_nm=probe_depths, method="nearest")
-    assert probed.z.values.tolist() == [25, 50, 75]
+    expected = zstack_da.isel(z=xr.DataArray([25, 50, 75], dims="probe"))
+    assert np.array_equal(probed.values, expected.values), "[100,200,300] nm -> slices [25,50,75]"
 
-    # Verify channel selection still works
-    nuclei = zstack_da.sel(channel="nuclei", depth_nm=400, method="nearest")
+    # Channel selection works alongside the transform (chain sels: exact channel,
+    # then nearest on the numeric depth coordinate)
+    nuclei = zstack_da.sel(channel="nuclei").sel(depth_nm=400, method="nearest")
     assert nuclei.channel.values == "nuclei"
 
     mo.callout(
         mo.md("""
-        **ZStackTransform verified:**
-        - `sel(depth_nm=500)` -> slice 125 (500/4=125)
-        - `sel(depth_nm=0)` -> slice 0
-        - Vectorized: [100, 200, 300] nm -> [25, 50, 75]
-        - Channel selection still works alongside the transform
+        **ZStackTransform verified** (by data-equivalence to `isel`):
+        - `sel(depth_nm=500)` returns slice 125's data
+        - `sel(depth_nm=0)` returns slice 0's data
+        - Vectorized: [100, 200, 300] nm -> slices [25, 50, 75]
+        - Channel selection works alongside the transform
         """),
         kind="success",
     )
+
+    return
+
+
+@app.cell(hide_code=True)
+def zstack_query(mo):
+    depth_query = mo.ui.slider(
+        0, 796, value=500, step=4,
+        label="depth (nm) \u2014 200 slices \u00d7 4 nm, lazy coordinate",
+    )
+    mo.vstack([
+        mo.md("**Drag the physical depth.** `ZStackTransform` lazily maps `depth_nm` \u2192 z-slice; the depth coordinate is never stored, only computed on demand at selection time."),
+        depth_query,
+    ])
+
+    return (depth_query,)
+
+
+@app.cell(hide_code=True)
+def zstack_plot(
+    depth_query,
+    go,
+    make_subplots,
+    mo,
+    slice_thickness,
+    zstack_da,
+):
+    _d = depth_query.value
+    _sel = zstack_da.sel(depth_nm=_d, method="nearest")
+    # z is dropped by the transform; recover the slice index from the reverse mapping
+    _slice_idx = int(round(_d / slice_thickness))
+    _img = _sel.sel(channel="nuclei").values
+
+    _depths = zstack_da.depth_nm.values
+    _prof_n = zstack_da.sel(channel="nuclei").mean(("x", "y")).values
+    _prof_m = zstack_da.sel(channel="membrane").mean(("x", "y")).values
+
+    _zfig = make_subplots(
+        rows=1, cols=2, column_widths=[0.42, 0.58],
+        horizontal_spacing=0.14,
+        subplot_titles=(f"slice {_slice_idx}  \u2014  depth {_d:.0f} nm", "mean fluorescence vs depth"),
+    )
+    _zfig.add_trace(go.Heatmap(
+        z=_img,
+        colorscale=[[0, "#0d1117"], [0.45, "#5a1a26"], [1, "#e94560"]],
+        showscale=False,
+        hovertemplate="y=%{y}<br>x=%{x}<br>counts=%{z}<extra></extra>",
+    ), row=1, col=1)
+    _zfig.add_trace(go.Scatter(
+        x=_depths, y=_prof_n, mode="lines", name="nuclei",
+        line=dict(color="#e94560", width=2),
+    ), row=1, col=2)
+    _zfig.add_trace(go.Scatter(
+        x=_depths, y=_prof_m, mode="lines", name="membrane",
+        line=dict(color="#7c8cf8", width=2, dash="dot"),
+    ), row=1, col=2)
+    _zfig.add_vline(x=float(_d), line=dict(color="#f0f9ff", width=2, dash="dash"), row=1, col=2)
+    _zfig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="#f0f9ff", size=12),
+        margin=dict(l=50, r=20, t=55, b=45),
+        height=400,
+        legend=dict(orientation="h", y=1.06, x=0.5, xanchor="center"),
+    )
+    _zfig.update_yaxes(autorange="reversed", row=1, col=1, title_text="y")
+    _zfig.update_xaxes(title_text="x", row=1, col=1)
+    _zfig.update_xaxes(title_text="depth (nm)", row=1, col=2)
+    _zfig.update_yaxes(title_text="mean counts", row=1, col=2)
+
+
+    def _dcards(d, sidx):
+        accent, pale, ink = "#e94560", "#d98a96", "#f0f9ff"
+        items = [
+            ("depth_nm", f"{d:.0f} nm", "the coordinate you asked for", accent, True),
+            ("z-slice", str(sidx), f"{d:.0f} / 4 nm", pale, False),
+            ("stored on disk?", "never", "computed by forward()", pale, False),
+        ]
+        ch = []
+        for nm, val, phrase, color, active in items:
+            bg = "#2a1016" if active else "#10171f"
+            border = color if active else "#2a2226"
+            glow = f"box-shadow:0 0 0 1px {color}55;" if active else ""
+            ch.append(
+                f'<div style="flex:1;min-width:140px;background:{bg};border:1.5px solid {border};'
+                f'border-radius:10px;padding:12px 14px;{glow}">'
+                f'<div style="color:{color};font-size:9.5px;text-transform:uppercase;letter-spacing:1.1px;font-weight:700;">{nm}</div>'
+                f'<div style="color:{ink};font-size:22px;font-weight:700;margin:3px 0 2px;font-family:ui-monospace,monospace;">{val}</div>'
+                f'<div style="color:{pale};font-size:10.5px;">{phrase}</div></div>'
+            )
+        lead = (
+            f"Selecting <b style='color:{accent};'>{d:.0f} nm</b> materialises z-slice "
+            f"<b style='color:{ink};'>{sidx}</b> \u2014 the depth axis is a pure transform, "
+            f"not an array in memory."
+        )
+        return (
+            f'<div style="font-family:-apple-system,system-ui,sans-serif;">'
+            f'<div style="color:{ink};font-size:13px;margin:2px 0 11px;">{lead}</div>'
+            f'<div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap;">{"".join(ch)}</div>'
+            f'</div>'
+        )
+
+
+    mo.vstack([
+        _zfig,
+        mo.Html(_dcards(_d, _slice_idx)),
+    ])
+
     return
 
 
@@ -369,34 +628,128 @@ def massspec_build(
     )
     print(f"Mass spec: {n_tof_bins} TOF bins")
     print(f"Calibration: mz = {calib_a} * sqrt(tof) + {calib_b}")
-    return (ms_da,)
+    return calib_a, calib_b, ms_da
 
 
 @app.cell
-def massspec_verify(mo, ms_da, xr):
-    # Verify: sel by m/z returns the correct TOF bin
-    result_1010 = ms_da.sel(mz=1010, method="nearest")
-    result_2010 = ms_da.sel(mz=2010, method="nearest")
+def massspec_verify(mo, ms_da, np, xr):
+    # CoordinateTransformIndex needs point-wise (DataArray) indexers + method="nearest".
+    # tof_bin is dropped on selection, so verify by data-equivalence against isel.
+    result_1010 = ms_da.sel(mz=xr.DataArray([1010], dims="q"), method="nearest")
+    assert np.array_equal(np.ravel(result_1010.values), np.ravel(ms_da.isel(tof_bin=100).values)), "mz=1010 -> tof_bin=100"
 
-    # mz=1010 -> tof=((1010-10)/100)^2 = 100
-    assert result_1010.tof_bin.values == 100, f"Expected tof_bin=100, got {result_1010.tof_bin.values}"
-    # mz=2010 -> tof=((2010-10)/100)^2 = 400
-    assert result_2010.tof_bin.values == 400, f"Expected tof_bin=400, got {result_2010.tof_bin.values}"
+    result_2010 = ms_da.sel(mz=xr.DataArray([2010], dims="q"), method="nearest")
+    assert np.array_equal(np.ravel(result_2010.values), np.ravel(ms_da.isel(tof_bin=400).values)), "mz=2010 -> tof_bin=400"
 
-    # Verify peaks are found at expected m/z values
+    # Peaks land at the expected m/z values
     peak_mz = xr.DataArray([1010, 2010, 3010], dims="peak")
     peaks = ms_da.sel(mz=peak_mz, method="nearest")
-    assert all(peaks.values > 100), "Expected high intensity at peak positions"
+    assert all(np.asarray(peaks.values).ravel() > 100), "Expected high intensity at peak positions"
 
     mo.callout(
         mo.md("""
-        **MassSpecTransform verified:**
-        - `sel(mz=1010)` -> tof_bin=100 (nonlinear calibration correct)
-        - `sel(mz=2010)` -> tof_bin=400
-        - Peaks detected at expected m/z values
+        **MassSpecTransform verified** (by data-equivalence to `isel`):
+        - `sel(mz=1010)` -> tof_bin 100 (nonlinear calibration: `((1010-10)/100)\u00b2`)
+        - `sel(mz=2010)` -> tof_bin 400
+        - Peaks detected at the expected m/z values
+
+        Note: `CoordinateTransformIndex` requires a `DataArray` indexer (point-wise)
+        plus `method="nearest"` \u2014 a bare scalar raises `TypeError`.
         """),
         kind="success",
     )
+
+    return
+
+
+@app.cell(hide_code=True)
+def massspec_query(mo):
+    mz_query = mo.ui.slider(
+        500, 3500, value=1010, step=10,
+        label="query m/z \u2014 the three synthetic peaks sit at 1010, 2010, 3010",
+    )
+    mo.vstack([
+        mo.md("**Drag the query m/z.** Data is stored as time-of-flight bins, but you query by mass-to-charge; `MassSpecTransform` inverts the nonlinear calibration `mz = 100\u00b7\u221atof + 10` on demand."),
+        mz_query,
+    ])
+
+    return (mz_query,)
+
+
+@app.cell(hide_code=True)
+def massspec_plot(calib_a, calib_b, go, mo, ms_da, mz_query):
+    _mzq = mz_query.value
+    _mz = ms_da.mz.values
+    _int = ms_da.values
+    _tofq = ((_mzq - calib_b) / calib_a) ** 2
+
+    _mfig = go.Figure()
+    _mfig.add_trace(go.Scatter(
+        x=_mz, y=_int, mode="lines", name="spectrum",
+        line=dict(color="#39465a", width=1),
+        hovertemplate="m/z=%{x:.1f}<br>intensity=%{y:.1f}<extra></extra>",
+    ))
+    for _pk, _tb in [(1010, 100), (2010, 400), (3010, 900)]:
+        _pv = float(ms_da.isel(tof_bin=_tb).values)
+        _mfig.add_trace(go.Scatter(
+            x=[_pk], y=[_pv], mode="markers+text",
+            marker=dict(size=12, color="#e94560", line=dict(width=1, color="#0d1117")),
+            text=[f"m/z {_pk}\nTOF {_tb}"],
+            textposition="top center",
+            textfont=dict(color="#e94560", size=10),
+            showlegend=False, hoverinfo="skip",
+        ))
+    _mfig.add_vline(x=float(_mzq), line=dict(color="#f0f9ff", width=2, dash="dash"))
+    _mfig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(13,17,23,0.6)",
+        font=dict(color="#f0f9ff", size=12),
+        margin=dict(l=55, r=20, t=20, b=45),
+        height=400,
+        xaxis=dict(title="m/z (lazy coordinate)", range=[500, 3500]),
+        yaxis=dict(title="intensity"),
+        showlegend=False,
+    )
+
+
+    def _mcards(mzq, tofq):
+        accent, pale, ink = "#e94560", "#d98a96", "#f0f9ff"
+        items = [
+            ("m/z", f"{mzq:.0f}", "the coordinate you asked for", accent, True),
+            ("tof_bin", f"{tofq:.0f}", "((m/z \u2212 10) / 100)\u00b2", pale, False),
+            ("mapping", "100\u00b7\u221atof+10", "nonlinear calibration", pale, False),
+        ]
+        ch = []
+        for nm, val, phrase, color, active in items:
+            bg = "#2a1016" if active else "#10171f"
+            border = color if active else "#2a2226"
+            glow = f"box-shadow:0 0 0 1px {color}55;" if active else ""
+            ch.append(
+                f'<div style="flex:1;min-width:140px;background:{bg};border:1.5px solid {border};'
+                f'border-radius:10px;padding:12px 14px;{glow}">'
+                f'<div style="color:{color};font-size:9.5px;text-transform:uppercase;letter-spacing:1.1px;font-weight:700;">{nm}</div>'
+                f'<div style="color:{ink};font-size:20px;font-weight:700;margin:3px 0 2px;font-family:ui-monospace,monospace;">{val}</div>'
+                f'<div style="color:{pale};font-size:10.5px;">{phrase}</div></div>'
+            )
+        lead = (
+            f"Selecting <b style='color:{accent};'>m/z {mzq:.0f}</b> resolves to TOF bin "
+            f"<b style='color:{ink};'>{tofq:.0f}</b> via the nonlinear calibration \u2014 "
+            f"the data is stored as TOF, queried as mass."
+        )
+        return (
+            f'<div style="font-family:-apple-system,system-ui,sans-serif;">'
+            f'<div style="color:{ink};font-size:13px;margin:2px 0 11px;">{lead}</div>'
+            f'<div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap;">{"".join(ch)}</div>'
+            f'</div>'
+        )
+
+
+    mo.vstack([
+        _mfig,
+        mo.Html(_mcards(_mzq, _tofq)),
+    ])
+
     return
 
 
