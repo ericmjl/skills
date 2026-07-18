@@ -7,12 +7,14 @@ description: >
   "create a competition submission," or pair-program an interactive research
   explainer on molab. Covers: what makes a notebook engaging (intuition game,
   real experiment, novel extension, design system), paper selection, narrative
-  arc and proportions, custom anywidget patterns, wigglystuff CellTour,
+  arc and proportions, custom anywidget patterns (bi-directional JS<->Python
+  state: JS brushing/selection -> Python region-of-interest; Python variables
+  reactively driving JS), wigglystuff CellTour,
   effective GPU usage, memory-efficient training (fused STE, gradient
   checkpointing), parallel review subagents, and a pre-publication polish
   checklist. CRITICAL: mo is auto-injected (import in
   ONE cell); every top-level name must be unique across ALL cells; custom
-  anywidget needs model.save_changes(); use mo.output.replace() for live charts;
+  anywidget needs model.save_changes() for JS->Python sync; use mo.output.replace() for live charts;
   guard all torch.cuda calls for CPU-only machines.
 license: MIT
 metadata:
@@ -144,8 +146,10 @@ the function name and its output need to be unique. Loop variables like `i`,
 `heat_ax`).
 
 **3. NO underscore-prefixed names for anything downstream cells need.**
-`_model` is treated as private and does NOT propagate. Use clean public names
-(`vis_model`).
+marimo treats underscore-prefixed variables as PRIVATE — they do not appear
+in the cell's defs at all, so they cannot be referenced in ANY form (`_model`
+or `model`) from another cell. Use clean public names (`vis_model`) so the
+name is available in every cell.
 
 **4. Cells don't auto-execute on creation** — call `ctx.run_cell(cid)` after
 `ctx.create_cell(...)`.
@@ -174,32 +178,121 @@ early — don't leave it for the end.
 
 ### Custom anywidget pattern
 
+An anywidget is a **bi-directional reactive bridge**: `traitlets` tagged
+`sync=True` flow BOTH ways between the browser and the kernel. This is what
+makes a bespoke widget powerful — not just "a custom visual," but a channel
+for reader actions to become Python variables, and for Python variables to
+reshape the visual live.
+
+**The two API calls that make the bridge:**
+- **JS → Python:** `model.set('trait', v)` then **`model.save_changes()`**
+  pushes a browser-side change into the kernel trait; downstream cells that
+  read the widget's value re-run reactively.
+- **Python → JS:** the JS reads initial state via `model.get('trait')` in
+  `render`; it can also react to later mutations via
+  `model.on('change:trait', cb)` — but only needed when the trait mutates on
+  a *persistent* instance (see Pattern B).
+
+Decide first which direction the widget serves.
+
+#### Pattern A — JS → Python (the widget is an INPUT)
+
+The reader acts in the browser (brush, drag, select); the action becomes a
+Python value downstream cells consume. Wrap in `mo.ui.anywidget()` and read
+`.value` in a **different** cell.
+
+Classic case — **brush a scatterplot → save the selection as a region of
+interest:**
+
 ```python
-class MyWidget(anywidget.AnyWidget):
+class BrushScatter(anywidget.AnyWidget):
     _esm = """
     function render({ model, el }) {
-      el.innerHTML = '<button>Click</button>';
-      el.querySelector('button').addEventListener('click', () => {
-        model.set('value', model.get('value') + 1);
-        model.save_changes();  // CRITICAL: without this, Python never sees the change
+      const pts = model.get('points');
+      // ...draw an SVG scatter of pts with a brush rectangle...
+      svg.addEventListener('pointerup', () => {
+        model.set('value', pointsInsideBrushRect());  // selection -> Python
+        model.save_changes();   // CRITICAL: without this, Python never sees it
       });
-      model.on('change:value', () => { /* update DOM on Python->JS */ });
     }
     export default { render };
     """
-    _css = ".my-widget { font-size: 1.2rem; }"
-    value = traitlets.Int(0).tag(sync=True)
+    points = traitlets.List().tag(sync=True)
+    value = traitlets.List([]).tag(sync=True)   # filled from JS = the selection
 
-widget = mo.ui.anywidget(MyWidget(value=42))  # wrap for marimo reactivity
-widget  # last expression = cell output
+brush = mo.ui.anywidget(BrushScatter(points=[[x, y] for x, y in data]))
+brush   # last expression = cell output
 ```
 
-**Key gotchas:**
-- `model.save_changes()` is REQUIRED for JS->Python trait sync — without it,
-  `.value` never updates and downstream cells don't re-run.
-- `_esm` and `_css` are anywidget's required attribute names (cannot rename).
-- Wrap in `mo.ui.anywidget()` — bare AnyWidget instances may not render.
-- Read the widget's value downstream via `widget.value`.
+```python
+# DIFFERENT cell — re-runs every time the reader brushes.
+roi = brush.value                              # the selected points
+mo.md(f"**Region of interest:** {len(roi)} points, mean y = {mean_y(roi):.2f}")
+```
+
+`brush.value` returns the widget's synced `value` trait. For a multi-trait
+widget, read the specific trait you care about so the cell only re-runs when
+that one changes.
+
+#### Pattern B — Python → JS (the widget is a DISPLAY)
+
+A Python control (dropdown/slider) or computed value changes what the widget
+shows. The reliable marimo pattern is **recompute-and-reinstantiate**: the
+widget's data is a function of Python state; when that state changes, the cell
+re-runs and mounts a fresh widget whose `render` reads the new traits at
+startup. No `change:` handler is needed because the widget is remounted.
+
+```python
+# cell 1 — control
+graph_choice = mo.ui.dropdown(["toy", "real-A", "real-B"], value="toy")
+graph_choice
+```
+
+```python
+# cell 2 — reads graph_choice.value (DIFFERENT cell!), rebuilds the widget
+data = load_graph(graph_choice.value)
+BFSAnimation(nodes_json=json.dumps(data["nodes"]),
+             steps_exists_json=json.dumps(data["steps"]),
+             target_label=str(data["target"]))   # bare instance — nothing reads it
+```
+
+This is exactly **Network-Analysis-Made-Simple `02-paths.py`**: a dropdown
+swaps the BFS animation between the toy teaching graph and real sociopatterns
+ego subgraphs; each graph's nodes/edges/BFS-steps are computed in Python
+(spring layout + step precomputation) and the JS just renders
+`model.get(...)` at mount. Use this pattern whenever the data swaps wholesale
+(new dataset, new layout) — and pass bulky data as JSON-string traits
+(`traitlets.Unicode(json.dumps(data))`, then `JSON.parse(model.get('x_json'))`
+in the ESM) rather than relying on object sync.
+
+For a **cheap scalar update that must preserve JS-side state** (current zoom,
+play position, scroll), keep the widget mounted and register
+`model.on('change:source', handler)` in `render` to mutate the existing DOM in
+place when a Python trait changes. For smooth in-place updates *within a single
+cell* (live training curves), use `mo.output.replace()` (see "Live-updating
+charts").
+
+#### Key gotchas
+
+- **Every trait that crosses the boundary needs `.tag(sync=True)`** — unsynced
+  traits never propagate in either direction.
+- **`model.save_changes()` is REQUIRED for JS→Python sync** — without it the
+  trait never updates and downstream cells don't re-run. The #1 anywidget bug.
+- **Reading `.value` must happen in a DIFFERENT cell** from the one that
+  created the widget — marimo raises `RuntimeError: Accessing the value of a
+  UIElement in the cell that created it is not allowed`. Split into a
+  create-cell and a consume-cell.
+- **Wrap in `mo.ui.anywidget()` to make an anywidget a marimo UI element.**
+  This is REQUIRED to read its `.value` downstream (input widgets). Display-only
+  widgets often render bare too (e.g. `BFSAnimation`), but wrapping is always
+  safe and is the conventional default for interactive widgets like CellTour.
+- **`_esm` and `_css` are anywidget's required class-attribute names** (the
+  framework looks them up by those exact names). These are class attributes,
+  not cell variables — so the no-underscore rule for shared cell names (rule
+  #3) doesn't apply to them.
+- **The widget's variable name must be non-underscore** if a downstream cell
+  reads it — underscore-prefixed names are cell-private and not shared (rule
+  #3), so name it `brush`, not `_brush`.
 
 ### wigglystuff CellTour (guided walkthrough)
 
