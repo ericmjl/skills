@@ -156,10 +156,53 @@ PR 2 of 5 in the stacked series.
 As reviews land:
 
 1. Merge from the bottom of the stack upward.
-2. Rebase child PR branches after parent merges if needed.
+2. Retarget child PR branches onto `main` after their parent merges (see the
+   `rebase --onto` technique below).
 3. Keep PR descriptions updated so chain state remains obvious.
 
 If one PR becomes contentious, isolate and resolve without bloating adjacent PRs.
+
+#### Retargeting a child PR after its base merges (`rebase --onto`)
+
+When a base PR merges — especially via **squash-merge** or **rebase-merge** — two
+things happen at once:
+
+- GitHub **auto-retargets** each dependent stacked PR's base from the merged
+  branch to `main`.
+- The child branch still carries the base PR's commits as **ancestors with the
+  OLD SHAs**, while the commits that landed on `main` now have **NEW SHAs**
+  (squash/rebase-merge rewrites them).
+
+Because the SHAs differ, a plain `git rebase origin/main` can **fail to
+auto-skip** the already-applied ancestor commits via patch-id detection, so you
+end up resolving conflicts on commits that are *logically already in main*. The
+fix is to replay **only your new commits** and drop the merged ancestors
+explicitly:
+
+```bash
+# 1. Fetch and survey the boundary
+git fetch origin
+git log --oneline origin/main..HEAD   # your NEW commits (to keep)
+
+# 2. CUTOFF = parent of your FIRST new commit (= old tip of the merged base branch)
+CUTOFF=$(git rev-parse <your-first-new-commit>^)
+
+# 3. Replay ONLY commits after the cutoff, onto main
+git rebase --onto origin/main "$CUTOFF"
+
+# 4. Force-push the retargeted branch
+git push --force-with-lease origin <child-branch>
+```
+
+`git rebase --onto <newbase> <upstream>` replays every commit reachable from
+`HEAD` but NOT reachable from `<upstream>`, on top of `<newbase>`. Setting
+`<upstream>` to the cutoff (old base tip) excludes the merged ancestors from the
+replay set entirely — no patch-id guessing, no phantom conflicts on
+already-landed commits.
+
+Verify on GitHub: `gh pr view <N> --json mergeable` reports `MERGEABLE`, and the
+diff against `main` shows **only your new commits** with no resurrected ancestor
+commits.
 
 ### 8) Quality bar checklist
 
