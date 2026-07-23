@@ -23,7 +23,7 @@ A research program measures the same molecules across multiple assays:
 - **Genomics**: target expression, off-target profiling
 
 Each assay produces data with its own shape and coordinate structure, but all
-share the entity being characterized (e.g. `molecule_id`).
+share the entity being characterized (e.g. `molecule`).
 
 The challenge: keep all this data linked so queries like "find molecules with
 DLS size < 100nm AND ELISA KD < 10nM AND flow cytometry uptake > 50%" work
@@ -56,11 +56,13 @@ ds = ds.assign({
     "ec50_um": (["molecule", "cell_line"], ec50_data),
 })
 
-# Query across all assays -- one line
+# Query across all assays -- one line.
+# NOTE: .drop_vars() after .sel() strips the leftover coordinate so the
+# single-indexer results align cleanly inside the combined boolean mask.
 promising = ds.where(
     (ds.hydrodynamic_diameter_nm.mean("replicate") < 100)
-    & (ds.kd_nm.sel(target="egfr") < 10)
-    & (ds.uptake_percent.sel(cell_line="hepg2").mean("replicate") > 50),
+    & (ds.kd_nm.sel(target="EGFR").drop_vars("target") < 10)
+    & (ds.uptake_percent.sel(cell_line="HEPG2").drop_vars("cell_line").mean("replicate") > 50),
     drop=True,
 )
 ```
@@ -80,7 +82,7 @@ is a tree node, sharing common coordinates via inheritance:
 ```python
 import xarray as xr
 
-# Root with shared molecule_id coordinate
+# Root with shared `molecule` coordinate
 root = xr.Dataset(coords={"molecule": mol_ids})
 
 # Each assay is a node with its own dims
@@ -107,7 +109,7 @@ flow_ds = xr.Dataset(
     {"fluorescence": (["molecule", "cell_line", "event"], flow_events)},
     coords={
         "molecule": mol_ids,
-        "cell_line": ["hepg2", "hek293", "primary"],
+        "cell_line": ["HEPG2", "HEK293", "primary"],
         "event": np.arange(10000),
     },
 )
@@ -123,19 +125,50 @@ tree = xr.DataTree.from_dict({
 
 ### Accessing nodes
 
-```python
-# Path-based access
-tree["/characterization/dls/ds"]
-tree["/bioassays/elisa/ds"]
+Get the `Dataset` at a node with the **`.ds` attribute** -- never subscript a
+`"/ds"` path suffix (that looks for a child node literally named `"ds"` and
+raises `KeyError`):
 
-# Dot notation
+```python
+# Path syntax -- .ds attribute returns the Dataset
+tree["/characterization/dls"].ds
+tree["/bioassays/binding"].ds
+
+# Dot syntax (equivalent)
 tree.characterization.dls.ds
+
+# Both return the same data
+assert tree["/characterization/dls"].ds.equals(tree.characterization.dls.ds)
 ```
 
-### Coordinate inheritance
+### Tree-wide selection
 
-Child nodes inherit coordinates from parent nodes. The `molecule` coordinate
-defined at the root is visible in every child -- no duplication.
+The headline feature: one `.sel()` propagates to **every** node. No manual
+index-matching across assays.
+
+```python
+# Slice all nodes for one molecule in a single call
+tree.sel(molecule="LNP_007")
+
+# Or a list of molecules (e.g. train/test split, or cross-assay query hits)
+tree.sel(molecule=hit_molecules)
+```
+
+### Coordinate inheritance (deep tree)
+
+When the tree has a `"/"` root, child nodes **inherit** the root's coordinates.
+The `molecule` coordinate defined once at the root is visible in every child
+without duplication:
+
+```python
+assert (tree["/characterization/dls"].ds.molecule.values == tree.ds.molecule.values).all()
+```
+
+> **Flat vs deep:** a *flat* tree (no `"/"` root) has each sibling carry
+> `molecule` independently -- fine for mostly-compatible assays. A *deep* tree
+> (root defines the shared coordinate) is for **incompatible** grids where one
+> `Dataset` would broadcast to huge NaN-filled arrays. See
+> [data-structure-design.md](data-structure-design.md).
 
 ## Pattern: custom index for cross-experiment selection
 
@@ -245,10 +278,10 @@ bioassay = xr.Dataset(
     },
     coords={
         "molecule": mol_ids,
-        "target": ["egfr", "her2", "cd20"],
+        "target": ["EGFR", "HER2", "CD20"],
         "concentration_nm": np.logspace(-1, 3, 8),
         "replicate": ["r1", "r2", "r3"],
-        "cell_line": ["hepg2", "hek293"],
+        "cell_line": ["HEPG2", "HEK293"],
         "event": np.arange(5000),
     },
 )
@@ -267,8 +300,8 @@ derived = xr.Dataset(
     },
     coords={
         "molecule": mol_ids,
-        "target": ["egfr", "her2", "cd20"],
-        "cell_line": ["hepg2", "hek293"],
+        "target": ["EGFR", "HER2", "CD20"],
+        "cell_line": ["HEPG2", "HEK293"],
     },
 )
 
@@ -280,13 +313,13 @@ tree = xr.DataTree.from_dict({
     "/bioassays/derived": derived,
 })
 
-# Cross-assay query
+# Cross-assay query (.drop_vars() keeps the two .sel() results aligned)
 promising_molecules = derived.where(
-    (derived.ec50_um.sel(target="egfr") < 1.0)
-    & (derived.kd_nm.sel(target="egfr") < 10),
+    (derived.ec50_um.sel(target="EGFR").drop_vars("target") < 1.0)
+    & (derived.kd_nm.sel(target="EGFR").drop_vars("target") < 10),
     drop=True,
 ).molecule.values
 
-# Pull analytical data for those molecules
-analytical_promising = tree["/characterization/ds"].sel(molecule=promising_molecules)
+# Pull analytical data for those molecules (.ds attribute, then .sel)
+analytical_promising = tree["/characterization"].ds.sel(molecule=promising_molecules)
 ```

@@ -38,10 +38,11 @@ synchronized through selection, computation, and storage.
 ```
 Experiment Design          xarray Structure
 ─────────────────          ────────────────
-Samples/subjects    →      dimension coordinates (e.g. molecule_id, sample)
-Experimental factors →     dimension coordinates (e.g. treatment, time_point)
-Raw measurements    →      data variables (e.g. expression_level, intensity)
-Derived estimates   →      data variables (e.g. ec50, kd, effect_estimate)
+Samples/subjects    →      dimension coordinates (e.g. molecule, sample)
+Experimental factors →     dimension coordinates (e.g. target, cell_line, treatment)
+Raw measurements    →      data variables (e.g. od450, intensity, uptake_pct_positive)
+Derived estimates   →      data variables (e.g. ec50_nm, kd_nm)
+Uncertainty         →      data variables along a `draw` dim (e.g. ec50_nm_posterior)
 Features            →      data variables along a feature dimension
 Splits/assignments  →      boolean mask variables along a split_type dimension
 Physical units      →      coordinate attrs or CoordinateTransform indexes
@@ -86,11 +87,14 @@ for full guidance.
 
 ```python
 # Label-based selection — everything stays aligned
-train = ds.where(ds.train_mask.sel(split_type="random_80_20"), drop=True)
+# (.drop_vars() strips the leftover coordinate so the mask aligns cleanly)
+train = ds.where(
+    ds.train_mask.sel(split_type="random_80_20").drop_vars("split_type"), drop=True
+)
 
 # Pointwise indexing with shared dimension
 targets = ds.sel(
-    molecule=xr.DataArray(["mol_3", "mol_7"], dims="query"),
+    molecule=xr.DataArray(["LNP_003", "LNP_007"], dims="query"),
     method="nearest",
 )
 
@@ -124,14 +128,17 @@ Read [references/cross-experiment-linking.md](references/cross-experiment-linkin
 for full guidance.
 
 ```python
-# DataTree for multi-assay hierarchy
+# DataTree for multi-assay hierarchy: root defines the shared `molecule`
+# coordinate, child nodes inherit it (a "deep" tree -- see nb5)
 tree = xr.DataTree.from_dict({
+    "/": xr.Dataset(coords={"molecule": mol_ids}),
     "/characterization/dls": dls_ds,
     "/characterization/hplc": hplc_ds,
-    "/bioassays/elisa": elisa_ds,
+    "/bioassays/binding": binding_ds,
     "/bioassays/flow_cytometry": flow_ds,
 })
-# Shared molecule_id coordinate inherited across nodes
+# One selection propagates to every node
+tree.sel(molecule="LNP_007")
 ```
 
 ## Reference notebooks
@@ -142,11 +149,11 @@ functional readouts, analytical chemistry). Run each with `uv run`:
 
 | Notebook | Topic |
 |----------|-------|
-| [01_linked_data_design.py](notebooks/01_linked_data_design.py) | Progressive accumulation linking 6 assay domains by molecule_id |
+| [01_linked_data_design.py](notebooks/01_linked_data_design.py) | Progressive accumulation across 6 assay domains; PyMC posteriors on a `draw` dim; flat DataTree + Zarr persistence -- all linked by `molecule` |
 | [02_periodic_and_transform_indexes.py](notebooks/02_periodic_and_transform_indexes.py) | PeriodicIndex + CoordinateTransform (flow cytometry, microscopy, mass spec) |
 | [03_ndindex_time_locking.py](notebooks/03_ndindex_time_locking.py) | NDIndex for N-D derived coordinates, time-locking to dosing events |
 | [04_linked_intervals_cross_slicing.py](notebooks/04_linked_intervals_cross_slicing.py) | DimensionInterval for concentration x time interval linking |
-| [05_cross_experiment_datatree.py](notebooks/05_cross_experiment_datatree.py) | DataTree hierarchy, cross-experiment queries |
+| [05_cross_experiment_datatree.py](notebooks/05_cross_experiment_datatree.py) | **Deep** DataTree (root-coordinate inheritance) for **incompatible grids** -- contrasted with Notebook 1's flat tree; cross-assay queries |
 
 ## API instability note
 

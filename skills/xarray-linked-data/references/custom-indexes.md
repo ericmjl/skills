@@ -65,6 +65,11 @@ class MyIndex(Index):
     def create_variables(self, variables):
         ...
 
+    # OPTIONAL: attach the coord variable to the array (default may skip it).
+    # Return True for N-D / derived coords you want visible on the object.
+    def should_add_coord_to_array(self, name, var, dims):
+        ...
+
     # OPTIONAL: alignment trio (all three required together)
     def equals(self, other): ...
     def join(self, other, how="inner"): ...
@@ -129,12 +134,14 @@ class PeriodicIndex(Index):
         (name, label), = labels.items()
         base = self._index.index.to_numpy()
         q = np.asarray(label, dtype=float)
+        # Wrapped distance on the circle (one formula handles 0-d and N-d)
+        d = np.abs(
+            (q[..., None] - base[None, :] + self.period / 2) % self.period
+            - self.period / 2
+        )
         if q.ndim == 0:
-            d = np.abs((float(q) - base + self.period / 2) % self.period - self.period / 2)
             return IndexSelResult({self._index.dim: [int(d.argmin())]})
-        d = np.abs((q[:, None] - base[None, :] + self.period / 2) % self.period - self.period / 2)
-        pos = d.argmin(axis=1)
-        return IndexSelResult({self._index.dim: pos})
+        return IndexSelResult({self._index.dim: d.argmin(axis=1)})
 
     def create_variables(self, variables):
         return self._index.create_variables(variables)
@@ -194,9 +201,61 @@ da = xr.DataArray(
     ),
 )
 
-# Select by physical depth -- xarray computes the reverse transform
-da.sel(depth_nm=500.0, method="nearest")  # finds slice 125 (500/4=125)
+# Select by physical depth -- xarray computes the reverse transform (500/4 = slice 125).
+# RECOMMENDED: use a DataArray indexer (point-wise) + method="nearest".
+da.sel(depth_nm=xr.DataArray([500.0], dims="probe"), method="nearest")
+
+# Vectorized: several physical depths at once
 da.sel(depth_nm=xr.DataArray([100, 200, 300], dims="probe"), method="nearest")
+```
+
+> **Verify transform selections by data-equivalence, not by reading the dropped
+> coordinate.** A `CoordinateTransformIndex` keeps only the *output* coordinate
+> after `.sel()` -- the input/storage coordinate (`z` here) is **dropped** from
+> the result, so `result.z` raises `AttributeError`. Recover it from the reverse
+> mapping (`z = depth_nm / slice_thickness`) or, better, assert the data matches
+> a plain positional slice:
+>
+> ```python
+> result = da.sel(depth_nm=xr.DataArray([500.0], dims="probe"), method="nearest")
+> assert np.array_equal(result.values, da.isel(z=125).values)  # 500 nm -> slice 125
+> ```
+
+### Reference: MassSpecTransform (nonlinear)
+
+A `CoordinateTransform` need not be linear. Mass spectrometry maps
+time-of-flight bins to mass-to-charge ratio via a quadratic calibration
+`mz = a * sqrt(tof) + b`:
+
+```python
+import numpy as np
+from xarray.indexes import CoordinateTransform
+
+
+class MassSpecTransform(CoordinateTransform):
+    """Maps time-of-flight bins to mass-to-charge ratio (m/z).
+
+    Calibration: mz = a * sqrt(tof) + b
+    Inverse:     tof = ((mz - b) / a) ** 2
+    """
+
+    def __init__(self, n_bins, calib_a, calib_b):
+        super().__init__(("mz",), {"tof_bin": n_bins})  # output "mz", input "tof_bin"
+        self.n_bins = n_bins
+        self.calib_a = calib_a
+        self.calib_b = calib_b
+
+    def forward(self, dim_positions):
+        tof = dim_positions["tof_bin"]
+        return {"mz": self.calib_a * np.sqrt(tof.astype(float)) + self.calib_b}
+
+    def reverse(self, coord_labels):
+        mz = coord_labels["mz"]
+        return {"tof_bin": ((mz - self.calib_b) / self.calib_a) ** 2}
+```
+
+```python
+ms_da.sel(mz=xr.DataArray([1010], dims="peak"), method="nearest")  # -> tof_bin 100
 ```
 
 ### Built-in RangeIndex
@@ -281,6 +340,7 @@ class NDIndex(Index):
 
     def __init__(self, nd_coords, slice_method="bounding_box"):
         self._nd_coords = nd_coords  # {name: (dims, values)}
+        self._slice_method = slice_method  # referenced by isel(); do NOT omit
 
     @classmethod
     def from_variables(cls, variables, *, options):
@@ -367,8 +427,25 @@ ds.sel(abs_time=7.5, method="nearest")
 window = ds.sel(stim_locked=slice(-0.5, 1.0))  # -0.5s to +1.0s around stim
 ```
 
-For the full implementation with slice methods and edge-case handling, see
-Ian Hunt-Isaak's [linked_indices library](https://github.com/ianhi/xarray-linked-indexes).
+### Carrying derived estimates through selection
+
+Because `NDIndex` keeps the derived coordinate alive after `.sel()`, you can
+store analysis results (e.g. MCMC posterior draws) alongside the raw data on
+the same `trial x rel_time` grid and have them travel with every selection.
+Notebook 03 fits a hierarchical model, stores the posterior under a `draw`
+dimension, then time-locks to a dosing event -- `epoch.sel(dose_locked=5)`
+returns the posterior draws for that window in one call:
+
+```python
+# posterior lives on a 'draw' dim alongside the experimental grid
+ds = ds.assign({"response_posterior": (["trial", "rel_time", "draw"], draws)})
+# selecting by the derived dose-locked coordinate carries the posterior too
+ds.sel(dose_locked=5.0, method="nearest")
+```
+
+For the full NDIndex implementation with slice methods and edge-case handling,
+see Ian Hunt-Isaak's [linked_indices library](https://github.com/ianhi/xarray-linked-indexes);
+Notebook 03 contains a self-contained version.
 
 ## DimensionInterval
 
@@ -397,12 +474,25 @@ ds = ds.drop_indexes(["time", "word", "phoneme"]).set_xindex(
 )
 ```
 
+> **`IntervalDtype` coordinates need no `drop_indexes`.** Only plain
+> dimension coordinates (like `time`, `word`) must be dropped before
+> re-installing. Coordinates whose dtype is `pd.IntervalDtype`
+> (`word_intervals`, `phoneme_intervals`) have no default index to remove.
+
 ### Cross-slicing
 
 ```python
 ds.sel(time=slice(30, 70))           # constrains word AND phoneme
 ds.sel(word_intervals=60)            # picks word [40,80); constrains time + phoneme
 ds.sel(phoneme_intervals=70)         # picks phoneme [60,80); constrains time + word
+```
+
+You can also select interval coordinates by **label** or by a `pd.Interval`
+object (as Notebook 04 does for dose-response data):
+
+```python
+ds.sel(dose_level="high")                                # by label on a linked dim
+ds.sel(dose_intervals=pd.Interval(80, 140, closed="left"))  # by Interval object
 ```
 
 ### Onset/duration format
@@ -415,8 +505,15 @@ ds = ds.drop_indexes(["time", "word"]).set_xindex(
 )
 ```
 
-For the full implementation, see
-[linked_indices](https://github.com/ianhi/xarray-linked-indexes).
+### Implementation
+
+The snippets above import `DimensionInterval` from Ian Hunt-Isaak's
+[linked_indices library](https://github.com/ianhi/xarray-linked-indexes).
+If you want a dependency-free, self-contained `DimensionInterval` (an
+`Index` subclass with `from_variables`, `create_variables`, `sel` with
+overlap propagation, and `should_add_coord_to_array`), Notebook 04 builds
+the full implementation inline over a dose-response example
+(`notebooks/04_linked_intervals_cross_slicing.py`) -- copy it directly.
 
 ## Registration
 
@@ -453,7 +550,7 @@ ds.xindexes  # pretty-prints index -> coords mapping
 ## Gotchas
 
 1. **Experimental API**: Custom indexes may change without deprecation.
-   Pin xarray versions.
+   Pin (or at minimum floor) xarray versions in projects that use them.
 
 2. **Must `drop_indexes` before re-installing**: `set_xindex` will not
    overwrite an existing custom index silently.
@@ -483,3 +580,26 @@ ds.xindexes  # pretty-prints index -> coords mapping
 8. **`NDIndex` vs `NDPointIndex`**: Different problems. `NDIndex` = value
    lookup in N-D array (structured data with derived coords). `NDPointIndex`
    = spatial nearest-neighbor in point clouds (unstructured data).
+
+9. **CoordinateTransformIndex drops the input coordinate after `.sel()`**:
+   Only the *output* coordinate survives the selection. With
+   `ZStackTransform` (`super().__init__(("depth_nm",), {"z": n_slices})`),
+   `da.sel(depth_nm=500)` returns a result carrying `depth_nm` but **not**
+   `z` -- `result.z` raises `AttributeError`. Recover the input from the
+   reverse mapping, or verify by data-equivalence against `isel`:
+   `assert np.array_equal(result.values, da.isel(z=125).values)`.
+
+10. **`CoordinateTransformIndex` needs a `DataArray` indexer + `method="nearest"`**:
+    It only supports advanced (point-wise) indexing. A bare scalar
+    `da.sel(depth_nm=500, method="nearest")` can raise
+    `TypeError: CoordinateTransformIndex only supports advanced (point-wise)
+    indexing with DataArray/Variable objects` -- in particular when the
+    transform dimension is the *only* dimension. Use the point-wise form:
+    `da.sel(depth_nm=xr.DataArray([500.0], dims="probe"), method="nearest")`.
+
+11. **`method="nearest"` applies to every indexer in one `.sel()` call**:
+    Combining a string indexer with a numeric transform coordinate in a
+    single call raises `TypeError: unsupported operand type(s) for -: 'str'
+    and 'str'` (nearest is applied to the string indexer too). Chain the
+    selections so the string one is exact:
+    `da.sel(channel="nuclei").sel(depth_nm=400, method="nearest")`.

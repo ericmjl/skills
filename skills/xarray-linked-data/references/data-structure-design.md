@@ -93,9 +93,29 @@ Stage 1: Raw measurements    →  ds = xr.Dataset({"raw": ...})
 Stage 2: Derived estimates   →  ds = ds.assign({"ec50": ..., "kd": ...})
 Stage 3: Computed features   →  ds = ds.assign({"features": ...})
 Stage 4: Model outputs       →  ds = ds.assign({"predictions": ..., "train_mask": ...})
+Stage 5: Uncertainty         →  ds = ds.assign({"ec50_posterior": (["molecule", "target", "draw"], samples)})
 ```
 
 Each stage reuses the same coordinates. No re-alignment needed.
+
+### Storing uncertainty inline (a `draw` dimension)
+
+A powerful pattern: store the full posterior from a Bayesian fit (PyMC/ArviZ)
+as an extra `draw` dimension aligned to the same coordinates as the point
+estimates. Selecting a molecule then carries its uncertainty along for free.
+Keep posteriors that belong to different assays in separate `Dataset`s or
+DataTree nodes so their `draw` dimensions don't collide.
+
+```python
+n_draws = trace.posterior.sizes["chain"] * trace.posterior.sizes["draw"]
+ds = ds.assign(
+    {"ec50_nm": (["molecule", "target"], ec50_estimates),  # point estimate
+     "ec50_nm_posterior": (["molecule", "target", "draw"], ec50_full_post)},
+).assign_coords(draw=np.arange(n_draws))
+
+# selecting a molecule carries the whole posterior with it
+ds.sel(molecule="LNP_007").ec50_nm_posterior  # (target, draw)
+```
 
 ### Full example
 
@@ -150,7 +170,7 @@ import xarray as xr
 
 # Different assays with incompatible shapes
 dls_ds = xr.Dataset(
-    {"hydrodynamic_diameter_nm": (["molecule", replicate"], dls_data)},  # (50, 3)
+    {"hydrodynamic_diameter_nm": (["molecule", "replicate"], dls_data)},  # (50, 3)
     coords={"molecule": mol_ids, "replicate": ["r1", "r2", "r3"]},
 )
 hplc_ds = xr.Dataset(
@@ -168,9 +188,43 @@ tree = xr.DataTree.from_dict({
 ```
 
 DataTree provides:
-- **Coordinate inheritance**: child nodes see parent coordinates
-- **Path-based access**: `tree["/characterization/dls/ds"]`
-- **Independent grids**: each node has its own dims
+- **Coordinate inheritance**: with a `"/"` root, child nodes inherit the
+  root's coordinates (the `molecule` defined once at root is visible in every
+  child -- no duplication)
+- **Path-based access**: get the `Dataset` at a node with the `.ds` attribute
+  -- `tree["/characterization/dls"].ds` (dot form works too:
+  `tree.characterization.dls.ds`). Note: `tree["/characterization/dls/ds"]`
+  is **wrong** -- it looks for a child node literally named `"ds"` and raises
+  `KeyError`.
+- **Tree-wide selection**: `tree.sel(molecule="mol_007")` propagates to every
+  node in one call (see [cross-experiment-linking.md](cross-experiment-linking.md))
+- **Independent grids**: each node keeps its own dims
+
+### Flat vs deep DataTree
+
+There are two shapes, for two situations (Notebooks 1 and 5 contrast them
+directly):
+
+- **Flat tree** (no `"/"` root): sibling nodes each independently carry the
+  shared coordinate. Use when assays have mostly **compatible** dimensions and
+  you just want them grouped.
+- **Deep tree** (with a `"/"` root that defines the shared coordinate): children
+  **inherit** the root's coordinates. Use when assays live on **incompatible**
+  grids and forcing one `Dataset` would broadcast to huge NaN-filled arrays.
+
+```python
+# Flat (Notebook 1): siblings each carry `molecule` independently
+campaign = xr.DataTree.from_dict({
+    "/analytical": ds_stage1,
+    "/binding": ds_stage2,
+})
+
+# Deep (Notebook 5): root defines `molecule` once, children inherit it
+campaign = xr.DataTree.from_dict({
+    "/": xr.Dataset(coords={"molecule": mol_ids}),
+    "/characterization/dls": dls_ds,
+})
+```
 
 ## Coordinate design patterns
 
