@@ -1,0 +1,5 @@
+{
+  "//": "Reference docs use long prose lines; relax line length but keep all other defaults.",
+  "default": true,
+  "MD013": false
+}
