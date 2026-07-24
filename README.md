@@ -47,11 +47,11 @@ Location: `skills/gh-pr-code-review/`
 
 PR code review workflow: pull diff, two-pass findings, draft and prioritize comments, then optionally post via gh api. Use when reviewing pull requests and leaving actionable feedback.
 
-### markdown-to-docx
+### marketing-copy
 
-Location: `skills/markdown-to-docx/`
+Location: `skills/marketing-copy/`
 
-Convert markdown files to styled Google Docs using pandoc and a Word template. Use when creating Google Docs from markdown notes, applying consistent branding to documents, or generating proposals and reports from Obsidian vault content. Supports self-healing pandoc installation and optional Google Drive upload.
+Write, review, and critique marketing copy using proven copywriting frameworks (F.R.E.D. avatar, headline formulas, PAS / benefit / before-after-bridge, email sequences, offers and risk reversal, stealth closes). Use when generating or auditing sales copy, headlines, bullets, emails, landing pages, or ad copy.
 
 ### ml-experimentation
 
