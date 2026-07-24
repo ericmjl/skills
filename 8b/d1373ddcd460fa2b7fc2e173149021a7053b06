@@ -1,0 +1,19 @@
+README.md
+  s_64becc3fc120d9::t_d1d86a29a4b1b1 50,52,54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "8bd1373ddcd460fa2b7fc2e173149021a7053b06",
+  "prompts": {},
+  "sessions": {
+    "s_64becc3fc120d9": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "bdb6a800-47d4-42fa-a10c-be0f624f623e",
+        "model": "grok-4.5"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
