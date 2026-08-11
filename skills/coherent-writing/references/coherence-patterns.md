@@ -4,13 +4,66 @@ Use this file during rewriting when you need concrete transition language or fas
 
 ## Fast Diagnostics
 
-Look for these common coherence failures:
+Five failure types to look for at every scale (sentence-to-sentence inside a paragraph, paragraph-to-paragraph at boundaries, section-to-section, and cross-draft):
 
-1. **Topic jump**: New sentence introduces a different subject without a bridge.
-2. **Orphan claim**: Assertion appears without evidence or context.
-3. **Looping**: Paragraph repeats the same claim with different wording.
-4. **Pronoun fog**: "this", "it", "they" without a clear referent.
-5. **Unsignaled pivot**: Shift from explanation to recommendation without warning.
+1. **Self-contradiction** — two claims that cannot both be true. The strongest failure; always flag these first.
+2. **Sudden topic jump** — a sentence introduces a different subject with no bridge.
+3. **Logical disconnect** — the sentence does not contradict the prior one, but the connection between them is never surfaced. The hardest to spot: each sentence looks fine in isolation, but the reader cannot say *why* sentence B follows sentence A.
+4. **Unsignaled pivot** — a shift in mode (explanation → recommendation, claim → evidence, general → specific) with no warning to the reader.
+5. **Pronoun fog** — `this`, `it`, `they`, `which` with no clear referent. Mechanical, common, easy to fix.
+
+A sixth pattern, **orphan claim**, is a special case: an assertion appears without evidence or context. Treat as a logical disconnect on the claim-to-evidence axis.
+
+### Where to hunt each type
+
+- **Self-contradiction** — Pass 1 (cross-paragraph) and Pass 2 (within-paragraph).
+- **Sudden topic jump** — Pass 2 (within) and Pass 4 (boundaries).
+- **Logical disconnect** — Pass 2 (within). This is the within-paragraph pass's primary target.
+- **Unsignaled pivot** — Pass 2 (within) and Pass 3 (section boundaries, where pivots are largest).
+- **Pronoun fog** — Pass 2 (within) and Pass 4 (boundaries).
+
+## Within-Paragraph Rewiring Patterns
+
+Use when a paragraph's interior logic is broken (Pass 2 territory). All of these preserve the paragraph's claims; they only rewire how sentences connect.
+
+### Expose a hidden link
+
+Sentence B follows A for a reason the writer assumed but never stated. Insert the reason.
+
+- Before: "The model overfits. We need more data."
+- After: "The model overfits, *which means it has learned noise rather than signal*. We need more data."
+
+### Reorder for cause-before-effect
+
+If effect precedes cause in the sentence order, swap them so the reader sees the cause first.
+
+- Before: "We need more data. The model overfits."
+- After: "The model overfits. We need more data."
+
+### Split a compound that bundles unrelated ideas
+
+A single sentence carrying two unrelated claims reads as a disconnect.
+
+- Before: "The model overfits and the UI is slow."
+- After: "The model overfits. Separately, the UI is slow."
+
+### Signal the pivot explicitly
+
+Mark a mode shift so the reader expects it.
+
+- Before: "The model overfits. Use regularization."
+- After: "The model overfits. *To address this*, use regularization."
+
+### Replace a vague referent
+
+Pin down what `this`, `it`, `they` actually points to.
+
+- Before: "This causes problems later."
+- After: "This *overfitting* causes problems later."
+
+### Delete the redundant sentence
+
+If a sentence repeats the prior claim in different words, delete it. Don't tighten it — delete it. Repetition masquerades as emphasis but reads as a loop.
 
 ## Transition Templates
 
