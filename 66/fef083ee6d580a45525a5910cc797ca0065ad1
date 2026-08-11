@@ -1,0 +1,24 @@
+skills/coherent-writing/references/subagent-prompts.md
+  s_0a9f1a7aa16b4b::t_8b781a59b7e9ed 5-6,17-21,26-27,30,34-86,89-91,94,97,113-114,122-124,128,131-133,136,139,155-156,159-160,164-166,170,173-175,178,181,183,192-193,200-201,203,206-208,211-214
+skills/coherent-writing/SKILL.md
+  s_0a9f1a7aa16b4b::t_42825d599fd13f 3,19-21,32-33,36,38-42,46-57,62-65,75-77,79-81,88,92-98,102,111-116,120-161,187,189,191,193,199,213,217,219,221,227,231-232,236,240-288,292,297-298,310,314-315,322-329,337-338
+  s_0a9f1a7aa16b4b::t_4f30cd82ed6ffb 294
+skills/coherent-writing/references/coherence-patterns.md
+  s_0a9f1a7aa16b4b::t_00a99464992f89 7,9-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "66fef083ee6d580a45525a5910cc797ca0065ad1",
+  "prompts": {},
+  "sessions": {
+    "s_0a9f1a7aa16b4b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_00f57014affeJYfNyvMs83IF2k",
+        "model": "glm-5.2"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
