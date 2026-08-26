@@ -1,25 +1,10 @@
 ---
-name: awesome-marimo-notebook
-description: >
-  Build an awesome marimo notebook that brings a research paper or dataset to
-  life — for competitions, tutorials, demos, or blog companions. Use when asked
-  to "make an awesome marimo notebook," "build a notebook for this paper,"
-  "create a competition submission," or pair-program an interactive research
-  explainer on molab. Covers: what makes a notebook engaging (intuition game,
-  real experiment, novel extension, design system), paper selection, narrative
-  arc and proportions, custom anywidget patterns (bi-directional JS<->Python
-  state: JS brushing/selection -> Python region-of-interest; Python variables
-  reactively driving JS), wigglystuff CellTour,
-  effective GPU usage, memory-efficient training (fused STE, gradient
-  checkpointing), parallel review subagents, and a pre-publication polish
-  checklist. CRITICAL: mo is auto-injected (import in
-  ONE cell); every top-level name must be unique across ALL cells; custom
-  anywidget needs model.save_changes() for JS->Python sync; use mo.output.replace() for live charts;
-  guard all torch.cuda calls for CPU-only machines.
+description: Build an awesome marimo notebook that brings a research paper or dataset to life — for competitions, tutorials, demos, or blog companions. Use when asked to "make an awesome marimo notebook," "build a notebook for this paper," "create a competition submission," or pair-program an interactive research explainer on molab.
 license: MIT
 metadata:
   author: ericmjl
-  version: "1.0"
+  version: '1.0'
+name: awesome-marimo-notebook
 ---
 
 # Awesome marimo Notebook
@@ -247,7 +232,6 @@ startup. No `change:` handler is needed because the widget is remounted.
 graph_choice = mo.ui.dropdown(["toy", "real-A", "real-B"], value="toy")
 graph_choice
 ```
-
 ```python
 # cell 2 — reads graph_choice.value (DIFFERENT cell!), rebuilds the widget
 data = load_graph(graph_choice.value)
@@ -261,40 +245,249 @@ swaps the BFS animation between the toy teaching graph and real sociopatterns
 ego subgraphs; each graph's nodes/edges/BFS-steps are computed in Python
 (spring layout + step precomputation) and the JS just renders
 `model.get(...)` at mount. Use this pattern whenever the data swaps wholesale
-(new dataset, new layout) — and pass bulky data as JSON-string traits
-(`traitlets.Unicode(json.dumps(data))`, then `JSON.parse(model.get('x_json'))`
-in the ESM) rather than relying on object sync.
-
-For a **cheap scalar update that must preserve JS-side state** (current zoom,
-play position, scroll), keep the widget mounted and register
-`model.on('change:source', handler)` in `render` to mutate the existing DOM in
-place when a Python trait changes. For smooth in-place updates *within a single
-cell* (live training curves), use `mo.output.replace()` (see "Live-updating
-charts").
+(new dataset, new layout). For smooth *in-place* updates within a single cell
+(live training curves), use `mo.output.replace()` (see "Live-updating charts")
+rather than mutating traits on a persistent instance.
 
 #### Key gotchas
-
-- **Every trait that crosses the boundary needs `.tag(sync=True)`** — unsynced
-  traits never propagate in either direction.
 - **`model.save_changes()` is REQUIRED for JS→Python sync** — without it the
   trait never updates and downstream cells don't re-run. The #1 anywidget bug.
 - **Reading `.value` must happen in a DIFFERENT cell** from the one that
   created the widget — marimo raises `RuntimeError: Accessing the value of a
   UIElement in the cell that created it is not allowed`. Split into a
   create-cell and a consume-cell.
-- **Wrap in `mo.ui.anywidget()` to make an anywidget a marimo UI element.**
-  This is REQUIRED to read its `.value` downstream (input widgets). Display-only
-  widgets often render bare too (e.g. `BFSAnimation`), but wrapping is always
-  safe and is the conventional default for interactive widgets like CellTour.
-- **`_esm` and `_css` are anywidget's required class-attribute names** (the
-  framework looks them up by those exact names). These are class attributes,
-  not cell variables — so the no-underscore rule for shared cell names (rule
-  #3) doesn't apply to them.
+- **Wrap in `mo.ui.anywidget()` when a downstream cell reads `.value`** (INPUT
+  widgets, JS→Python). Pure Python→JS display widgets (like `BFSAnimation`)
+  render fine as a bare instance; wrapping a display widget is harmless and is
+  how `CellTour` below is used, but only INPUT widgets NEED the wrap.
+- **`_esm` and `_css` are anywidget's required attribute names** (the framework
+  looks them up by those exact names) — the deliberate exception to the
+  no-underscore rule.
 - **The widget's variable name must be non-underscore** if a downstream cell
-  reads it — underscore-prefixed names are cell-private and not shared (rule
-  #3), so name it `brush`, not `_brush`.
+  reads it: marimo treats underscore-prefixed variables as private (not
+  shared at all), so `_brush` is not available in any form in other cells.
+
+### Bi-directional state sync (the real power of anywidgets)
+
+A widget that only renders Python data into the DOM (Python→JS, once) is the
+floor. The ceiling — and the reason to reach for a custom anywidget over a
+static plot — is **bi-directional state**: JS interactions become Python data,
+and Python data reactively reshapes the JS UI. The button-counter above shows
+the mechanism in miniature; real notebooks use both directions to make the
+widget a two-way instrument, not a display.
+
+**Direction 1 — JS state → Python (interactions become data).** The killer use
+case is a *selection that you save as a Python value* and then use downstream.
+Classic example: brush a scatterplot and store the selected points as a region
+of interest (ROI) that filters/masks the rest of the notebook.
+
+```python
+class BrushScatter(anywidget.AnyWidget):
+    _esm = """
+    function render({ model, el }) {
+      // ...draw points, attach a brush handler...
+      brush.on('end', ({ selection }) => {
+        if (selection) {
+          model.set('roi', pointsInside(selection));  // push JS state up
+          model.save_changes();   // CRITICAL — without this Python never sees it
+        }
+      });
+    }
+    export default { render };
+    """
+    roi = traitlets.List([]).tag(sync=True)   # JS writes this; Python reads it
+
+brush = mo.ui.anywidget(BrushScatter())
+brush  # cell output
+```
+
+Downstream, `brush.roi` is an ordinary Python list — read it in another cell to
+filter a DataFrame, refit a model, etc. marimo re-runs every downstream cell
+that reads `brush.roi` each time the brush changes, so the ROI drives the rest
+of the notebook live. **The test that you've wired this correctly:** interact in
+the browser and watch a downstream cell re-run and change.
+
+**Direction 2 — Python state → JS (reactive UI rebuild).** A Python control
+(dropdown, slider) changes a value, and the widget re-renders with new data.
+Two equivalent flavors:
+
+- **Rebuild on change (simplest, preferred when the data is bulky):** put the
+  widget in a cell that depends on the upstream control. When the control
+  changes, marimo re-runs the cell and you construct a fresh widget with new
+  `sync=True` traits — the JS re-renders from the new trait payloads. This is
+  the pattern in Network-Analysis-Made-Simple notebook `02-paths.py`: a
+  `mo.ui.dropdown` picks a graph; the widget cell rebuilds `BFSAnimation(
+  nodes_json=..., steps_path_json=..., target_label=...)` from the selection,
+  and the BFS animation re-renders on the chosen graph. Pass bulky data as
+  JSON-string traits (`traitlets.Unicode(json.dumps(data)).tag(sync=True)`)
+  and `JSON.parse` them in the ESM.
+- **React in place (preferred for cheap scalar updates, no re-render):**
+  register `model.on('change:source', handler)` in the render function and
+  mutate the existing DOM. Use this when only a small value changes and you
+  want to preserve JS-side state (current zoom, play position) that a rebuild
+  would discard.
+
+**Mechanic checklist (both directions):**
+- Every trait that crosses the boundary needs `.tag(sync=True)` — unsynced
+  traits never propagate either way.
+- JS→Python: `model.set(...)` then **always** `model.save_changes()` (the
+  gotcha above; forgetting it is the #1 silent-failure in anywidget code).
+- Python→JS rebuild: the widget must be the cell's last expression AND the cell
+  must reference the upstream control so marimo's dataflow re-runs it.
+- Send structured/bulky data as JSON-string traits (`Unicode`) rather than
+  relying on object sync — ESM does `JSON.parse(model.get('x_json'))`.
+
+
+### Round-trip sync anti-pattern (JS → Python → JS feedback loop)
+
+The two directions above are shown in **isolation** (JS→Python, then
+Python→JS). Chaining them into a round-trip — JS sets trait A, Python
+`@observe` derives trait B from A, JS listens to B and re-renders — is an
+**anti-pattern** that silently fails.
+
+**Symptom signature.** The Python observer fires correctly (the derived trait
+has the right value in Python — verified by setting the source trait manually
+and reading the derived trait back), but the JS `model.on('change:<derived>',
+handler)` listener does **not** fire — or fires with stale data — **when the
+original change came from JS**. Initial render works; subsequent updates,
+especially rapid `j`/`k` keyboard navigation across graph nodes, do not.
+
+**Root cause.** The "ping-pong" round-trip where JS initiated the change,
+Python processes it and emits a new trait value, and that value must sync
+**back** to JS. Change-batching/queueing in the anywidget/ipywidget model can
+drop or coalesce the second trait update, especially under rapid interaction.
+The Python side looks correct in every probe; the failure is on the
+Python→JS return leg of a round-trip that JS started.
+
+**Fix — avoid the Python round-trip for derived DISPLAY state.** Pass the
+data JS needs to render the detail as a **one-shot payload trait** populated
+once at widget construction, and render the detail pane **entirely in JS** by
+looking up `payload[selected]` inside the `change:selected` handler:
+
+```python
+class GraphWidget(anywidget.AnyWidget):
+    _esm = """
+    function render({ model, el }) {
+      const payload = model.get('posts_payload');   // one-shot, set once
+      const detail  = el.querySelector('.detail');
+      const render  = () => {
+        const sel = model.get('selected');
+        detail.innerHTML = payload[sel]?.html || '<em>—</em>';
+      };
+      model.on('change:selected', render);           // JS-side lookup, no round-trip
+      render();
+    }
+    export default { render };
+    """
+    selected      = traitlets.Int(0).tag(sync=True)   # canonical bi-directional trait
+    posts_payload = traitlets.Dict().tag(sync=True)   # one-shot data, JS owns rendering
+    # NO @observe('selected'), NO derived 'selected_html' trait
+```
+
+The canonical bi-directional trait stays **minimal** (just the selection);
+all detail rendering reads from the JS-side payload keyed by the selection.
+No Python `@observe`, no second derived trait, no round-trip.
+
+**Generalizes to ANY anywidget** where (a) JS initiates a change to trait A,
+(b) Python computes a derived value for trait B from A, (c) JS needs to
+re-render based on B. Prefer the one-shot payload + JS-side rendering over
+the Python observer + derived trait. Reserve the Python `@observe` for cases
+where the derived value must be consumed by **downstream Python cells**
+(i.e. it is INPUT data, not display state) — in that case the round-trip is
+load-bearing and you do need it; otherwise keep the loop in JS.
+
+**Concrete instance:** marimo discourse-graph widget over Bluesky quote-trees
+(`graph-widget-keyboard-nav-popover` skill, 2026-07-18) — `j`/`k` nav sets
+`selected` in JS, a Python `@observe` pushed `selected_html` back, the detail
+pane didn't update on navigation despite `selected_html` being correct in
+Python; dropping the observer + rendering detail in JS from `posts_payload`
+fixed it immediately.
+
+**Distinct from the #1 anywidget bug** (forgetting `model.save_changes()` on
+the JS→Python direction — THAT silently fails to push JS state to Python at
+all; THIS fails on the Python→JS return leg of a round-trip the JS side
+started).
+
+### Same-direction synchronous double-fire (event handler + change listener both call the side-effect)
+
+A sibling of the round-trip anti-pattern above, but **same-direction (JS→JS)** and
+fails by **double-execution** rather than by a lost return leg. Easier to hit than
+the round-trip version and produces vivid jittery symptoms.
+
+**Trigger condition.** Your widget has BOTH:
+1. An originating event handler (click, hover, drag) that calls
+   `model.set('trait', v)` **and also** performs a side-effect directly — e.g.
+   `network.focus(nodeId, {animation})`, `network.fit()`, a DOM toggle, a
+   `fetch`.
+2. A `model.on('change:trait', ...)` listener that performs the **same**
+   side-effect.
+
+**Root cause.** In anywidget, a JS-side `model.set('trait', v)` fires the
+`change:trait` listener **synchronously and immediately** — not on a separate
+tick, not batched. So a single user action runs the side-effect **twice in a
+row**: once inside the event handler, once inside the change listener. For
+imperative visual operations that start an animation (`network.focus`,
+`network.fit`, camera transitions), the two calls start **competing animations**
+that fight each other for control of the viewport.
+
+**Symptom signature (vis-network, marimo discourse-graph widget over Bluesky
+quote-trees, 2026-07-18).** The graph_widget "rapidly zooms in then back out
+when clicking a node, EVEN IF already zoomed in"; the bipartite graph "pans
+rapidly across the viewport when hovering edges." The animation looks like a
+fight between two focus targets.
+
+**Fix — perform the side-effect in EXACTLY ONE place.** Either the event
+handler OR the change listener, not both. **Prefer the change listener** as the
+single source of truth: every selection change — whether from a click, from
+`j`/`k` keyboard navigation, from a programmatic `model.set`, or from a Python
+push — routes through exactly one focus call. Remove the side-effect from the
+originating event handler; let `change:selected` own it.
+
+```js
+// BAD — two focus calls on every click (handler + listener)
+network.on("click", (params) => {
+  const sel = params.nodes[0];
+  if (sel) {
+    model.set("selected", pn);          // fires change:selected synchronously
+    model.save_changes();
+    network.focus(sel, {scale: 1.1, animation: {duration: 250}});  // FOCUS #1
+  }
+});
+model.on("change:selected", () => {
+  const sel = nodeById[model.get("selected")];
+  if (sel) network.focus(sel, {scale: 1.1, animation: {duration: 250}});  // FOCUS #2
+});
+
+// GOOD — focus lives ONLY in the change listener
+network.on("click", (params) => {
+  const sel = params.nodes[0];
+  if (sel) {
+    model.set("selected", pn);          // fires change:selected -> focus runs once
+    model.save_changes();
+  }
+});
+model.on("change:selected", () => {
+  const sel = nodeById[model.get("selected")];
+  if (sel) network.focus(sel, {scale: 1.1, animation: {duration: 250}});  // the ONE focus
+});
+```
+
+**Diagnosis heuristic.** If a vis-network (or any animated-canvas) widget has
+jittery / competing pan-or-zoom animations on user action, grep the widget
+source for `network.focus` / `network.fit` and confirm each appears in
+**exactly one call site per user action**. Two call sites that both fire on a
+click is the bug.
+
+**Distinct from the round-trip anti-pattern above.** That is JS→Python→JS
+where the **return leg is lost or coalesced** under rapid interaction and the
+listener silently fails to fire. THIS is same-direction JS→JS, the listener
+**fires reliably every time**, and the bug is that **two listeners run** rather
+than one being dropped. Both are anywidget feedback-loop gotchas; they fail in
+opposite directions (lost-fire vs. double-fire). Concrete instance:
+marimo discourse-graph widget (graph_widget + bipartite cells, 2026-07-18).
 
 ### wigglystuff CellTour (guided walkthrough)
+
 
 ```python
 import wigglystuff
@@ -565,3 +758,9 @@ This skill assumes:
   every cell index matches its title/description. When asked to populate
   CellTours across a series of notebooks, apply these rules consistently to ALL
   notebooks in the series.
+
+
+## Original description (preserved on trim, 2026-07-19)
+
+Build an awesome marimo notebook that brings a research paper or dataset to life — for competitions, tutorials, demos, or blog companions. Use when asked to "make an awesome marimo notebook," "build a notebook for this paper," "create a competition submission," or pair-program an interactive research explainer on molab. Covers: what makes a notebook engaging (intuition game, real experiment, novel extension, design system), paper selection, narrative arc and proportions, custom anywidget patterns (bi-directional JS<->Python state: JS brushing/selection -> Python region-of-interest; Python variables reactively driving JS; the JS->Python->JS ROUND-TRIP anti-pattern where a Python @observe on a JS-set trait pushes a derived trait back to JS whose change listener silently fails under rapid interaction — render derived display state in JS from a one-shot payload instead), wigglystuff CellTour, effective GPU usage, memory-efficient training (fused STE, gradient checkpointing), parallel review subagents, and a pre-publication polish checklist. CRITICAL: mo is auto-injected (import in ONE cell); every top-level name must be unique across ALL cells; custom anywidget needs model.save_changes(); use mo.output.replace() for live charts; guard all torch.cuda calls for CPU-only machines.
+
