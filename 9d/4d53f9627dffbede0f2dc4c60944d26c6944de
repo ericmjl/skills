@@ -1,0 +1,30 @@
+README.md
+  s_66f2e23f9fd47b::t_a4c2ad7be887a4 86-91
+skills/video-script-writing/references/purpose-playbooks.md
+  s_66f2e23f9fd47b::t_4fcb2b7a548269 1-2,7,15-16,39,43-44,64,69-71,75,125,137
+  s_66f2e23f9fd47b::t_2e138adc97510a 3-6,17-38,40-42,45-63,65-68,72-74,76-124,126-136,138-142
+  s_66f2e23f9fd47b::t_e650564bad6475 8-14
+skills/video-script-writing/SKILL.md
+  s_66f2e23f9fd47b::t_ccca519ef583cd 40-49
+  s_66f2e23f9fd47b::t_7c7f7f7916f36b 37-39
+  s_66f2e23f9fd47b::t_86c11cc27a6be4 50-52
+  s_66f2e23f9fd47b::t_4b02101d380358 1-36,53-181
+skills/video-script-writing/references/research-digest.md
+  s_66f2e23f9fd47b::t_dff97a45cf478f 1-204
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "9d4d53f9627dffbede0f2dc4c60944d26c6944de",
+  "prompts": {},
+  "sessions": {
+    "s_66f2e23f9fd47b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fc06b4f3affeMpUV2SVp4sLFoW",
+        "model": "glm-5.3"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
