@@ -6,6 +6,13 @@ This is a skills repository following the [Anthropic Agent Skills Specification]
 
 No build or test system. Skills are markdown instructions with optional scripts.
 
+## Version Control
+
+This repository is git-tracked. Any change made inside this directory — editing,
+adding, or removing skills — must be tracked with git: commit each logical change
+with a descriptive message, and do not leave work uncommitted. Prefer atomic
+commits (one skill per commit) over mixed batches.
+
 ## Creating Skills
 
 1. Create a folder under `skills/` with lowercase hyphenated name
