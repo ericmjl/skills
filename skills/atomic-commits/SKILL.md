@@ -8,6 +8,36 @@ license: MIT
 
 Guide the user from a dirty working tree to a clean commit history where each commit is one logical change with a clear Conventional Commit message.
 
+## Critical: Match the Repo's Existing Commit Style First
+
+**Before drafting any commit message, run `git log --oneline -15` to inspect the
+repo's existing commit style.** Do this as the FIRST step, before proposing any
+`type(scope):` prefix. Repos vary widely:
+
+1. **Conventional Commits** (`feat:`, `fix(scope):`, etc.) — many modern OSS projects
+2. **Sentence-case prose, no prefix** (`Clarify Genie 3 feature dictionaries`,
+   `Simplify the published architecture directory`) — many blog/doc/personal repos
+3. **Lowercase prose, no prefix**
+4. **Always-single-line subjects** vs **always-with-body**
+
+The Conventional Commits format documented in §2 below is the **DEFAULT**, applied
+when the repo's recent history shows CC prefixes OR has no clear pattern. If the
+repo uses a different convention, **MATCH IT** — do not impose Conventional Commits
+on a repo that does not use them.
+
+**Also check whether bodies are used.** If the last 10-20 commits are all
+single-line subjects with no body, put the detail in the PR description instead
+of writing a multi-paragraph commit body.
+
+**Concrete instance (explainer repo, 2026-07-19):** assistant initially drafted
+`feat(renderer): add canvas-chat-style keyboard navigation shortcuts` + a 14-line
+body, then checked `git log` and found the repo uses prose single-line subjects
+(`Clarify Genie 3...`, `Simplify the published architecture directory`,
+`Harden touch rendering and selective Pages builds`). It adapted to a
+single-line prose subject (`Add canvas-chat-style keyboard navigation shortcuts`)
+and moved the detail to the PR body. Without this check the commit would have
+been stylistically inconsistent with the rest of the history.
+
 ## Workflow
 
 ### 1. Analyze changes
@@ -76,7 +106,6 @@ For each proposed commit:
 
 5. **Pre-split compile-safety check (the critical step).** BEFORE deciding to split, verify the INTERMEDIATE commit (staged set without the dependent commit's changes) still compiles and has no unused-symbol warnings. Trace each newly-added helper/function: is it still CALLED by code remaining in the staged set? Worked example: commit 1 (refactor) adds helpers `getOwnedSession` and `findSetByNormalizedName`; commit 2 (feature) adds `deleteSetForServer` which also uses them. Before splitting, confirm at least one mutation staged in commit 1 still calls each helper (here: `logSetForServer` calls `findSetByNormalizedName`, several mutations call `getOwnedSession`) — so commit 1 stands alone with no unused-symbol warning. Only split when every intermediate state is self-consistent. If any intermediate would not compile or would reference an undefined symbol, fall back to the "When NOT to split" rule below and keep that file's changes in ONE commit.
 
-
 **When NOT to split hunks within a file:** When hunks are interleaved across multiple concerns (e.g. the same hunk touches both a new feature and an unrelated cleanup — an import for feature A alongside a deletion for concern B), do NOT attempt fragile manual hunk surgery. Cherry-picking line ranges or scripting `git add -p` responses often produces commits that don't compile or miss critical imports.
 
 Instead, group that file's changes into ONE commit. A commit that reads as one coherent unit ("the page after wiring timer feedback, including the cleanup it enables") is better than three commits stitched from fragile partial edits. Narrative coherence beats strict per-concern atomicity when the cost of splitting is a broken intermediate state.
@@ -103,7 +132,7 @@ Root cause: `git commit` commits the ENTIRE index, not just the files from the m
 
 **Stash-conflict variant (distinct from a clean abort):** pre-commit stashes UNSTAGED changes before running hooks, then restores them after. If a hook (ruff format, end-of-file-fixer) MODIFIES a staged file, the stash restore can CONFLICT with the hook's fix — you see `[WARNING] Stashed changes conflicted with hook auto-fixes... Rolling back fixes...` + `[INFO] Restored changes from ...`. The commit then FAILS (no `[main <hash>]` line in the output) and leaves a messy index. This is a different signature from a clean hook abort: the commit silently does not land, and the staged set is now a jumble of files from multiple intended commits. Treat the absence of a commit-hash line as the signal that the commit did NOT land, regardless of the `[INFO] Restored changes` noise. Recovery is the same (unstage strays, re-stage intentionally) but the BEST fix is proactive — see defense 1 below.
 
-**Stale-staged-blob variant (distinct from strays):** after a hook aborts on a file (e.g. pydoclint DOC101 missing `:param:`), fixing the violation in the WORKING TREE and retrying `git commit` WITHOUT re-staging FAILS AGAIN with the SAME error — the INDEX still holds the pre-fix blob, and hooks run on the STAGED content, not the working tree. Signature: you edited the exact line the hook complained about, `git diff` shows the fix present in the working tree, yet the hook re-reports the identical violation. Confirm with `git diff --cached <file>` (shows the old, unfixed version staged) vs `git diff <file>` (shows the fix unstaged). Recovery: `git reset HEAD -- <file>` (or `git reset` to clear the whole index) then `git add <file>` to stage the FIXED blob, then commit. ROOT RULE: any time you edit a file to satisfy a hook after an abort, re-stage it before committing — the index is a SEPARATE snapshot from the working tree, and a working-tree fix does NOT update the staged blob until you `git add` again. This is the mechanism behind defense 4 below: it is not only UNRELATED files from other commits that leak into the index — the SAME file's pre-fix blob lingers too. (Discovered build-deep-research-agent 07-09: pydoclint kept failing on `solutions/part3.py` + `tools/*` despite docstring fixes already in the working tree, until `git reset HEAD -- .` + re-stage resolved it.)
+**Stale-staged-blob variant (distinct from strays):** after a hook aborts on a file (e.g. pydoclint DOC101 missing `:param:`), fixing the violation in the WORKING TREE and retrying `git commit` WITHOUT re-staging FAILS AGAIN with the SAME error — the INDEX still holds the pre-fix blob, and hooks run on the STAGED content, not the working tree. Signature: you edited the exact line the hook complained about, `git diff` shows the fix present in the working tree, yet the hook re-reports the identical violation. Confirm with `git diff --cached <file>` (shows the old, unfixed version staged) vs `git diff <file>` (shows the fix unstaged). Recovery: `git reset HEAD -- <file>` (or `git reset` to clear the whole index) then `git add <file>` to stage the FIXED blob, then commit. ROOT RULE: any time you edit a file to satisfy a hook after an abort, re-stage it before committing — the index is a SEPARATE snapshot from the working tree, and a working-tree fix does NOT update the staged blob until you `git add` again. (Discovered build-deep-research-agent 07-09: pydoclint kept failing on `solutions/part3.py` + `tools/*` despite docstring fixes already in the working tree, until `git reset HEAD -- .` + re-stage resolved it.)
 
 Defenses (apply to every commit in a sequence):
 
@@ -115,3 +144,72 @@ Defenses (apply to every commit in a sequence):
 5. **Re-stage the hook-modified file, then commit.** `git add <hook-modified-file>` only re-adds that file; it does NOT clear other staged files.
 
 Recovery if a leak already landed in a tip commit (not pushed): `git reset --soft HEAD~1`, then `git restore --staged <files-that-do-not-belong>`, commit the intended subset, then stage and commit the rest.
+
+## Critical Guardrail: Pre-Existing Staged Files
+
+**Before staging a new concern, always check what is ALREADY in the index.** `git add` is ADDITIVE — it adds to whatever is already staged, it does not replace. Files left staged from a prior session, an interrupted commit, an in-progress merge/rebase, or a teammate's `git add` will be **silently bundled** into your next `git commit`.
+
+**Detection (run before any `git add`):**
+
+```
+git status               # look for "Changes to be committed:"
+git diff --cached --stat # shows what is already staged
+```
+
+If the staged set contains files that belong to a DIFFERENT concern than the one you are about to commit, you have four options (option 0 is the preferred default):
+
+0. **Pathspec-restricted commit (PREFERRED — the direct defense):** `git commit -- <paths> -m "..."` commits ONLY the named paths, ignoring everything else in the index. This is strictly safer than `git add <paths> && git commit` because it does not depend on the index being clean. When the user asks to commit a SPECIFIC subset, default to this form.
+1. **Commit the pre-staged files first** as their own atomic commit (`git commit -m "..."` with no new `git add`).
+2. **Unstage the unrelated files** with `git restore --staged <files>` (or `git reset HEAD <files>` on older git), then stage your own concern and commit.
+3. **Consciously bundle them** only when the pre-staged files genuinely belong in the same commit (e.g. their renames are required for the new code to compile).
+
+**Symptom of the bug:** you run `git add foo/ && git commit -m "feat: add foo"` and the commit shows 10 files changed when you only intended 3 — the other 7 were pre-staged by someone/something else. By then it is usually already pushed.
+
+**Concrete instance (website repo, 2026-07-19):** a prior session had `git add`ed video-editor file renames but never committed them. The assistant ran `git add blog/ && git commit` for an unrelated blog post; the commit and push included both the blog work AND the video-editor renames. The renames were 100%-identical pure file moves matching the documented canonical layout, so it was benign — but it violated the atomic-commit principle and would have been a real problem if the pre-staged changes were broken or sensitive.
+
+**Concrete instance (learn-anything repo, 2026-08-01):** the assistant ran `git add landing-page/ && git commit` to commit a new Astro landing page. A plain `git commit` swept in 3 pre-staged persona-simulation file deletions (`01-amara-okafor.md`, `04-lena-bergman.md`, `05-jt-thompson.md`) sitting in the index from prior rename work. The push went through with 33 files changed (intended landing-page files PLUS the 3 unintended deletions). Using `git commit -- landing-page/ -m "..."` would have committed only the landing page and left the deletions staged and untouched. The assistant caught the mistake post-push and flagged it honestly to the user, but the cleaner path is to avoid it entirely with the pathspec-restricted form.
+
+**Concrete instance (learn-anything repo, 2026-08-25, `git reset --soft` variant):** after a soft reset to redo a 2-commit sequence, the reset itself had deposited BOTH commits' files into the index as staged. The assistant ran `git add <file-for-commit-1> && git commit` — commit 1 came out as "3 files changed, 432 insertions" (the one intended file PLUS both carried-over staged files), leaving commit 2 with "nothing to commit", which aborted the `&&` chain before push. **A soft reset is a FIFTH source of pre-staged files** — it preserves the index by design, so everything from the reset-away commits sits staged waiting to be bundled. **Fix when REDOING commits as multiple atomic units:** use `git reset --mixed <sha>` (the default) instead of `--soft` — mixed points the index at the target commit while keeping the working tree, so every file returns to modified/untracked and each `git add` is deliberate. (Soft reset is for re-committing EVERYTHING as one; mixed is for re-splitting.) Then stage per commit, and after each commit verify the reported file count matches intent before chaining the next command.
+
+## Recovery: When a Non-Atomic Commit Is ALREADY Pushed
+
+The guardrail above prevents the mistake. But "by then it is usually already
+pushed" (see Symptom) means you will frequently discover the impurity AFTER
+the commit is on a shared branch. The recovery decision has a correct default:
+
+**Do NOT force-push shared branches (main, shared feature branches) to rewrite
+history for cosmetic atomicity — unless the user explicitly asks for it.**
+Even though rewriting would "clean up" the commit, the cost (rewriting history
+collaborators may have pulled, breaking their local state) outweighs the
+benefit when the working tree's END STATE is correct and only the attribution
+is split across commits.
+
+**Recovery procedure (the correct default):**
+
+1. Finish the remaining work as clean atomic commits (the unrelated changes
+   that got swept in usually have a natural home among them — e.g. the persona
+   renames' *additions* land in their own commit while their *deletions* sit in
+   the earlier non-atomic commit).
+2. Acknowledge the impurity HONESTLY to the user when you report done — name
+   the commit hash, what got bundled in, and that the rename/feature is split
+   across two commits rather than living in one. Do not silently ship it.
+3. OFFER a force-push rewrite as an explicit opt-in, not a default:
+   "say the word and I'll rewrite it — safe as long as no one has pulled since."
+   Only proceed on explicit confirmation AND after confirming no collaborator
+   has pulled (force-push to a branch only you own is low-risk; to shared main
+   it is high-risk).
+
+**Why not auto-rewrite:** global AGENTS.md forbids force-push unless explicitly
+requested, and "the landing page commit should have just been the landing page"
+is a LAMENT about intent, not a request to rewrite already-pushed shared
+history. Treat user hindsight-remarks ("oh, it should have just been X") as
+diagnostic, not as authorization to force-push. Confirm before any history
+rewrite on a shared branch.
+
+**Concrete instance (learn-anything repo, 2026-08-01):** the landing-page
+commit `7600bc4` had bundled 3 persona-simulation deletions (pushed to
+`origin/main`, a shared branch). The assistant did NOT force-push; it made 4
+subsequent atomic commits for the remaining work, then flagged that the
+persona rename was split (deletions in `7600bc4`, additions in the rescope
+commit) and offered a conditional force-push. This is the recovery default in
+action — correct end state, honest attribution flag, opt-in rewrite.
