@@ -1,0 +1,19 @@
+skills/awesome-marimo-notebook/SKILL.md
+  s_66f2e23f9fd47b::t_46a89659320d06 2,6-7,248-250,259-265,267-487,491,761-766
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "75b0993c232ade683fd8404f4f15bbf8baba509e",
+  "prompts": {},
+  "sessions": {
+    "s_66f2e23f9fd47b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fc06b4f3affeMpUV2SVp4sLFoW",
+        "model": "glm-5.3"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
