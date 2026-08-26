@@ -83,6 +83,12 @@ Location: `skills/publish-to-google-docs/`
 
 Quickly publish markdown notes to styled Google Docs using pandoc and a Word template. Converts markdown to docx with template styling, then uploads to Google Drive. Use when you want to publish markdown content to Google Docs with consistent branding.
 
+### video-script-writing
+
+Location: `skills/video-script-writing/`
+
+Retention-first video script writing for any purpose (founder story, landing-page conversion, YouTube explainer, short-form, demo/testimonial). Grounded in viewer-attention research: hook concreteness tests, open-loop architecture, spoken-register drafting, speech-rate bands, cut rhythm and caption specs, and per-purpose benchmarks. Use when writing, revising, or auditing a video script, or when asked whether a script will hold attention.
+
 ## Adding new skills
 
 Create a new directory under `skills/` with a `SKILL.md` file:
