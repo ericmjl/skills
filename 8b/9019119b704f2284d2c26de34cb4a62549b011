@@ -1,0 +1,19 @@
+skills/stacked-pr-decomposition/SKILL.md
+  s_66f2e23f9fd47b::t_3e2c6902c2766b 3,217-369
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "8b9019119b704f2284d2c26de34cb4a62549b011",
+  "prompts": {},
+  "sessions": {
+    "s_66f2e23f9fd47b": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fc06b4f3affeMpUV2SVp4sLFoW",
+        "model": "glm-5.3"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
