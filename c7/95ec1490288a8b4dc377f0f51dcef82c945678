@@ -1,0 +1,14 @@
+AGENTS.md
+  h_923f9eef54c2c1 9-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "c795ec1490288a8b4dc377f0f51dcef82c945678",
+  "prompts": {},
+  "humans": {
+    "h_923f9eef54c2c1": {
+      "author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
