@@ -1,0 +1,19 @@
+skills/typewriter-video/assets/template/package.json
+  s_06bb3bcdf557fa::t_4faba93e01c7ca 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "e973293192e09b85a37559cfdadb36cd1e7dbd10",
+  "prompts": {},
+  "sessions": {
+    "s_06bb3bcdf557fa": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fb5c86586ffeGBlk9N7PKBx32Z",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
