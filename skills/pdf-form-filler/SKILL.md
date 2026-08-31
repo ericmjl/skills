@@ -1,172 +1,104 @@
 ---
 name: pdf-form-filler
-description: "Fill static PDF forms (without fillable fields) using text search for text-based PDFs or Claude Vision for image-based/scanned PDFs. Use when: (1) User wants to fill out a PDF form, (2) PDF has no fillable form fields, (3) User asks to fill in or complete a PDF form. Auto-detects PDF type and uses appropriate method."
+description: "Fill flat PDF forms that have NO fillable fields (school enrollment packets, medical intakes, waivers, government paperwork) and reuse a prior year's filled PDF as the source of answers. Requires a vision-language-model coding agent (renders pages to images and looks at them); there is no non-VLM fallback. Use when: the user asks to fill out / complete / fill in a PDF form, especially recurring yearly forms (enrollment, renewal, intake) where a previously filled copy exists; when pypdf reports zero AcroForm fields but the form has lines and labels; when the user says 'agent, fill this form for me'; when transplanting prior answers onto a new PDF template; when reproducing a scanned or drawn signature as vector ink from an old PDF; or when a filled form's text overlaps lines or labels and placement needs verification against rendered pixels."
+license: MIT
 ---
 
 # PDF Form Filler
 
-Fill static PDF forms by detecting PDF type and using the appropriate method:
-- **Text-based PDFs**: Search for label text and insert values at found positions
-- **Image-based PDFs**: Use Claude Vision iteratively for pixel-perfect placement
+Fill flat PDFs (no AcroForm fields) by transplanting answers from a prior filled copy, drawing text at exact PDF coordinates, and verifying every page by rendering it and looking at the pixels. Requirement: you (the agent) must be able to view images. There is no non-VLM fallback; without vision, do not attempt this workflow, you will ship misaligned text and never know.
 
-## Quick Start
+## Core insight
 
-```bash
-# Option 1: Text-based PDF (fast, uses label search)
-uv run scripts/fill_pdf.py form.pdf filled.pdf "Label:?=value"
+A form is a measured coordinate range, never a visual impression. The whole discipline is: get exact geometry from the PDF's own data, convert coordinate conventions correctly, and verify placement against rendered pixels because every library lies at least once.
 
-# Option 2: VLM-guided (works for ANY PDF, iteratively verifies placement)
-uv run scripts/fill_pdf_vlm.py form.pdf filled.pdf --fields '{"Field": "value"}'
-```
+## The one workflow that works
 
----
+### 1. Mine a prior filled copy before writing any code
 
-## Method 1: Text Search Positioning (Text-Based PDFs)
+Search the user's machine (Downloads, Documents, email attachments) for a previously filled version of the same form. Recurring forms (yearly enrollment, renewals) are almost always the identical template year over year. A prior copy provides:
 
-**This is how pixel-perfect filling works:**
+- Every answer (and the positions of its answers, which become your coordinates)
+- The user's signature as vector ink (see signature section)
+- Baseline offsets that a human already got right (steal them)
 
-Instead of guessing x/y coordinates, we:
-1. **Search for the label text** using PyMuPDF's `page.search_for("Label:")`
-2. **Get the bounding rectangle** of the found text
-3. **Insert value after the label** at `x = rect.x1 + offset` (right edge of label + small offset)
+Diff the prior template against the new blank: extract all text lines with coordinates from both and compare position sets. If blanks align, transplant answers wholesale and update only what changed. Ask the user a batched list of just the changed fields (insurance plan, phone numbers, dates, names); never guess these.
 
-```
-┌─────────────────────────────────────┐
-│ Student's name: ________________    │
-│                ↑                    │
-│         rect.x1 (right edge)        │
-│              + 5px offset           │
-│              = insertion point      │
-└─────────────────────────────────────┘
-```
+Highest-leverage check: confirm the two templates are identical by testing that every static text line sits at the same (page, x, y). Only footer dates should differ.
 
-**Code pattern:**
+### 2. Confirm the form has no fillable fields
+
 ```python
-areas = page.search_for("Student's name:")
-if areas:
-    rect = areas[0]
-    x = rect.x1 + 5  # right edge + small offset
-    y = rect.y0      # top of the text
-    page.insert_text((x, y + fontsize * 0.8), "Philip Ma", fontsize=11)
+from pypdf import PdfReader
+print(PdfReader("form.pdf").get_fields())  # None or {} = flat PDF, this skill applies
 ```
 
-**Why this works:**
-- PDFs store text with precise positions
-- PyMuPDF returns exact bounding boxes for found text
-- Inserting right after the label naturally aligns with the form field
+(If real AcroForm fields exist, set their values instead; this skill is for the flat case.)
 
-### Usage
+### 3. Extract prior answers with positions
 
-```bash
-# Detect PDF type
-uv run scripts/fill_pdf.py --detect form.pdf
+Use pdfminer.six to get text, position, size, and color per line: `extract_pages()` gives `LTTextContainer`/`LTTextLine` with `.bbox` (x0, y0 from BOTTOM-LEFT) and per-char `graphicstate.ncolor`. Filter to the fill color (often blue or black) to separate answers from form labels.
 
-# Extract text to find labels
-uv run scripts/fill_pdf.py --extract form.pdf
+Dump the extracted fills to JSON (page, x, y, size, text) before transforming; you will reuse it every iteration.
 
-# Fill using label?=value format
-uv run scripts/fill_pdf.py form.pdf filled.pdf \
-    "Student's name:?=John Doe" \
-    "Total:?=1500.00"
-```
+### 4. Write text on the blank PDF, honoring the placement contract
 
----
+Use PyMuPDF (`pymupdf`/`fitz`) to `insert_text()`. The placement contract, hard-earned:
 
-## Method 2: VLM-Guided Iterative Filling (Any PDF)
+- **Baseline sits ~2.5pt ABOVE the drawn line, never at it.** Text at the line's y crosses through glyphs like a strikethrough. y_top = page_height - extracted_y - 2.5 (the 2.5 came from measuring a human-filled exemplar).
+- **Text must not overlap anything.** Not the printed label, not the line, not adjacent fields, not the page edge. Compute the string's rendered width (`fitz.get_text_length(text, fontname, fontsize)`) and shrink the font (min ~7pt) until `x + width <= blank_right_edge`.
+- **Center on the blank's measured range.** Field blanks are the underscore runs inside the field's text span; measure their exact extent (char-level via `get_text('rawdict')`) and place text ON that run, not past its end, not on the label.
+- Junk from the old form (stray single characters, mis-angled fragments near signature areas) gets DROPPED, never transplanted. Ask the user for real values where junk blocked a field.
+- CJK text needs a CJK-capable font ("china-s" in PyMuPDF); measure its width with the same font you draw with.
 
-**For complex forms or when text search fails:**
+### 5. Signatures: replay vector ink, never paste pixels
 
-Uses Claude Vision to:
-1. **Discover**: Identify where each value should be placed
-2. **Render**: Place text and render the page
-3. **Verify**: Ask VLM if placement is correct
-4. **Iterate**: Correct positions up to N times until verified
+A drawn signature in a PDF is NOT an image; it is hundreds of small path segments ('l', 'c' curve operators) in one or few drawing objects, filtered by stroke/fill color (e.g. blue 0,0.44,1). To move it to a new PDF:
 
-```
-┌──────────────────────────────────────────┐
-│  PDF Page                                │
-│  ┌─────────────────────────────────────┐ │
-│  │ Print Name                          │ │
-│  │ ══════════════════════════════════  │ │
-│  │         ↑ VLM sees: "above line!"   │ │
-│  │ Date                                │ │
-│  │ ══════════════════════════════════  │ │
-│  └─────────────────────────────────────┘ │
-│                                          │
-│  VLM: "Print Name should be ABOVE line"  │
-│  → Corrects y-position automatically     │
-└──────────────────────────────────────────┘
-```
+1. Read the source page's `get_drawings()`.
+2. Select paths whose color matches the ink.
+3. Replay each path's items as raw PDF operators (m/l/c/re + h + f) appended to the destination page's content stream, coordinates as-is (see gotchas for the flip trap).
+4. Never crop the source page as pixels: the region smuggles surrounding printed text into your output image. If a pixel region must be used (last resort), mask to keep only strongly-colored ink and alpha out the background.
 
-### Key Features
+Yes, the user should ideally sign by hand; also offer the replayed signature, they usually accept it (it is their own signature from their own prior form).
 
-1. **Only renders pending fields** during verification (not all fields)
-2. **Uses pixel coordinates** for VLM communication, converts to PDF points internally
-3. **Iterative convergence** until all fields are correctly positioned
+### 6. The verification loop (mandatory, this is the skill)
 
-### Usage
+For every page: render to PNG (`page.get_pixmap()`), then LOOK at the image. Check: text on the correct blank, baseline above the line without crossing it, no overlap with labels or neighbors, nothing spilling past the page edge, signature present and in the right place. Iterate until clean. Render-verify-fix is the loop; text-length arithmetic is a hypothesis, the render is the verdict.
 
-```bash
-# Requires ANTHROPIC_API_KEY
-export ANTHROPIC_API_KEY=sk-...
+### 7. Pixel-profile check for signatures (fallback when unsure)
 
-uv run scripts/fill_pdf_vlm.py form.pdf filled.pdf --fields '{
-    "Student Name": "Philip Ma",
-    "Print Name (first)": "Eric Ma",
-    "Date (first)": "March 08, 2026",
-    "Print Name (second)": "Nan Li",
-    "Date (second)": "March 08, 2026"
-}'
-```
+To find where ink actually is: render at 72dpi, scan for pixels where blue channel far exceeds red (b > 150 and b - r > 60), cluster the rows, and compare clusters against the old page's clusters. Same clusters = same placement. Do not trust coordinate math alone; measure ink.
 
-### How It Works
+## Coordinate systems (read this twice)
 
-1. **Discovery Phase**: For each page, Claude Vision analyzes the form and returns pixel coordinates for each field
-2. **Iteration Phase**: 
-   - Render PDF with only PENDING (uncorrected) fields
-   - VLM checks if text is correctly positioned
-   - If wrong, VLM provides corrected pixel coordinates
-   - Repeat up to `--max-iter` times (default: 5)
-3. **Final Output**: Write all verified placements to output PDF
+The single biggest source of wrong renders. Three conventions coexist:
 
-### Example Run
-```bash
---- Page 1: Discovering ---
-  'Student Name' at (134, 84)
-  'Print Name (p1)' at (306, 763)
-  
-=== Iteration 1 (11 pending) ===
-  Page 1:
-    OK 'Student Name'
-    FIX 'Print Name (p1)': (306,763) -> (306,749) - Text should be ABOVE signature line
-    
-=== Iteration 2 (10 pending) ===
-  Page 1:
-    OK 'Print Name (p1)'
-    
-All verified after 2 iterations!
-```
+- **pdfminer/PDF content space**: origin BOTTOM-LEFT, y up. Extraction gives you this.
+- **PyMuPDF page.rect / get_pixmap**: origin TOP-LEFT, y down. Drawing with `insert_text()` uses this.
+- **PDF content-stream path operators** (what `get_drawings()` items map to): origin BOTTOM-LEFT again, y up.
 
-### When to Use
+Converting extracted (bottom-left) positions to PyMuPDF drawing (top-left): `y_pymupdf = page_height - y_extracted`, plus your baseline offset (above). Note `page_height` is the page's actual height (letter = 792), and non-72dpi renders multiply everything by dpi/72.
 
-- **Scanned/image PDFs** where text extraction fails
-- **Complex layouts** where labels don't clearly indicate position
-- **Forms with horizontal lines** where text goes above/below
-- **High precision needed** and willing to use API calls
+Signatures replay in raw content-stream space: pymupdf's get_drawings() rect for a bottom-half signature may ALREADY be in top-down convention on some PDFs. Do not trust either convention: render, measure the ink's pixel rows, and compute the flip from evidence. Verify with the ink-profile technique above; if the signature lands mirrored (top of page instead of bottom), you flipped wrong, and the profile check catches it instantly.
 
-### Cost Considerations
+## Rejected approaches (do not retry)
 
-Each iteration makes ~1 API call per page for verification.
-Most forms complete in 2-3 iterations.
+- **show_pdf_page with clip rects** to copy signature regions: copies ALL content in the rect, duplicating text and lines.
+- **Rasterized region pastes** for signatures: smuggles printed text into the image at stamp resolution.
+- **XObject indirection** for simple path replay: resource-dictionary failures ("cannot find XObject"); direct path operators in the content stream work.
+- **Trusting any single library's coordinate report**: each must be calibrated against rendered pixels once per document.
 
----
+The fallback loop for every failure: render, look at the image, measure ink pixels, reconcile the transform. Pixel measurement beats arithmetic every time they disagree.
 
-## Environment Variables
+## Working checklist
 
-- `ANTHROPIC_API_KEY`: Required for VLM-guided mode (`fill_pdf_vlm.py`)
+1. Locate prior filled PDF; diff templates; ask user for changed values in one batch.
+2. Extract answers + positions + color (pdfminer); dump JSON.
+3. Write text (pymupdf): baseline 2.5pt above line, no overlaps, shrink-to-fit, CJK font when needed, drop junk.
+4. Replay signature/ink vector paths; determine flips from pixel evidence, not theory.
+5. Render every page to PNG; LOOK at each. Zoom on dense areas (tables, signature rows, narrow blanks).
+6. Iterate fixes until every field passes the placement contract.
+7. Deliver: filled PDF + one PNG render per page for the user's own final check.
 
-## Limitations
-
-- Signature areas should remain blank for manual signing
-- Does not handle checkboxes or radio buttons
-- VLM mode uses Claude API tokens per iteration
+The user's final look is part of the pipeline, not a nicety. They will catch what the render-verify loop normalized.
