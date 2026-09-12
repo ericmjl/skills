@@ -4,14 +4,19 @@ description: >-
   Write, review, and critique marketing copy using proven copywriting frameworks.
   Use when the user asks to write or generate sales copy, headlines, bullet
   points, email teasers, email sequences, sales letters, sales pages, landing
-  page copy, social media ad copy (Facebook, Instagram, LinkedIn), product
-  descriptions, Amazon listings, or webinar registration copy. Also use when the
-  user asks to review, critique, audit, score, or improve existing copy.
-  Frameworks include customer avatar definition (F.R.E.D.), headline formulas,
-  the ultimate bullet formula (feature + benefit + meaning), PAS / benefit /
+  page or hero copy, social media ad copy (Facebook, Instagram, LinkedIn),
+  product descriptions, Amazon listings, webinar registration copy, or
+  newsletter P.S. blocks / postscripts promoting an event, workshop, or
+  product — or says 'sell the benefits', 'marketing copy', 'persuasive',
+  'make it compelling', or 'advocate for X'. Also use when the user asks to
+  review, critique, audit, score, or improve existing copy. Frameworks include
+  customer avatar definition (F.R.E.D.), headline formulas, the ultimate
+  bullet formula (feature + benefit + meaning), PAS / benefit /
   before-after-bridge sales formulas, email subject-line patterns, offer
-  building and risk reversal, stealth closes, hooks and angles, and swipe file
-  methodology. Produces multiple variations by default.
+  building and risk reversal, stealth closes, hooks and angles, swipe file
+  methodology, the 5-part newsletter P.S. block formula, value-on-top-of-
+  persuasion for recurring post cadences, persona-matched CTAs, and
+  price-objection reframing. Produces multiple variations by default.
 license: MIT
 ---
 
@@ -22,7 +27,7 @@ Frameworks adapted from Jim Edwards' *Copywriting Secrets* (31 secrets). Princip
 ## Modes
 
 | Mode | When to use | Behavior |
-|------|-------------|----------|
+| ------ | ------------- | ---------- |
 | Quick (default) | User wants copy now | Infer avatar and formula from context; produce immediately |
 | Guided | User says "help me write" or context is thin | Ask F.R.E.D. questions first, then produce |
 
@@ -56,11 +61,13 @@ Also capture: demographics, where they hang out online, words and phrases they u
 Select the copy type and load the matching reference:
 
 | Copy type | Primary reference | Key frameworks |
-|-----------|-------------------|----------------|
+| ----------- | ------------------- | ---------------- |
 | Headlines | [headlines-and-bullets.md](references/headlines-and-bullets.md) | Headline types, curiosity hooks |
 | Bullets | [headlines-and-bullets.md](references/headlines-and-bullets.md) | Feature + Benefit + "which means..." |
 | Sales letter / page | [sales-formulas.md](references/sales-formulas.md) | PAS, Benefit, Before/After/Bridge + 13-step template |
 | Email teaser / sequence | [email-and-ads.md](references/email-and-ads.md) | Subject-line patterns, teaser body formula |
+| Newsletter P.S. block (event/product promo) | [newsletter-ps-blocks.md](references/newsletter-ps-blocks.md) | 5-part P.S. formula, tie-in with the main post, weekly rotation guidance |
+| Advocacy blog post / recurring cadence | [advocacy-and-cadence.md](references/advocacy-and-cadence.md) | Value-on-top-of-persuasion, persona CTAs, end strong |
 | Social media ad | [email-and-ads.md](references/email-and-ads.md) | Hook + ad purpose + angle selection |
 | Offer / bonus stacking | [offers-and-desire.md](references/offers-and-desire.md) | Desire builders, stacking, risk reversal |
 | Product listing / webinar | [sales-formulas.md](references/sales-formulas.md) | Benefit-driven descriptions, registration copy |
@@ -126,11 +133,13 @@ Offer to apply all fixes and produce a revised version.
 ## Reference library
 
 | File | When to load |
-|------|-------------|
+| ------ | ------------- |
 | [fred-avatar.md](references/fred-avatar.md) | Building a customer avatar; audience is unclear |
 | [headlines-and-bullets.md](references/headlines-and-bullets.md) | Writing or evaluating headlines, bullet points |
 | [sales-formulas.md](references/sales-formulas.md) | Writing sales letters, sales pages, long-form copy |
 | [email-and-ads.md](references/email-and-ads.md) | Writing email teasers, ad copy, social posts |
+| [newsletter-ps-blocks.md](references/newsletter-ps-blocks.md) | Writing newsletter/Substack/LinkedIn P.S. blocks that promote an event or product; must tie into the post's main content |
+| [advocacy-and-cadence.md](references/advocacy-and-cadence.md) | Advocacy posts, recurring promo cadences, price objections, persona-matched CTAs, copy work |
 | [offers-and-desire.md](references/offers-and-desire.md) | Building offers, bonus stacks, risk reversal |
 | [psychology-and-emotion.md](references/psychology-and-emotion.md) | Understanding why people buy, emotional triggers, positioning |
 | [proof-and-closes.md](references/proof-and-closes.md) | Adding testimonials, stealth closes, ethical persuasion |
