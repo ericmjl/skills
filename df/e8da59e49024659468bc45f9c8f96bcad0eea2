@@ -1,0 +1,25 @@
+skills/marketing-copy/SKILL.md
+  s_c3f3fa1de0aa2e::t_6a7989307f0518 69-70,136,141-142
+  s_c3f3fa1de0aa2e::t_b4866e2685b9f5 7-14,16-19
+  s_c3f3fa1de0aa2e::t_df160426c3a884 30
+skills/marketing-copy/references/newsletter-ps-blocks.md
+  s_c3f3fa1de0aa2e::t_7b7cfdcac2e4fb 77
+  s_c3f3fa1de0aa2e::t_3a1f75207b5c3f 1-76,78-100
+  s_c3f3fa1de0aa2e::t_21cb6cd3ab1d2a 101-103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "dfe8da59e49024659468bc45f9c8f96bcad0eea2",
+  "prompts": {},
+  "sessions": {
+    "s_c3f3fa1de0aa2e": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fe92459eeffe3PVbHx9cf95MfA",
+        "model": "glm-5.3"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
