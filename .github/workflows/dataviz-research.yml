@@ -5,12 +5,15 @@
 # reviewed.
 #
 # Required secret:
-#   ANTHROPIC_API_KEY — API key for the model provider pi uses.
+#   ZAI_API_KEY — Z.ai API key for the model provider pi uses (minted in the
+#   Z.ai console; stored in 1Password, synced to this secret).
 # Optional secret:
 #   EXA_API_KEY — Exa API key for literature search. Without it the run uses
 #   the Exa MCP server's free tier, which is rate-limited.
-# Optional variable:
-#   PI_MODEL — pi model pattern for the run (default: sonnet:medium).
+# Optional variables:
+#   PI_PROVIDER — pi provider for the run (default: zai).
+#   PI_MODEL — pi model pattern for the run (default: glm-4.7, verified
+#   entitled on the current Z.ai plan).
 
 name: Dataviz skill literature research
 
@@ -40,10 +43,10 @@ jobs:
     steps:
       - name: Check required secret
         env:
-          HAS_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+          HAS_ZAI_KEY: ${{ secrets.ZAI_API_KEY != '' }}
         run: |
-          if [ "$HAS_ANTHROPIC_KEY" != "true" ]; then
-            echo "::error::ANTHROPIC_API_KEY secret is not set. Add it under Settings > Secrets and variables > Actions, then re-run."
+          if [ "$HAS_ZAI_KEY" != "true" ]; then
+            echo "::error::ZAI_API_KEY secret is not set. Add it under Settings > Secrets and variables > Actions, then re-run."
             exit 1
           fi
 
@@ -99,7 +102,7 @@ jobs:
       - name: Run pi research agent
         timeout-minutes: 35
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ZAI_API_KEY: ${{ secrets.ZAI_API_KEY }}
           GH_TOKEN: ${{ github.token }}
           PI_MODEL: ${{ vars.PI_MODEL }}
           PI_PROVIDER: ${{ vars.PI_PROVIDER }}
@@ -112,7 +115,7 @@ jobs:
 
           Operator-selected focus topic for this run: $FOCUS_TOPIC"
           fi
-          pi --print --approve --provider "${PI_PROVIDER:-anthropic}" --model "${PI_MODEL:-sonnet:medium}" "$PROMPT" 2>&1 | tee pi-output.log
+          pi --print --approve --provider "${PI_PROVIDER:-zai}" --model "${PI_MODEL:-glm-4.7}" "$PROMPT" 2>&1 | tee pi-output.log
 
       - name: Guard — scope and push check
         env:
