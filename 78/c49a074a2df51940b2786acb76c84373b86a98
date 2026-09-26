@@ -1,0 +1,25 @@
+README.md
+  s_112a41adede5c6::t_720ce736774f5e 108-118
+.github/workflows/dataviz-research.yml
+  s_112a41adede5c6::t_4d2ab54b5b83fe 53-54
+  s_112a41adede5c6::t_395b01271be6e9 106,115
+  s_112a41adede5c6::t_dae4fc607b7d10 1-52,55-105,107-114,116-161
+.github/pi/dataviz-research-prompt.md
+  s_112a41adede5c6::t_d99fb6ba7ef1b7 1-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "78c49a074a2df51940b2786acb76c84373b86a98",
+  "prompts": {},
+  "sessions": {
+    "s_112a41adede5c6": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0de80-0dbf-766a-940d-b7eb88968570",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": null
+    }
+  }
+}
