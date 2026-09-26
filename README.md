@@ -114,7 +114,7 @@ Self-improving: a scheduled GitHub Actions workflow runs the `pi` coding agent, 
 3. Pushes a `research/dataviz-<date>` branch and opens a pull request with a findings report. No-change runs produce a report and no PR.
 4. Enforces guardrails: the diff may touch only `skills/data-visualization-master/`; the agent never merges — every PR is reviewed and merged by a human.
 
-Setup: add repository secrets `ANTHROPIC_API_KEY` (required) and `EXA_API_KEY` (optional, avoids free-tier rate limits), and optional `PI_MODEL`/`PI_PROVIDER` variables (defaults `sonnet:medium` / `anthropic`). Trigger manually from the Actions tab to test.
+Setup: add repository secret `ZAI_API_KEY` (required — the Z.ai key is minted in the Z.ai console and stored in 1Password) and `EXA_API_KEY` (optional, avoids free-tier rate limits), plus optional `PI_MODEL`/`PI_PROVIDER` variables (defaults `glm-4.7` / `zai`, verified entitled on the current plan). Trigger manually from the Actions tab to test.
 
 ## Adding new skills
 
