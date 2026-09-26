@@ -89,6 +89,14 @@ Location: `skills/video-script-writing/`
 
 Retention-first video script writing for any purpose (founder story, landing-page conversion, YouTube explainer, short-form, demo/testimonial). Grounded in viewer-attention research: hook concreteness tests, open-loop architecture, spoken-register drafting, speech-rate bands, cut rhythm and caption specs, and per-purpose benchmarks. Use when writing, revising, or auditing a video script, or when asked whether a script will hold attention.
 
+### evident-charts
+
+Location: `skills/evident-charts/`
+
+Makes explanatory charts whose point is evident, using evidence-tagged dataviz rules with deterministic check scripts. Use whenever you create, revise, restyle, or review a chart, plot, graph, or figure: matplotlib, seaborn, pandas .plot, ggplot2, Plotly, Altair/Vega-Lite, D3, or any PNG/SVG chart. Each rule is tagged `[E]` (experimental evidence), `[P]` (practitioner consensus), or `[T]` (taste) and cited in `references/sources.md`.
+
+Vendored from [rhiever/evident-charts](https://github.com/rhiever/evident-charts) (MIT, © Randal S. Olson). Treat this directory as upstream-owned: report fixes upstream and re-vendor rather than editing in place, so future updates apply cleanly.
+
 ## Adding new skills
 
 Create a new directory under `skills/` with a `SKILL.md` file:
