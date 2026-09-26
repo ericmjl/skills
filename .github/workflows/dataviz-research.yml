@@ -12,8 +12,8 @@
 #   the Exa MCP server's free tier, which is rate-limited.
 # Optional variables:
 #   PI_PROVIDER — pi provider for the run (default: zai).
-#   PI_MODEL — pi model pattern for the run (default: glm-4.7, verified
-#   entitled on the current Z.ai plan).
+#   PI_MODEL — pi model pattern for the run (default: glm-5.3-flash,
+#   verified entitled on the CI key's plan).
 
 name: Dataviz skill literature research
 
@@ -115,7 +115,7 @@ jobs:
 
           Operator-selected focus topic for this run: $FOCUS_TOPIC"
           fi
-          pi --print --approve --provider "${PI_PROVIDER:-zai}" --model "${PI_MODEL:-glm-4.7}" "$PROMPT" 2>&1 | tee pi-output.log
+          pi --print --approve --provider "${PI_PROVIDER:-zai}" --model "${PI_MODEL:-glm-5.3-flash}" "$PROMPT" 2>&1 | tee pi-output.log
 
       - name: Guard — scope and push check
         env:
