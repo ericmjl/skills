@@ -1,0 +1,19 @@
+.github/workflows/dataviz-research.yml
+  s_112a41adede5c6::t_37ce4eaa409c17 64,107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4379b961e2b03f3e87f3d96bbf49f1afb074da2f",
+  "prompts": {},
+  "sessions": {
+    "s_112a41adede5c6": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0de80-0dbf-766a-940d-b7eb88968570",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
