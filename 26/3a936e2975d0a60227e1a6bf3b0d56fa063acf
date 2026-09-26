@@ -1,0 +1,63 @@
+skills/evident-charts/assets/palettes.json
+  s_112a41adede5c6::t_ab70f21d82d7da 1-67
+skills/evident-charts/references/libraries.md
+  s_112a41adede5c6::t_ab70f21d82d7da 1-74
+README.md
+  s_112a41adede5c6::t_e621d646532b59 92-99
+skills/evident-charts/assets/evident.mplstyle
+  s_112a41adede5c6::t_ab70f21d82d7da 1-78
+skills/evident-charts/references/critique.md
+  s_112a41adede5c6::t_ab70f21d82d7da 1-91
+skills/evident-charts/references/candidates.md
+  s_112a41adede5c6::t_ab70f21d82d7da 1-26
+skills/evident-charts/references/text.md
+  s_112a41adede5c6::t_ab70f21d82d7da 1-80
+skills/evident-charts/assets/themes/evident_d3_tokens.js
+  s_112a41adede5c6::t_ab70f21d82d7da 1-49
+skills/evident-charts/scripts/check_palette.py
+  s_112a41adede5c6::t_ab70f21d82d7da 1-665
+skills/evident-charts/scripts/evident.py
+  s_112a41adede5c6::t_ab70f21d82d7da 1-883
+skills/evident-charts/scripts/check_chart.py
+  s_112a41adede5c6::t_ab70f21d82d7da 1-2498
+skills/evident-charts/SKILL.md
+  s_112a41adede5c6::t_ab70f21d82d7da 1-65
+skills/evident-charts/references/sources.md
+  s_112a41adede5c6::t_ab70f21d82d7da 1-181
+skills/evident-charts/assets/themes/evident_vegalite.json
+  s_112a41adede5c6::t_ab70f21d82d7da 1-43
+skills/evident-charts/assets/themes/evident_plotly.json
+  s_112a41adede5c6::t_ab70f21d82d7da 1-45
+skills/evident-charts/assets/presets.json
+  s_112a41adede5c6::t_ab70f21d82d7da 1-208
+skills/evident-charts/scripts/side_by_side.py
+  s_112a41adede5c6::t_ab70f21d82d7da 1-53
+skills/evident-charts/references/integrity.md
+  s_112a41adede5c6::t_ab70f21d82d7da 1-49
+skills/evident-charts/references/choosing.md
+  s_112a41adede5c6::t_ab70f21d82d7da 1-104
+skills/evident-charts/assets/themes/evident_d3.css
+  s_112a41adede5c6::t_ab70f21d82d7da 1-29
+skills/evident-charts/agents/openai.yaml
+  s_112a41adede5c6::t_ab70f21d82d7da 1-4
+skills/evident-charts/assets/themes/theme_evident.R
+  s_112a41adede5c6::t_ab70f21d82d7da 1-118
+skills/evident-charts/references/color.md
+  s_112a41adede5c6::t_ab70f21d82d7da 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "263a936e2975d0a60227e1a6bf3b0d56fa063acf",
+  "prompts": {},
+  "sessions": {
+    "s_112a41adede5c6": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0de80-0dbf-766a-940d-b7eb88968570",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
