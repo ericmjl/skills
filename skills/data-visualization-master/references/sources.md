@@ -14,7 +14,8 @@ record (journal, volume, page, authors) on 2026-09-26.
 
 ## Nature Methods "Points of View" corpus
 
-Complete series (43 columns, 2010–2016). Full-text distillations:
+Complete original series (43 columns, 2010–2016); relaunched June 2026 —
+see "Points of View, anew" below. Full-text distillations:
 `references/points-of-view.md`. Series index: Nature Methods Methagora blog,
 "Data visualization: A view of every Points of View column"
 (https://blogs.nature.com/methagora/2013/07/data-visualization-points-of-view.html);
@@ -69,6 +70,28 @@ author bibliography: https://mk.bcgsc.ca/pointsofview/bibliography.mhtml
 Note: page numbers follow the journal's cumulative-issue pagination; some
 aggregators list adjacent page values (e.g., 778 vs 779 for Sets and
 intersections). The DOIs are the authoritative identifiers.
+
+Correction: W11-Blindness has an Author Correction (Wong B., Nat. Methods
+20, 1266, 2023, https://doi.org/10.1038/s41592-023-01974-0) adding the
+missing link to the Okabe–Ito color-blind-safe palette — now key [OI02]
+below. Verified 2026-09-26.
+
+## Points of View, anew (2026– )
+
+Nature Methods reintroduced the column in June 2026 (announcement editorial:
+"Points of View, anew", Nat. Methods 23, 1069,
+https://doi.org/10.1038/s41592-026-03143-5 — fetched and read in full
+2026-09-26), now written by Helena Jambor (DAViS, University of Applied
+Sciences of the Grisons; NCT/UCC Dresden), revisiting the original series'
+topics with modern tools.
+
+| Key | Column | Citation | DOI |
+|---|---|---|---|
+| J26-Viridis | Color scales and the birth of viridis | Jambor H.K., Nat. Methods 23, 1071–1072 (2026) | https://doi.org/10.1038/s41592-026-03114-w |
+
+J26-Viridis: bibliographic record verified via Crossref and the publisher
+abstract read 2026-09-26; full text paywalled, so it backs no rule yet.
+Distillation pending in `references/points-of-view.md`.
 
 ## Foundational and research literature
 
@@ -144,6 +167,18 @@ intersections). The DOIs are the authoritative identifiers.
 - [L22] Lundgard A & Satyanarayan VR 2022, Accessible visualization via
   natural language descriptions, IEEE TVCG.
   https://doi.org/10.1109/TVCG.2021.3114770
+- [WSB22] Wijnker W, Smeets I, Burger P & Willems S 2022, Debunking
+  strategies for misleading bar charts, Journal of Science Communication
+  21(7): A07. https://doi.org/10.22323/2.21070207
+- [OI02] Okabe M & Ito K 2002, Color Universal Design (CUD): How to make
+  figures and presentations that are friendly to colorblind people
+  (palette), University of Cologne.
+  https://jfly.uni-koeln.de/html/manuals/pdf/color_blind.pdf
+- [H24] Hill A 2024, Are pie charts evil? An assessment of the value of pie
+  and donut charts compared to bar charts, Information Visualization 24(1).
+  https://doi.org/10.1177/14738716241259432 [UNVERIFIED] (record and author
+  abstract via Crossref; SAGE full text bot-blocked on 2026-09-26 — fetch
+  and read full text before citing in a rule)
 
 ## Chart-level bibliography
 
