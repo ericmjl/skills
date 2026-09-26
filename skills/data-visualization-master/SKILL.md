@@ -36,7 +36,8 @@ for sound default decisions.
   analyze the data, state the takeaway, choose the form, build, check, review,
   deliver.
 - Applies principles from three evidence layers: the Nature Methods
-  *Points of View* series (43 columns, 2010–2016, cited per rule), experimental
+  *Points of View* series (43 columns, 2010–2016; relaunched June 2026 under
+  Helena Jambor, cited per rule), experimental
   graphical-perception research, and practitioner consensus from newsroom and
   statistical-agency style guides.
 - Enforces honesty constraints (integrity rules) that may not be broken for
@@ -117,9 +118,10 @@ distilled in `references/points-of-view.md`. A project style guide overrides
 
 ### Color
 
-- COL1 `[E]` Color-blind-safe palettes by default; ~8% of men cannot
-  distinguish common red-green pairs. Never encode meaning in red vs green
-  alone. Cite: [B12], [M09]; POV: [W11-Blindness].
+- COL1 `[E]` Color-blind-safe palettes by default (e.g., the Okabe–Ito
+  palette [OI02]); ~8% of men cannot distinguish common red-green pairs.
+  Never encode meaning in red vs green alone. Cite: [B12], [M09], [OI02];
+  POV: [W11-Blindness].
 - COL2 `[P]` At most ~4 categorical hues per chart (plus grays). One accent
   color on gray when a single element is the story. Cite: [HE12], [GAF];
   POV: [W10-Color].
@@ -170,7 +172,8 @@ distilled in `references/points-of-view.md`. A project style guide overrides
 
 - INT1 `[E]` Bars start at zero. Truncated bar baselines exaggerate
   differences and deceive a majority of readers even after warnings. Line
-  charts may use a non-zero range when stated. Cite: [P15], [C20], [Y21].
+  charts may use a non-zero range when stated. Cite: [P15], [C20], [Y21],
+  [WSB22].
 - INT2 `[E]` No dual y-axes; no inverted value axes; no 3D effect charts;
   aspect ratio must not distort the perceived effect. Cite: [P15], [F08];
   POV: [G12-3D].
@@ -233,8 +236,10 @@ Extra rules when the destination is a journal, thesis, or technical report:
 
 Every rule above carries a citation key. The key resolves in
 `references/sources.md`, which holds verified bibliographic entries — including
-the complete Nature Methods *Points of View* corpus (43 columns, all DOIs
-resolved via Crossref) and the experimental literature behind the `[E]` tags.
+the complete Nature Methods *Points of View* corpus (43 columns, 2010–2016,
+all DOIs resolved via Crossref; relaunched June 2026 under Helena Jambor —
+see `references/sources.md`) and the experimental literature behind the
+`[E]` tags.
 Long-form distillations of the Points of View columns live in
 `references/points-of-view.md`.
 

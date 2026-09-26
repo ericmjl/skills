@@ -241,3 +241,19 @@ lives.
 Arcs, color, dot plots, and node graphs each show relations between distant
 genomic positions differently; pick by the relation class (orientation,
 distance, reciprocal exchange), and say which you mean.
+
+## Points of View, anew (2026– )
+
+Nature Methods reintroduced the series in June 2026, now written by Helena
+Jambor (announcement editorial: Nat. Methods 23, 1069,
+https://doi.org/10.1038/s41592-026-03143-5). New columns are tracked here as
+they become verifiable. Column tracked so far:
+
+### Color scales and the birth of viridis — [J26-Viridis] (Jambor, 2026)
+
+*Abstract-only entry: full text paywalled at verification time (2026-09-26);
+distillation pending full-text access.* Publisher abstract: "The color
+palette viridis is replacing rainbow color schemes in scientific figures,
+for good reason." It echoes the original series' first column [W10-Color]
+and is consistent with rule [COL3] in `SKILL.md` (sequential,
+perceptually ordered scales for magnitude; never rainbow).
