@@ -1,0 +1,33 @@
+skills/data-visualization-master/SKILL.md
+  s_112a41adede5c6::t_16304e32f99d78 1-123,125-154,156-174,177,180-204,206-275
+  s_112a41adede5c6::t_2fee60e9614f15 155,205
+  s_112a41adede5c6::t_ce818cf236d22d 124,175-176,178-179
+skills/data-visualization-master/references/points-of-view.md
+  s_112a41adede5c6::t_6b696b39084d4b 1-243
+skills/data-visualization-master/references/research-protocol.md
+  s_112a41adede5c6::t_8179d731b05c92 1-118
+skills/data-visualization-master/references/sources.md
+  s_112a41adede5c6::t_29cd922923c526 96-99
+  s_112a41adede5c6::t_66f148f70a322f 102-103,112-113,130-135
+  s_112a41adede5c6::t_20edad547125c9 1-95,100-101,104-111,114-129,136-170
+skills/data-visualization-master/references/research-log.md
+  s_112a41adede5c6::t_9b61aa01c30e11 1-20
+README.md
+  s_112a41adede5c6::t_f99d3a651bc70f 100-107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6387e0b33544d26dd06f169f3151d448df9fccb7",
+  "prompts": {},
+  "sessions": {
+    "s_112a41adede5c6": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0de80-0dbf-766a-940d-b7eb88968570",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
