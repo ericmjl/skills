@@ -97,6 +97,14 @@ Makes explanatory charts whose point is evident, using evidence-tagged dataviz r
 
 Vendored from [rhiever/evident-charts](https://github.com/rhiever/evident-charts) (MIT, © Randal S. Olson). Treat this directory as upstream-owned: report fixes upstream and re-vendor rather than editing in place, so future updates apply cleanly.
 
+### data-visualization-master
+
+Location: `skills/data-visualization-master/`
+
+Master skill for creating, critiquing, and improving data visualizations. Synthesizes the complete Nature Methods "Points of View" column series (43 columns by Bang Wong, Martin Krzywinski & coauthors, with Crossref-verified DOIs) with the evidence-tagged rules of evident-charts and the experimental graphical-perception literature. Every rule carries a citation key resolving in `references/sources.md`.
+
+Self-improving: a scheduled GitHub Actions workflow runs the `pi` coding agent, which searches the visualization literature, verifies sources, and opens pull requests proposing cited rule updates (`references/research-protocol.md` is the agent's operating manual; `references/research-log.md` holds the run history).
+
 ## Adding new skills
 
 Create a new directory under `skills/` with a `SKILL.md` file:
