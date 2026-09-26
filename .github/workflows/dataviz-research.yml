@@ -37,8 +37,6 @@ jobs:
   research:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    env:
-      PI_CODING_AGENT_DIR: ${{ runner.temp }}/pi-agent-home
     steps:
       - name: Check required secret
         env:
@@ -63,6 +61,7 @@ jobs:
       - name: Prepare pi agent directory (MCP search server)
         env:
           EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+          PI_CODING_AGENT_DIR: ${{ github.workspace }}/../pi-agent-home
         run: |
           mkdir -p "$PI_CODING_AGENT_DIR"
           if [ -n "$EXA_API_KEY" ]; then
@@ -105,6 +104,7 @@ jobs:
           PI_MODEL: ${{ vars.PI_MODEL }}
           PI_PROVIDER: ${{ vars.PI_PROVIDER }}
           FOCUS_TOPIC: ${{ inputs.focus }}
+          PI_CODING_AGENT_DIR: ${{ github.workspace }}/../pi-agent-home
         run: |
           PROMPT="$(cat .github/pi/dataviz-research-prompt.md)"
           if [ -n "$FOCUS_TOPIC" ]; then
