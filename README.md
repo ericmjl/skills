@@ -105,6 +105,17 @@ Master skill for creating, critiquing, and improving data visualizations. Synthe
 
 Self-improving: a scheduled GitHub Actions workflow runs the `pi` coding agent, which searches the visualization literature, verifies sources, and opens pull requests proposing cited rule updates (`references/research-protocol.md` is the agent's operating manual; `references/research-log.md` holds the run history).
 
+## Self-improving skill automation
+
+`.github/workflows/dataviz-research.yml` runs weekly (Mondays 14:00 UTC) and on demand (with an optional focus topic). Each run:
+
+1. Installs the [pi coding agent](https://github.com/earendil-works/pi) headlessly (`pi --print`) with an Exa MCP server configured for literature search.
+2. Executes the research protocol in `skills/data-visualization-master/references/research-protocol.md`: search → fetch and verify sources (DOI checked against Crossref) → propose cited rule updates.
+3. Pushes a `research/dataviz-<date>` branch and opens a pull request with a findings report. No-change runs produce a report and no PR.
+4. Enforces guardrails: the diff may touch only `skills/data-visualization-master/`; the agent never merges — every PR is reviewed and merged by a human.
+
+Setup: add repository secrets `ANTHROPIC_API_KEY` (required) and `EXA_API_KEY` (optional, avoids free-tier rate limits), and optional `PI_MODEL`/`PI_PROVIDER` variables (defaults `sonnet:medium` / `anthropic`). Trigger manually from the Actions tab to test.
+
 ## Adding new skills
 
 Create a new directory under `skills/` with a `SKILL.md` file:

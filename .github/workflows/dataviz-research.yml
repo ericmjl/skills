@@ -1,0 +1,161 @@
+# Self-improving dataviz skill: scheduled literature research via the pi
+# coding agent. The agent searches visualization literature, verifies
+# sources, and opens a PR proposing cited updates to
+# skills/data-visualization-master/. It never merges; every PR is human-
+# reviewed.
+#
+# Required secret:
+#   ANTHROPIC_API_KEY — API key for the model provider pi uses.
+# Optional secret:
+#   EXA_API_KEY — Exa API key for literature search. Without it the run uses
+#   the Exa MCP server's free tier, which is rate-limited.
+# Optional variable:
+#   PI_MODEL — pi model pattern for the run (default: sonnet:medium).
+
+name: Dataviz skill literature research
+
+on:
+  schedule:
+    - cron: "0 14 * * 1" # Mondays 14:00 UTC
+  workflow_dispatch:
+    inputs:
+      focus:
+        description: "Optional focus topic for this run (e.g. 'uncertainty display')"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: dataviz-research
+  cancel-in-progress: false
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      PI_CODING_AGENT_DIR: ${{ runner.temp }}/pi-agent-home
+    steps:
+      - name: Check required secret
+        env:
+          HAS_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+        run: |
+          if [ "$HAS_ANTHROPIC_KEY" != "true" ]; then
+            echo "::error::ANTHROPIC_API_KEY secret is not set. Add it under Settings > Secrets and variables > Actions, then re-run."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install pi coding agent
+        run: npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+
+      - name: Prepare pi agent directory (MCP search server)
+        env:
+          EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+        run: |
+          mkdir -p "$PI_CODING_AGENT_DIR"
+          if [ -n "$EXA_API_KEY" ]; then
+            cat > "$PI_CODING_AGENT_DIR/mcp.json" <<EOF
+          {
+            "mcpServers": {
+              "exa": {
+                "url": "https://mcp.exa.ai/mcp",
+                "headers": { "x-api-key": "$EXA_API_KEY" },
+                "directTools": true
+              }
+            }
+          }
+          EOF
+          else
+            cat > "$PI_CODING_AGENT_DIR/mcp.json" <<'EOF'
+          {
+            "mcpServers": {
+              "exa": {
+                "url": "https://mcp.exa.ai/mcp",
+                "directTools": true
+              }
+            }
+          }
+          EOF
+          fi
+          python3 -m json.tool "$PI_CODING_AGENT_DIR/mcp.json" > /dev/null
+          echo "pi agent dir ready: $PI_CODING_AGENT_DIR"
+
+      - name: Configure git identity
+        run: |
+          git config user.name "dataviz-research-bot"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run pi research agent
+        timeout-minutes: 35
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+          PI_MODEL: ${{ vars.PI_MODEL }}
+          PI_PROVIDER: ${{ vars.PI_PROVIDER }}
+          FOCUS_TOPIC: ${{ inputs.focus }}
+        run: |
+          PROMPT="$(cat .github/pi/dataviz-research-prompt.md)"
+          if [ -n "$FOCUS_TOPIC" ]; then
+            PROMPT="$PROMPT
+
+          Operator-selected focus topic for this run: $FOCUS_TOPIC"
+          fi
+          pi --print --approve --provider "${PI_PROVIDER:-anthropic}" --model "${PI_MODEL:-sonnet:medium}" "$PROMPT" 2>&1 | tee pi-output.log
+
+      - name: Guard — scope and push check
+        env:
+          BASE_REF: ${{ github.ref_name }}
+        run: |
+          BASE="origin/$BASE_REF"
+          N_COMMITS=$(git rev-list --count "$BASE..HEAD")
+          if [ "$N_COMMITS" -eq 0 ]; then
+            echo "No commits made — recording a no-change research run."
+            exit 0
+          fi
+          {
+            echo "### Proposed changes ($N_COMMITS commit(s))"
+            echo '```'
+            git diff --name-only "$BASE...HEAD"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          OUT_OF_SCOPE=$(git diff --name-only "$BASE...HEAD" | grep -v '^skills/data-visualization-master/' || true)
+          if [ -n "$OUT_OF_SCOPE" ]; then
+            echo "::error::Agent changed out-of-scope files (review and close the PR): $OUT_OF_SCOPE"
+            exit 1
+          fi
+          if [ -z "$(git ls-remote --heads origin "refs/heads/research/dataviz-*")" ]; then
+            echo "::error::Commits exist locally but no research/dataviz-* branch was pushed — the agent failed to open its PR."
+            exit 1
+          fi
+
+      - name: Append run output to job summary
+        if: always()
+        run: |
+          if [ -f pi-output.log ]; then
+            {
+              echo "### pi agent output (last 4 KB)"
+              echo '```'
+              tail -c 4000 pi-output.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pi-run-log
+          path: pi-output.log
+          if-no-files-found: ignore
