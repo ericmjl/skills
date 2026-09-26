@@ -1,0 +1,21 @@
+README.md
+  s_112a41adede5c6::t_c84270fe8af2f7 117
+.github/workflows/dataviz-research.yml
+  s_112a41adede5c6::t_218fcb771afac5 8-9,13-16,46,48-49,105,118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d48f0396eb8ad59cac4c2ca456b43a17584dcb1a",
+  "prompts": {},
+  "sessions": {
+    "s_112a41adede5c6": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0de80-0dbf-766a-940d-b7eb88968570",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
