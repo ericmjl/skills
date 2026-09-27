@@ -107,7 +107,7 @@ Self-improving: a scheduled GitHub Actions workflow runs the `pi` coding agent, 
 
 ## Self-improving skill automation
 
-`.github/workflows/dataviz-research.yml` runs weekly (Mondays 14:00 UTC) and on demand (with an optional focus topic). Each run:
+`.github/workflows/dataviz-research.yml` runs monthly on the first Sunday (14:00 UTC — cron can't express "first Sunday", so the job gates on day-of-month ≤ 7 and skips other Sundays) and on demand (with an optional focus topic; dispatch bypasses the gate). Each run:
 
 1. Installs the [pi coding agent](https://github.com/earendil-works/pi) headlessly (`pi --print`) with an Exa MCP server configured for literature search.
 2. Executes the research protocol in `skills/data-visualization-master/references/research-protocol.md`: search → fetch and verify sources (DOI checked against Crossref) → propose cited rule updates.
