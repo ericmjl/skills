@@ -1,0 +1,19 @@
+skills/codebase-study-parallel-reporters/SKILL.md
+  s_63ac998537a833::t_d5f9771ef9ada6 1-113
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f8fb75dc058b6549c966900ca50bccdcf6da0bd1",
+  "prompts": {},
+  "sessions": {
+    "s_63ac998537a833": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0e049-8263-709b-bf2f-04324f8ffb44",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
