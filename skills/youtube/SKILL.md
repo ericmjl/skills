@@ -1,6 +1,7 @@
 ---
 name: youtube
-description: Comprehensive YouTube operations using yt-dlp - download videos/audio, extract transcripts and subtitles, get metadata, work with playlists, download thumbnails, and inspect available formats. Use this for any YouTube content processing task.
+description: >-
+  Comprehensive YouTube operations using yt-dlp - download videos/audio, extract transcripts and subtitles, get metadata, work with playlists, download thumbnails, and inspect available formats. Also covers fixing HTTP 429 rate-limit / bot-check failures with --cookies-from-browser, and the follow-on 'Only images are available for download' / 'Requested format is not available' metadata-extraction failure on old videos (fix: --remote-components ejs:github pulls the current n/sig challenge solver). Use this for any YouTube content processing task.
 license: MIT
 ---
 
@@ -253,6 +254,55 @@ uvx yt-dlp --write-subs --embed-subs --write-thumbnail --embed-thumbnail --write
 # Run periodically to get only new uploads
 uvx yt-dlp --download-archive channel-archive.txt -o "~/Videos/%(uploader)s/%(upload_date)s-%(title)s.%(ext)s" "CHANNEL_URL/videos"
 ```
+
+## Rate limiting (HTTP 429 / bot check) — use --cookies-from-browser chrome
+
+**Trigger**: after a batch of yt-dlp metadata pulls (e.g. `-j`/`--dump-json` across a channel playlist or a dozen videos), subsequent calls return EMPTY output (the exit code can still look fine when piping through jq/python, so the failure is SILENT) or fail with HTTP 429 + a bot-check page. Empty output from a `-j` pull is NOT a parse failure — check raw stderr first (`uvx yt-dlp <url> -j 2>&1 | head -c 500`) before blaming your parsing pipeline.
+
+**Root cause**: YouTube rate-limits and bot-checks by IP; bulk metadata pulls from one IP trip it.
+
+**Fix**: pass browser cookies so requests ride an authenticated session:
+
+```bash
+uvx yt-dlp --cookies-from-browser chrome -j "https://www.youtube.com/watch?v=VIDEO_ID"
+```
+
+Verified working 2026-08-22 (website talks-description task) after a 12-video metadata batch hit 429 + bot check.
+
+**Gotchas**:
+
+- A warning about an "n challenge" may print; it is BENIGN — the JSON still comes through. Verify with `head -c 300` on the output rather than assuming failure from the warning.
+- On macOS, Chrome cookies work directly; Safari cookie access requires extra permissions (prefer chrome/firefox/arc in that order).
+- `--cookies cookies.txt` (manual export, used above for age-restricted content) is a different, older flow; `--cookies-from-browser` needs no export step.
+- Expect the SECOND bulk batch in a session to need the cookies flag even when the first batch (e.g. playlist pulls) worked without it.
+
+## Follow-on failure: "Only images are available" / "Requested format is not available" (old videos, even with cookies)
+
+**Trigger**: on OLD videos (2017-era conference talk uploads), even AFTER the cookies fix above, `-j`/`--dump-json` dies with "Only images are available for download" + "Requested format is not available".
+
+**Root cause**: the video's format list comes back empty (the player response lacks stream formats; the n-challenge warning that is usually BENIGN — see gotcha above — becomes FATAL here). `-j` already implies simulate, so the failure is in format-table resolution, not download intent.
+
+**Diagnose FIRST (cheap probes before any fix)**:
+
+- `uvx yt-dlp -F "VIDEO_URL"` — enumerate which formats ARE actually available
+- `uvx yt-dlp --version` — uvx CACHES environments, so a cached stale yt-dlp release is a candidate root cause; force `uvx yt-dlp@latest` to rule it out
+
+**Dead-end ladder (all tried 2026-08-23 on s0S6HFdPtlA, PyData NYC 2017; NONE fixed it — do not re-walk blindly)**: `--js-runtimes node`, brew-installing deno (yt-dlp's default JS runtime), `--extractor-args "youtube:player_client=android|web_embedded|tv"`.
+
+**Candidate fallback (untested — verify before relying on it)**: if only title/author are needed, the oEmbed endpoint `https://www.youtube.com/oembed?url=<url>&format=json` requires no format resolution at all.
+
+**Debug discipline from the same spiral**: never suppress stderr (`2>/dev/null`) while diagnosing — it turned a clear yt-dlp error into mystery "empty output"; do not invent flag combinations (`--with-requirements /dev/null` is nonsense); run the cheap observational probe (`-F`, `--version`) BEFORE expensive speculative fixes (installing JS runtimes, swapping player clients).
+
+
+**RESOLVED (2026-08-23, same task): the fix is `--remote-components ejs:github`.** yt-dlp ships its n/sig challenge solver as EJS components (github.com/yt-dlp/ejs); when the solver BUNDLED with your yt-dlp release is stale relative to YouTube's current player, format resolution dies with the errors above even with cookies, a fresh yt-dlp, and working JS runtimes. `--remote-components ejs:github` lets yt-dlp download the CURRENT solver from GitHub into `~/.cache/yt-dlp/challenge-solver/` — which is why the entire runtime/player_client dead-end ladder above failed: the runtime was never the problem, the stale solver was. Verified working invocation (unlocked the full 12-video batch with zero runtime installs, including s0S6HFdPtlA):
+
+```bash
+uvx yt-dlp --cookies-from-browser chrome --remote-components ejs:github -j "https://www.youtube.com/watch?v=VIDEO_ID"
+```
+
+Notes: `--remote-components ejs:npm` is the sibling option (solver from npm); the yt-dlp wiki recommends putting the flag in your yt-dlp config so solvers auto-update. Try remote-components FIRST when you see the n-challenge warning turn fatal — before installing any JS runtime or swapping player clients.
+
+**Deno role (2026-08-23 session-summary cross-check): necessary-but-not-sufficient.** The remote EJS solver still needs a JS runtime to EXECUTE, and deno (yt-dlp's default runtime, brew-installed during the dead-end ladder above and left in place) was present in the session's final working stack — the session's own report attributed success to "chrome cookies + deno". Installing deno ALONE does not fix the stale-solver problem (that was the dead end); `--remote-components ejs:github` WITH a working JS runtime does. Keep a JS runtime installed when applying the fix — do not uninstall deno or dismiss it as pure dead weight.
 
 ## Notes
 
