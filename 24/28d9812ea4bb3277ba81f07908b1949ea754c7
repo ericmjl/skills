@@ -1,0 +1,23 @@
+skills/marketing-copy/SKILL.md
+  s_63ac998537a833::t_7b6bd4df515ae5 4,33-43,54,69,73-74,77,83,105,131-133,150
+skills/marketing-copy/references/advocacy-and-cadence.md
+  s_63ac998537a833::t_a899e29d54313d 1-124
+skills/marketing-copy/references/video-retention-science.md
+  s_63ac998537a833::t_5107793a30a782 1-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2428d9812ea4bb3277ba81f07908b1949ea754c7",
+  "prompts": {},
+  "sessions": {
+    "s_63ac998537a833": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0e049-8263-709b-bf2f-04324f8ffb44",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
