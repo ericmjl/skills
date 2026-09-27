@@ -1,0 +1,21 @@
+skills/docker-offline-verification/PURPOSE.md
+  s_63ac998537a833::t_d109dfb5c293a4 1-13
+skills/docker-offline-verification/SKILL.md
+  s_63ac998537a833::t_9962318e15d7f8 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0e726296e42d273e1e8f7b25d07efb15b1b06814",
+  "prompts": {},
+  "sessions": {
+    "s_63ac998537a833": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0e049-8263-709b-bf2f-04324f8ffb44",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
