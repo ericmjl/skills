@@ -103,3 +103,13 @@ Begin with supply chain signals: maintenance activity, contributor count, securi
 
 ### Pull Request Review
 Focus on the diff. For each changed file, assess which dimensions are relevant based on the code's function. Flag new dangerous patterns. Verify that security-sensitive changes have tests. Check that secrets were not accidentally committed. For PRs touching CI/CD workflows, always check SHA pinning and `pull_request_target` (dimension 4).
+
+## Framework Check: Next.js Bundle-Level Data Exposure on Auth-Gated Routes
+
+Middleware/route auth gates the PAGE, not the CHUNK. Any data (JSON snapshots, config, constants) statically imported into a CLIENT component is compiled into a `/_next/*` static chunk that is always publicly fetchable — middleware matchers exclude `/_next/*` — and the chunk URL is enumerable from any public page's build manifest of the same deployment. Authenticated-but-unauthorized users also download the chunk before any client-side gate (e.g. an `isAdmin` check) renders.
+
+**Check (add to dimension 2 auth review for Next.js apps):** for every auth-gated route, grep its client components for static JSON/data imports and scan the bundled payload for PII (person names, emails, EINs, company/entity identifiers).
+
+**Fix evaluation order:** a dynamic-import "fix" is INSUFFICIENT — the chunk still exists at a fetchable URL; only loading is deferred. Real fixes: (a) serve the data as props from a server component gated on server-side auth (complex when auth is Clerk-JWT + Convex in RSC), (b) strip sensitive values from the bundled payload at source (script-level sanitization), or (c) explicitly accept the risk with the owner's sign-off.
+
+Instance: learn-anything `/admin/gantt` `retreat-board.json` shipped in a public chunk (MAJOR, 2026-08-16).

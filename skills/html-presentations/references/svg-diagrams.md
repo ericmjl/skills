@@ -255,3 +255,42 @@ Use for feature comparisons, option trade-offs, before/after.
 4. **Text sizing** — labels inside nodes use `font-size:13–16px` in the SVG coordinate space (the viewBox scales it). Smaller annotations use `10–12px`.
 5. **Spacing** — 50–60px between node edges. Keep consistent horizontal and vertical rhythm.
 6. **Bezier curves** — for curved connections, use cubic bezier paths: `<path d="M x1,y1 C cx1,cy1 cx2,cy2 x2,y2" />`. Control points should be roughly 1/3 of the way to the destination to produce smooth arcs.
+
+## Mathematical Accuracy for Data-Driven SVGs (MANDATORY)
+
+**The user catches geometry errors by eye.** Any SVG that depicts quantifiable
+or structural content — bar charts, line charts, adjacency matrices, arc/circos
+plots, pie charts, scatter plots — must have its geometry **computed from the
+actual data**, never eyeballed or approximated. This has been flagged as a
+correction multiple times (Nan's Notes 03-18: bar height vs axis-tick
+mismatch; Network-Analysis-Made-Simple 07-11: matrix/arc/circos geometry wrong).
+
+### Rules
+
+1. **Axis-driven bar heights** — a bar at value V with an axis spanning
+   [min, max] in the plot area [yBottom, yTop] must have its top edge at
+   `yTop + (1 - (V - min) / (max - min)) * (yBottom - yTop)`. Never guess;
+   never let a lower-valued bar render taller than a higher tick mark.
+
+2. **Line chart points** — each point's Y is derived from the axis scale
+   using the same formula as bar heights. X positions are evenly spaced
+   (or time-scaled). Verify the rendered line visually matches the data table.
+
+3. **Adjacency matrix plots** — each filled cell at (row i, col j) corresponds
+   to an actual edge in the graph. Use a real edge list. For grouped graphs,
+   the matrix shows block-diagonal structure; random opacity cells are wrong.
+
+4. **Arc plots** — nodes sit on a horizontal line at evenly spaced X positions.
+   Each arc is a semicircular/bowed path connecting two nodes that share an
+   edge. Arc height ∝ node distance. Draw ALL edges, not just two.
+
+5. **Circos plots** — nodes sit at equal angles on a circle. Edges are drawn
+   as **interior chords/arcs** (Bézier curves bowing toward the center), not
+   just dots on the ring. A circos plot with nodes but no edge chords is
+   incomplete.
+
+6. **Verification step** — after generating a data-driven SVG, mentally (or
+   programmatically) re-check: does the tallest bar correspond to the largest
+   value? Do matrix cells match the edge list? Do arc/circos chords correspond
+   to real edges? If any visual element does not correspond to the data it
+   represents, fix the geometry before presenting.
