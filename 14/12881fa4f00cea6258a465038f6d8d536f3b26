@@ -1,0 +1,29 @@
+skills/cybersecurity-review/SKILL.md
+  s_f9639b3fcf6b81::t_d059c04a0a819a 106-115
+skills/html-presentations/SKILL.md
+  s_f9639b3fcf6b81::t_eecb2f323d1c86 709-717
+skills/html-presentations/references/svg-diagrams.md
+  s_f9639b3fcf6b81::t_a6b18bdbb7ba4c 258-296
+skills/pdf-form-filler/SKILL.md
+  s_f9639b3fcf6b81::t_b21a65e8c09a70 3,36,104-123
+skills/skill-creator/SKILL.md
+  s_f9639b3fcf6b81::t_2f63cd9f1bd001 64-73,120,421-475
+skills/slack-cli/SKILL.md
+  s_f9639b3fcf6b81::t_ed7f449957fc9e 46-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1412881fa4f00cea6258a465038f6d8d536f3b26",
+  "prompts": {},
+  "sessions": {
+    "s_f9639b3fcf6b81": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0e2cd-fef4-709b-bf2f-043588618b2f",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
