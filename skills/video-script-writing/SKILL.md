@@ -102,6 +102,21 @@ to care; a quarter of all flops), greetings ("hey everyone, welcome back"),
 and promise-only openers ("stick around and I'll show you" asks for credit;
 give instead).
 
+GENRE EXCEPTION - founder / invitation / landing-page videos (2026-08-27,
+Learn Anything founder video): when the video is a PERSONAL ADDRESS (founder
+story, invitation, landing-page embed - the viewer pressed play on a PERSON,
+not a topic), a warm greeting opener is CORRECT, not a flop. Eric explicitly
+commissioned: "Hey everybody, I'm Eric. I thought I'd take a little bit of
+time to tell you a little bit of my convictions and motivations for running
+this retreat." The greeting + one-line intent IS the promised content here,
+so it passes the promise test; the greeting flop-pattern data comes from
+topic-promise YouTube videos where the title/thumbnail claim must be engaged
+in ~15s. Corollary (same session): closers in this genre carry NO
+honesty-flag hedges ("And honestly, ...") - "if I have to write honestly,
+that means I wasn't being honest" - close warm and conversational.
+Dictation rules apply: splice Eric's dictated opener/closer phrasing
+near-verbatim.
+
 Mechanics: make the stake second person ("you") where honest; size the gap
 right (enough context to make the gap visible, not so much it self-closes;
 curiosity follows an inverted-U); explanatory gaps ("I know what, not why")
@@ -179,3 +194,48 @@ appears, fix that moment, not the whole script.
 - Do not over-cut. Diminishing returns are real; processing takes time;
   scenes under one second cannot encode.
 - Engagement is not conversion. Judge the script by the action it produces.
+
+## Weaving source material into an existing script (revision protocol)
+
+Distilled 2026-08-29 from the Learn Anything founder-video session (mining
+the Daniel Fischer intake-call transcript for story material into a
+runtime-capped script).
+
+1. Mine with one read-only reporter, assess in the main thread. When a
+   large transcript/source feeds an existing script, save the source to a
+   file and dispatch ONE explore subagent with a three-part brief:
+   (a) the headline candidate stories VERBATIM, (b) all material mapping
+   onto the script's existing beats, (c) anything CONTRADICTING current
+   script claims. The main thread holds the constraint set (the script's
+   one doubt-killing job, runtime budget, guardrails, retention rules)
+   and does the assessment; the subagent only extracts.
+2. Assess every candidate against four axes BEFORE editing: structure
+   fit, runtime (additions to an over-budget script require trades),
+   guardrails (provenance, claims audit), retention (concreteness,
+   caption legibility). A candidate that fails an axis is parked WITH the
+   reason logged, not silently dropped.
+3. Paired cut (show-don't-tell swap): when an inserted story
+   INSTANTIATES an abstract claim already in the script ("each one took
+   real effort and time"), cut the abstract claim in the same edit — the
+   story now carries it. Net runtime stays flat; assertion becomes
+   evidence.
+4. Keep a trim ladder in the script notes: an ordered list of
+   pre-approved cuts, weakest first (e.g. field names → lever/crutch
+   couplet → never the struggle), so future runtime overruns trade down
+   deterministically instead of re-deliberating.
+5. Provenance fidelity beats rhetorical punch: NEVER transplant a
+   verbatim quote from one story arc into another (a "five more times"
+   quote from the backprop arc must not land in the Gaussian-processes
+   arc even though it is the stronger line). Record each woven story's
+   provenance (source, date) in the script's guardrails block.
+6. Earnings history as transformation, never figures: in
+   founder-marketing scripts the speaker's own outcome is admissible as
+   history ("that tripled my grad student stipend") but dollar figures
+   ($112K) and job titles are omitted — concrete money numbers read as
+   implied outcome promises. The speaker's own hedge on the source call
+   ("that's not a lot, right?") is the tell the number will land wrong.
+7. Auto-transcript numbers need a table-read flag: near-verbatim quotes
+   from an auto-generated transcript carry garbled counts and names;
+   adjacent story arcs can hold different counts ("five more times" vs
+   "two, three times"). Flag every numeric or named claim sourced from
+   auto-transcript for speaker confirmation at the table read.
