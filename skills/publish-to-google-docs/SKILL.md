@@ -20,6 +20,37 @@ Quickly publish markdown notes to styled Google Docs using pandoc and a Word tem
 2. A Word template (.docx) with desired styles
 3. OAuth credentials for Google Drive (one-time setup)
 
+## Consent boundary and the local-generation fallback
+
+The Google Drive OAuth flow (`upload_to_drive.py`) opens a browser for Google
+login on FIRST run and is a **consent boundary the agent cannot cross
+autonomously** (see the `consent-gated-verification` skill). Before starting
+the full convert-then-upload workflow, verify both blockers:
+
+1. **pandoc installed?** `which pandoc` — if missing, `pixi global install pandoc` (preferred per AGENTS.md) or another option from the self-healing table.
+2. **Google OAuth creds present?** `echo ${GOOGLE_CLIENT_ID:+set}` / `echo ${GOOGLE_CLIENT_SECRET:+set}` — if either is empty, the upload step will fail.
+
+If BOTH are satisfied → run the full workflow (convert + upload).
+
+If OAuth creds are MISSING (the common case for a first attempt on a new
+project/machine) → **offer the local-generation fallback FIRST** rather than
+asking the user to do Google Cloud Console setup:
+
+### Fallback: generate .docx locally, user uploads manually
+
+1. Convert markdown to .docx with pandoc (Step 2 of the main workflow).
+2. Report the local path of the generated .docx to the user.
+3. Let the user drag-and-drop the file into Google Docs / Drive themselves.
+
+This sidesteps the OAuth consent boundary entirely and is usually what the
+user wants for a one-off document (setting up OAuth credentials for a single
+doc is rarely worth the Google Cloud Console work). Verified 2026-07-18 in
+the brain42 project: user chose the local-generation path over OAuth setup
+for a letter-of-support .docx.
+
+Only set up OAuth (Google Cloud Console OAuth client + env vars) if the user
+will publish to Google Docs REPEATEDLY and wants the automated upload path.
+
 ## Self-healing: Installing pandoc
 
 If pandoc is not installed, ask the user how they would like to install it:
