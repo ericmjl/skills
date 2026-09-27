@@ -1,0 +1,19 @@
+skills/voss-advisor/SKILL.md
+  s_f9639b3fcf6b81::t_daad7790f9faca 3-11,590-594
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9966ac2becfdb3eb6e6d5518b2a370e398d5618d",
+  "prompts": {},
+  "sessions": {
+    "s_f9639b3fcf6b81": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0e2cd-fef4-709b-bf2f-043588618b2f",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
