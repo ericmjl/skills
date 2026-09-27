@@ -1,6 +1,12 @@
 ---
 name: gh-activity-summary
-description: Generate a plain-language activity report of your GitHub work for a given date range, including commits, pull requests, reviews, issues, and comments. Use this when you need to summarize what you've accomplished on GitHub for status updates, retrospectives, or tracking your work.
+description: >-
+  Generate a plain-language activity report of your GitHub work for a date
+  range or a single day, including commits, pull requests, reviews, issues,
+  comments, and a chronological event timeline. Use this when you need to
+  summarize what you've accomplished on GitHub for status updates,
+  retrospectives, reviewing what happened on a specific date, or tracking
+  your work.
 license: MIT
 ---
 
@@ -44,3 +50,24 @@ To generate a short natural-language summary, you can pipe the report into your 
 ```bash
 bash skills/gh-activity-summary/activity-report.sh 2026-01-01 2026-01-07 | claude "Summarize this in 2-3 sentences"
 ```
+
+## Daily timeline view
+
+For a single specific day (commits grouped by repo and branch, issue
+interactions, and a chronological event timeline), use the timeline script:
+
+```bash
+# Today
+bash skills/gh-activity-summary/gh-activity.sh
+
+# A specific date (YYYY-MM-DD)
+bash skills/gh-activity-summary/gh-activity.sh 2025-12-15
+```
+
+Where `activity-report.sh` aggregates a range via `gh search` (best for
+"what did I do this week"), `gh-activity.sh` replays the GitHub events API
+for one day (best for "what happened on the 15th", including pushes, PR
+comments, and issue activity in order).
+
+Consolidated 2026-09-27: absorbs gh-daily-timeline (deleted; its script and
+docs live here).
