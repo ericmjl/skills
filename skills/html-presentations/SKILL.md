@@ -706,3 +706,12 @@ For SVG path drawing, set `--len` to the path's total length:
 9. **Fill the slide** — avoid layouts where content clusters in one corner and the rest is empty space. Use two-column grids (`grid-template-columns: 1fr 1fr`) to balance text and diagrams side by side, with `align-items:center` to vertically center both columns.
 10. **Taglines over bullets for features** — when spotlighting a feature or concept, replace bullet lists with a short tagline (2–3 short lines broken with `<br>`) and keyword pills beneath. This is punchier and more scannable.
 11. **Make SVGs the hero** — when a slide has a diagram, give it at least half the slide width. Use generous `viewBox` dimensions and fill the space with detail: multiple nodes, labels, phases, wireframe lines, loop-back arrows. A tiny diagram floating in whitespace looks unfinished.
+
+## Eric's deck tenets (all decks: HTML, PPTX, consulting-style; stated 2026-09-01 commissioning a BCG-style consulting deck skill)
+
+1. ONE key message per slide, stated as an action title (finding + so-what), never a topic label.
+2. Plain English everybody understands. No lofty consultant speak (synergies, leverage, holistic).
+3. Uncluttered slides: generous margins and white space; if content crowds, split the slide.
+4. Never arrange points into boxes/grids/pillars (4-box, 2x2, six pillars) unless the geometry itself carries the argument. If the layout does not make the message land faster, use prose or a list.
+5. One accent color reserved for the decisive comparison; put a source line on every evidence slide.
+6. For brand decks use the brand's OFFICIAL colors, verified against the brand's own live-site CSS (fetch in HTML format; see webfetch-empty-use-agent-browser for the fetch path), never third-party aggregator lists. BCG palette verified 2026-09-01 from bcg.com inline style block id=global-colors: #144622, #0C2B15, #197A56, #21BF61, #96F878.

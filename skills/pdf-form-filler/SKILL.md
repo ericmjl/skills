@@ -1,6 +1,6 @@
 ---
 name: pdf-form-filler
-description: "Fill flat PDF forms that have NO fillable fields (school enrollment packets, medical intakes, waivers, government paperwork) and reuse a prior year's filled PDF as the source of answers. Requires a vision-language-model coding agent (renders pages to images and looks at them); there is no non-VLM fallback. Use when: the user asks to fill out / complete / fill in a PDF form, especially recurring yearly forms (enrollment, renewal, intake) where a previously filled copy exists; when pypdf reports zero AcroForm fields but the form has lines and labels; when the user says 'agent, fill this form for me'; when transplanting prior answers onto a new PDF template; when reproducing a scanned or drawn signature as vector ink from an old PDF; or when a filled form's text overlaps lines or labels and placement needs verification against rendered pixels."
+description: "Fill PDF forms: flat PDFs with NO fillable fields and fillable AcroForm PDFs with real fields (school enrollment packets, medical intakes, waivers, government paperwork) and reuse a prior year's filled PDF as the source of answers. Requires a vision-language-model coding agent (renders pages to images and looks at them); there is no non-VLM fallback. Use when: the user asks to fill out / complete / fill in a PDF form, especially recurring yearly forms (enrollment, renewal, intake) where a previously filled copy exists; when pypdf reports zero AcroForm fields but the form has lines and labels; when pypdf reports REAL AcroForm fields that need filling; when the user says 'agent, fill this form for me'; when transplanting prior answers onto a new PDF template; when reproducing a scanned or drawn signature as vector ink from an old PDF; or when a filled form's text overlaps lines or labels and placement needs verification against rendered pixels."
 license: MIT
 ---
 
@@ -33,7 +33,7 @@ from pypdf import PdfReader
 print(PdfReader("form.pdf").get_fields())  # None or {} = flat PDF, this skill applies
 ```
 
-(If real AcroForm fields exist, set their values instead; this skill is for the flat case.)
+(If real AcroForm fields exist, use Branch B at the end of this file and set the field values. The rest of this file is the flat case.)
 
 ### 3. Extract prior answers with positions
 
@@ -102,3 +102,22 @@ The fallback loop for every failure: render, look at the image, measure ink pixe
 7. Deliver: filled PDF + one PNG render per page for the user's own final check.
 
 The user's final look is part of the pipeline, not a nicety. They will catch what the render-verify loop normalized.
+
+## Branch B: the form HAS real AcroForm fields (fillable PDF)
+
+Step 2 detects this: `get_fields()` returns a populated dict. Fill the real fields instead of drawing text. The render-verify loop and placement contract still apply in full.
+
+1. Map cryptic field names to printed labels. Names are often machine-generated (`topmostSubform[0].Page1[0].f1_03[0]`), so match each widget's rect against the printed label text on the rendered page instead of trusting name order.
+2. Fill with pypdf: build a `PdfWriter`, then `update_page_form_field_values(page, {name: value})` per page, and enable NeedAppearances (`writer.set_need_appearances_writer(True)`) so viewers actually render the values. Without it, values can be set but invisible in Preview/Acrobat.
+3. Rasterize every TOUCHED page and look at it, same as Branch A. Values can render in a fallback font, at the wrong size, or not at all; the render is the verdict.
+4. Leave signature-line fields empty for hand-signing. Typed "print name" lines are fine to fill; actual signature fields are not.
+5. Sensitive fields (DOB, SSN, account numbers): write them into the local PDF only. Tell the user they land in the file and are not echoed in chat or summaries.
+6. Deliver two files side by side in ~/Downloads: the draft-filled PDF and the untouched original, named so the user can tell them apart.
+
+### Batch-question fallback (question UI dismissed or unavailable)
+
+Interactive question prompts can get dismissed mid-flow. The fallback that keeps momentum: prefill everything known-safe first, generate the draft, then ask ALL remaining blanks in ONE numbered plain-text message ("answer inline by number, any format; skip what you don't know and I'll leave it blank for handwriting"). One message, never a dribble of questions. Prefill-then-ask converts a blocked session into a deliverable draft plus a single round-trip.
+
+### Downloading government form PDFs
+
+Some portals block scripted downloads: curl/webfetch get nothing useful, e.g. Mass.gov. Pull the file through a real browser session (agent-browser) and save from there. Do not loop on curl retries first; see webfetch-empty-use-agent-browser for the general pivot rule.

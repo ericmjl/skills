@@ -61,6 +61,16 @@ Fingerprints to remove or reframe in source-neutral terms:
 
 Keep the underlying principles; strip the derivation. The user values honest critical assessment of over-indexing over cheerleading — proactively flag when a skill is over-fit to its source. Distinct from deciding WHERE a skill lives (public vs private repo); this governs CONTENT de-identification of a genuinely-general skill.
 
+### Keep domain-specific content out of general/umbrella skills
+
+A general or umbrella skill (e.g. `awesome-marimo-notebook` = general marimo patterns) must contain only content GENERAL to its declared domain. Do NOT add domain-specific or library-specific errors to a general skill's failure/troubleshooting table — those belong in focused, library-specific skills. This is especially important when a focused skill ALREADY EXISTS for the error: adding it to the umbrella skill too is both scope pollution AND redundancy (two skills now describe the same failure, and the umbrella skill drifts toward a grab-bag).
+
+Before adding any entry to an umbrella skill's failure table, ask: "is this failure GENERAL to this skill's domain, or specific to a particular library/tool that has (or should have) its own focused skill?" If the latter, route it to the focused skill, not here.
+
+Concrete instance (2026-07-14): xarray-specific `IndexError` from `.sel()`+`.where()` and DataTree `/ds` vs `.ds` errors were added to the `awesome-marimo-notebook` failure table; the user corrected that these are "specific to xarray" — they belong only in `xarray-sel-coordinate-alignment` and `xarray-datatree-ds-attribute-access`, not in the general marimo skill.
+
+Sibling of "Strip derivation fingerprints when generalizing from specific exemplars" (which governs generalizing FROM a source); THIS governs keeping domain-specific content OUT of an already-general skill.
+
 ### Anatomy of a Skill
 
 Every skill consists of a required SKILL.md file and optional bundled resources.
@@ -107,6 +117,7 @@ Every SKILL.md consists of:
 
 - **Frontmatter** (YAML): Must include `name` and `description`. OpenCode also recognizes `license`, `compatibility`, and `metadata` (string-to-string map). Other fields are ignored. The `description` **is** the trigger: agents see it before the body; write imperative *Use when …* text with user phrasings and concrete anchors (files, tools, URLs). See [references/skill-description-triggers.md](references/skill-description-triggers.md).
 - **Body** (Markdown): Instructions and guidance for using the skill. Only loaded after the skill triggers (if at all).
+- **Description-body sync on PATCHES (maintenance rule)**: when patching a RULE that appears in a skill's body, grep the frontmatter `description` (and any body intro that duplicates it) for the same rule — agents that never load the full body reason from the DESCRIPTION ALONE, so a body-only patch leaves the most-visible surface serving the STALE rule. Instance 2026-08-28: git-worktree-session-workflow's body gained the DELIVERABLE-SCOPE CARVE-OUT (2026-08-27) but its description still said 'merge in the close-out turn' unconditionally; the next session quoted the stale description verbatim during its close-out deliberation. Patch BOTH surfaces in the same edit, and verify with a grep that no copy of the old rule text remains.
 
 #### Bundled Resources (optional)
 
@@ -407,3 +418,58 @@ After testing the skill, users may request improvements. Often this happens righ
 3. If the agent rarely loads the skill despite relevant requests, **revise `description` first** (then body or references)
 4. Identify how SKILL.md or bundled resources should be updated
 5. Implement changes and test again
+
+## Restructuring overgrown skills (3-part architecture)
+
+When a skill has grown into a long negative list (more than ~150 accumulated
+"don't do X" rules added reactively after failures), its effectiveness drops:
+the agent checks against a list rather than internalizing the behavior, and the
+rule set exceeds the ~150-rule budget an agent can reliably follow.
+
+The canonical restructure splits the skill into THREE parts:
+
+**Part 1 — Calibration Protocol (~15-20 lines, always loaded).** For skills
+where the target behavior varies by session context (voice, style, tone),
+define a per-session calibration: the agent offers N distinct variants of an
+opening artifact (3 paragraph vibes, 3 code styles, 3 analysis framings), the
+user picks, and that choice sets the session's parameters. Skip if the skill's
+behavior is context-invariant (a CLI procedure, a verification checklist).
+
+**Part 2 — Core Rules (~25-50 lines, always loaded).** The high-leverage
+subset: 4-13 generative principles that cover novel situations, plus the hard
+mechanical rules (format requirements, banned patterns). This must fit well
+under the 150-rule budget. Phrase as positive principles ("prefer X", "lead
+with Y") where possible, not just negatives.
+
+**Part 3 — Detailed Reference (unbounded, loaded ONLY during review/diagnosis).**
+The full accumulated rule set is preserved verbatim but clearly marked as
+reference material, not for drafting-time loading. An agent loads Part 3 only
+when diagnosing a specific failure during a review pass.
+
+### When to apply this restructure
+
+Diagnose by rule count and effectiveness: if the skill's SKILL.md exceeds ~200
+lines of rules AND the user reports the skill's output still "has a lot of
+things I don't like" despite the rules, it is a candidate. The fix is NOT to
+append more rules — it is to split into the 3-part architecture and prefer
+generative principles + calibration over accumulated negatives.
+
+### Preference order when adding a new recurring lesson
+
+1. Can an EXISTING core rule in Part 2 be generalized to cover this case? If
+   yes, generalize it rather than appending.
+2. Is this a one-off or context-specific instance? Route to Part 3 reference,
+   not Part 2.
+3. Only append a NEW rule to Part 2 when the lesson is genuinely novel AND
+   high-leverage AND not coverable by generalizing an existing rule.
+
+Appending reactively to Part 2 is what causes the negative-list bloat this
+restructure exists to fix.
+
+### Origin
+
+Discovered 2026-07-27 restructuring write-like-eric: the skill had grown to
+~600 lines of accumulated voice rules yet output quality was still
+unsatisfactory; the restructure produced Part 1 (17-line calibration protocol),
+Part 2 (25-line / 13-rule core), Part 3 (626-line reference). The same
+architecture applies to any overgrown skill, not just voice skills.

@@ -43,6 +43,18 @@ Default mindset: discover progressively with `--help`, verify against official d
 5. For state-changing commands, confirm target workspace/app context (`--team`, `--app`) before execution.
 6. Prefer explicit flags over interactive prompts for reproducibility.
 
+## Auth secrets — never collect in chat
+
+`slack login` / `/slackauthticket` **challenge codes**, OAuth codes, and bot
+tokens (`xoxb-…`, `xoxp-…`) are **human-terminal-only**.
+
+- **Do not** ask the user to paste a challenge code, ticket completion secret,
+  or Slack token into the agent chat.
+- **Do not** run `slack login` (or `--no-prompt` ticket flows) as the agent when
+  the human must approve the modal — give them the commands instead.
+- If auth is stale: hand them a copy-paste command block; continue only after
+  they say auth/install/sync is done (no secrets in the reply).
+
 ## Help-Only Study Mode
 
 If a user asks to "study the CLI" or "do not run real operations":
