@@ -4,6 +4,10 @@
 # skills/data-visualization-master/. It never merges; every PR is human-
 # reviewed.
 #
+# Schedule: monthly, first Sunday 14:00 UTC (cron cannot express "first
+# Sunday"; the job runs every Sunday and the gate step exits early on the
+# other Sundays). Manual dispatch bypasses the gate.
+#
 # Required secret:
 #   ZAI_API_KEY — Z.ai API key for the model provider pi uses (minted in the
 #   Z.ai console; stored in 1Password, synced to this secret).
@@ -19,7 +23,7 @@ name: Dataviz skill literature research
 
 on:
   schedule:
-    - cron: "0 14 * * 1" # Mondays 14:00 UTC
+    - cron: "0 14 * * 0" # every Sunday 14:00 UTC; the gate step keeps only the first Sunday of each month
   workflow_dispatch:
     inputs:
       focus:
@@ -41,7 +45,25 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
+      - name: Gate — first Sunday of the month (scheduled runs only)
+        id: gate
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual dispatch — gate bypassed."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          DOM=$(date +%-d)
+          if [ "$DOM" -le 7 ]; then
+            echo "First Sunday of the month (DOM=$DOM) — running."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Regular Sunday (DOM=$DOM) — first-Sundays-only schedule, skipping."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Check required secret
+        if: steps.gate.outputs.run == 'true'
         env:
           HAS_ZAI_KEY: ${{ secrets.ZAI_API_KEY != '' }}
         run: |
@@ -51,17 +73,21 @@ jobs:
           fi
 
       - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
         with:
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
+        if: steps.gate.outputs.run == 'true'
         with:
           node-version: "22"
 
       - name: Install pi coding agent
+        if: steps.gate.outputs.run == 'true'
         run: npm install -g --ignore-scripts @earendil-works/pi-coding-agent
 
       - name: Prepare pi agent directory (MCP search server)
+        if: steps.gate.outputs.run == 'true'
         env:
           EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
           PI_CODING_AGENT_DIR: ${{ github.workspace }}/../pi-agent-home
@@ -95,11 +121,13 @@ jobs:
           echo "pi agent dir ready: $PI_CODING_AGENT_DIR"
 
       - name: Configure git identity
+        if: steps.gate.outputs.run == 'true'
         run: |
           git config user.name "dataviz-research-bot"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Run pi research agent
+        if: steps.gate.outputs.run == 'true'
         timeout-minutes: 35
         env:
           ZAI_API_KEY: ${{ secrets.ZAI_API_KEY }}
@@ -118,6 +146,7 @@ jobs:
           pi --print --approve --provider "${PI_PROVIDER:-zai}" --model "${PI_MODEL:-glm-5.3-flash}" "$PROMPT" 2>&1 | tee pi-output.log
 
       - name: Guard — scope and push check
+        if: steps.gate.outputs.run == 'true'
         env:
           BASE_REF: ${{ github.ref_name }}
         run: |
@@ -144,7 +173,7 @@ jobs:
           fi
 
       - name: Append run output to job summary
-        if: always()
+        if: always() && steps.gate.outputs.run == 'true'
         run: |
           if [ -f pi-output.log ]; then
             {
@@ -156,7 +185,7 @@ jobs:
           fi
 
       - name: Upload run log
-        if: always()
+        if: always() && steps.gate.outputs.run == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: pi-run-log
