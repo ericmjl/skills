@@ -1,22 +1,7 @@
 ---
 name: marketing-copy
 description: >-
-  Write, review, and critique marketing copy using proven copywriting frameworks.
-  Use when the user asks to write or generate sales copy, headlines, bullet
-  points, email teasers, email sequences, sales letters, sales pages, landing
-  page or hero copy, social media ad copy (Facebook, Instagram, LinkedIn),
-  product descriptions, Amazon listings, webinar registration copy, or
-  newsletter P.S. blocks / postscripts promoting an event, workshop, or
-  product — or says 'sell the benefits', 'marketing copy', 'persuasive',
-  'make it compelling', or 'advocate for X'. Also use when the user asks to
-  review, critique, audit, score, or improve existing copy. Frameworks include
-  customer avatar definition (F.R.E.D.), headline formulas, the ultimate
-  bullet formula (feature + benefit + meaning), PAS / benefit /
-  before-after-bridge sales formulas, email subject-line patterns, offer
-  building and risk reversal, stealth closes, hooks and angles, swipe file
-  methodology, the 5-part newsletter P.S. block formula, value-on-top-of-
-  persuasion for recurring post cadences, persona-matched CTAs, and
-  price-objection reframing. Produces multiple variations by default.
+  Write, review, and critique marketing copy using proven copywriting frameworks. Use when the user asks to write or generate sales copy, headlines, bullet points, email teasers or sequences, sales letters, sales pages, landing page or hero copy, social media ad copy (Facebook, Instagram, LinkedIn), product descriptions, Amazon listings, webinar registration copy, or newsletter P.S. blocks — or says 'sell the benefits', 'marketing copy', 'persuasive', 'make it compelling', or 'advocate for X'. Also use when asked to review, critique, audit, score, or improve existing copy. Frameworks (customer avatar, headline formulas, ultimate bullet formula, PAS, subject-line patterns, offer building and risk reversal, stealth closes, hooks and angles, swipe files, newsletter P.S. formula, persona-matched CTAs, price-objection reframing) live in the body. Produces multiple variations by default.
 license: MIT
 ---
 
@@ -45,7 +30,17 @@ Determine from the request or by asking:
 - **Medium**: Where will this copy appear? (Sales page, email, ad, social post, product listing)
 - **Angle/hook**: What is the main promise or curiosity trigger?
 
-### 2. Build the avatar (when needed)
+### 2. Verify factual claims (gate before persuasion)
+
+Frameworks amplify whatever claims the copy makes, true or false. Before generating, verify every checkable claim:
+
+- **Autobiographical claims** (the author's history, "most/half of my ..."): use only claims the author has explicitly stated about themselves, verbatim or weaker. Never convert a general statement into a first-person statistic; "that's how a lot of us found our jobs" became "Most of the jobs I've had started with someone passing something along", which Eric flagged as categorically false (2026-08-21). If no attested claim is available, write a claim-free line instead.
+- **Program mechanics** (application vs waitlist, funnel stage, dates, capacity, venue, pricing, referenced pages): check the live site and use its exact terminology and CTA. "Applications have been coming in" was wrong for Learn Anything; the site funnel is "Join the waitlist" then "Applications open to the waitlist first", so the accurate claim was "the waitlist has been growing" (2026-08-21).
+- **Demand and social-proof numbers**: only use stats the user supplied. "Been floored by the response" is usable color; an invented signup count is not.
+
+If a claim cannot be verified this turn, cut it or mark it [VERIFY] for the user. A weaker true claim beats a stronger invented one.
+
+### 3. Build the avatar (when needed)
 
 If the audience is undefined, load [references/fred-avatar.md](references/fred-avatar.md) and run through the F.R.E.D. framework:
 
@@ -56,7 +51,7 @@ If the audience is undefined, load [references/fred-avatar.md](references/fred-a
 
 Also capture: demographics, where they hang out online, words and phrases they use, their objections and skepticism.
 
-### 3. Apply the framework
+### 4. Apply the framework
 
 Select the copy type and load the matching reference:
 
@@ -71,18 +66,21 @@ Select the copy type and load the matching reference:
 | Social media ad | [email-and-ads.md](references/email-and-ads.md) | Hook + ad purpose + angle selection |
 | Offer / bonus stacking | [offers-and-desire.md](references/offers-and-desire.md) | Desire builders, stacking, risk reversal |
 | Product listing / webinar | [sales-formulas.md](references/sales-formulas.md) | Benefit-driven descriptions, registration copy |
+| Video script / founder video | [video-retention-science.md](references/video-retention-science.md) | Hook, open loops, speech rate, CTA friction |
 
 For psychology and emotional triggers, load [psychology-and-emotion.md](references/psychology-and-emotion.md).
 
+For video scripts and timed spoken persuasion, load [video-retention-science.md](references/video-retention-science.md).
+
 For proof elements (testimonials, credibility), load [proof-and-closes.md](references/proof-and-closes.md).
 
-### 4. Generate variations
+### 5. Generate variations
 
 For headlines, bullets, subject lines, and hooks: produce **3 to 5 variations** using different angles or formulas. Label each with the technique used.
 
 For long-form copy (sales letters, emails): produce one complete version, then offer alternative openings or headlines.
 
-### 5. Polish
+### 6. Polish
 
 Apply the editing checklist from [swipe-and-polish.md](references/swipe-and-polish.md):
 
@@ -104,6 +102,7 @@ Load [review-checklist.md](references/review-checklist.md) and score the copy on
 - **Emotion**: Does it connect emotionally before asking for action?
 - **Call to action**: Is it clear, specific, and singular?
 - **Proof**: Are there credibility elements?
+- **Factual fidelity**: Is every checkable claim attested (the author's own words for personal claims, the live site for program mechanics, user-supplied numbers for demand)?
 - **Risk reversal**: Is there a guarantee or objection handling?
 - **Clarity**: Could a 12-year-old understand the offer?
 
@@ -129,6 +128,9 @@ Offer to apply all fixes and produce a revised version.
 5. **A confused mind says no.** Clarity beats cleverness. One message, one offer, one call to action.
 6. **Risk reversal increases conversion.** Remove the buyer's risk with guarantees, trials, or bonuses.
 7. **Great copy is assembled, not written.** Use proven formulas and patterns (swipe files) rather than inventing from scratch.
+8. **Sequence closers preserve future optionality.** The final message of a drip/reminder sequence must convey SHORT-TERM finality ("Last note from me for now"), never permanent goodbye ("Last note from me, I promise"). A forever-goodbye closer burns the list: if a future broader campaign to the same audience is conceivable (a full-list blast when plans firm up, a relaunch, a new cohort), the graceful exit stays graceful AND revocable. When writing any "final" reminder, ask what campaigns might still target this list and scope the finality to the sequence, not the relationship. (Instance: learn-anything waitlist R3 corrected 2026-08-23 — Eric reserved a full waitlist blast for when retreat plans clear.)
+
+9. **Lead with what the reader walks away with, not with what happens.** Copy that narrates the process or itinerary (what happens at the event, how the program works) without naming the durable takeaways and why they matter to the reader reads as a schedule, not a pitch. State the takeaways (skills, practices, theory, a repeatable method) and their personal relevance in the first breath; the process becomes the proof the promise works, not the headline. Sharpening of principle 4 for experiential offerings: the itinerary is a feature, the takeaway is the benefit. (Instance: learn-anything referral blurbs v1 rejected 2026-08-23 — "it tells what happens. It doesn't say what they take away and why this could be important for them.")
 
 ## Reference library
 
@@ -145,4 +147,5 @@ Offer to apply all fixes and produce a revised version.
 | [proof-and-closes.md](references/proof-and-closes.md) | Adding testimonials, stealth closes, ethical persuasion |
 | [swipe-and-polish.md](references/swipe-and-polish.md) | Research methods, swipe files, editing and refinement |
 | [review-checklist.md](references/review-checklist.md) | Auditing or scoring existing copy |
+| [video-retention-science.md](references/video-retention-science.md) | Writing or auditing video scripts, founder videos, landing-page videos |
 | [all-secrets-index.md](references/all-secrets-index.md) | Quick lookup of any of the 31 copywriting secrets |
