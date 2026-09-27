@@ -1,6 +1,7 @@
 ---
 name: gh-cli
-description: Use GitHub CLI (gh) for common operations like creating PRs, viewing GitHub Actions logs, managing issues, GitHub Projects boards (gh project field/item automation), reviewing PRs, and more. When merging PRs via gh, use rebase merge only (--rebase) — standing user rule (Eric, 2026-08-26: "in general i want to do rebases only, never any type of merge"): never merge commits, never squash-merge, unless Eric explicitly requests otherwise for a specific PR.
+description: >-
+  Use GitHub CLI (gh) for common operations like creating PRs, viewing GitHub Actions logs, managing issues, GitHub Projects boards (gh project field/item automation), reviewing PRs, and more. When merging PRs via gh, use rebase merge only (--rebase) — standing user rule (Eric, 2026-08-26: "in general i want to do rebases only, never any type of merge"): never merge commits, never squash-merge, unless Eric explicitly requests otherwise for a specific PR.
 license: MIT
 ---
 
@@ -18,6 +19,25 @@ This skill provides quick access to common GitHub CLI operations for managing re
 ### Merge policy (PRs)
 
 When merging with `gh pr merge`, **always use rebase merge** (`--rebase`): it reapplies the PR commits on top of the base branch for a linear history. Standing user rule (Eric, 2026-08-26: "rebases only, never any type of merge"): never squash (`--squash`), never a merge commit (`--merge` / plain merge), unless Eric explicitly asks for that style on a specific PR.
+
+#### Merge commissions execute immediately (same turn)
+
+When Eric commissions merges — "can be merged. use rebase", "we can merge all
+PRs with rebase", "merge them all" — that message IS the execute signal, not a
+discussion prompt. Run `gh pr merge <n> --rebase --delete-branch` for every
+named PR in the SAME turn as the commission (validated 2026-08-27, website PRs
+#291/#292; substituting deliberation for the merge commands drew a
+"Take action now" interrupt — memories #2006/#2012).
+
+For a STACK of PRs (a PR whose base is another PR's branch), merge bottom-up in
+dependency order (e.g. #84 -> #85 -> #86), independent PRs in any order. Do NOT
+pre-deliberate GitHub merge internals in prose (rebase-merge SHA replay, patch-ID
+dedup, stacked-PR auto-retargeting when a base branch is deleted) — mechanics
+questions resolve by ACTING then verifying: after each merge, check the next PR
+with `gh pr view <next> --json state,baseRefName` before merging it. Mechanics
+speculation is the stall form, not diligence (instance 2026-08-27: six-PR
+rebase commission over two stacks answered with four paragraphs of GitHub
+rebase-merge theory and zero tool calls, interrupted before any merge ran).
 
 ### Pull requests
 
@@ -343,6 +363,40 @@ handles arbitrarily complex Markdown.
 Discovered build-deep-research-agent PR #41 (2026-07-12): the PR was created
 successfully but the body's code spans were eaten by zsh command substitution,
 requiring a follow-up `gh pr edit` to restore them.
+
+### Secret VALUES — never `--body "..."` for `gh secret set`; use the hidden prompt
+
+The `--body-file` advice above is for Markdown BODIES. Secret values are a
+different hazard with a different fix. `gh secret set NAME --body "...value..."`
+persists the shell-processed string VERBATIM: double-quote processing can embed
+or swallow quote characters, clipboard artifacts ride along (stray spaces, or
+accidentally copying the whole command instead of the key), and the write-only
+store never validates or reveals the corruption. The failure surfaces later as
+the consuming workflow failing with the SAME auth/invalid-key error — even
+though `gh secret list` shows a fresh Updated timestamp proving the write
+landed.
+
+The fix: drop `--body` entirely and use the hidden interactive prompt:
+
+```bash
+gh secret set NAME --repo OWNER/REPO
+# ? Paste your secret:  (hidden input, no shell interpretation, trailing
+#                       whitespace trimmed)
+```
+
+Sanity-check the clipboard BEFORE pasting (a Convex prod deploy key is one
+unbroken string starting with `prod|`). Do NOT reach for `--body-file` here —
+for a secret that just drops the credential to disk. When handing the command
+to the user to run himself (secrets-transfer norm), hand the flag-less form:
+the interactive prompt is immune to the quoting pitfalls that corrupted the
+pasted value.
+
+Instance (2026-08-31, sgbs-training): CONVEX_DEPLOY_KEY re-set landed (fresh
+Updated timestamp after the probe) yet the deploy failed with the identical
+error; re-entering the key via the hidden prompt turned the same run green end
+to end (prod Convex + Vercel). Companions: the `prod|` vs `preview|` prefix
+rule (convex-env-var-deployments skill) and never probing a real secret name
+with a dummy write (write-only destructive upsert).
 
 ### Creating a PR from a fork against the upstream repo (fork-and-contribute)
 
@@ -795,3 +849,35 @@ gh pr review 123 --approve
 gh run list --workflow "Deploy"
 gh run watch <latest-run-id>
 ```
+
+### Post-merge CI / publish verification — one blocking call, not multi-turn polling
+
+After `gh pr merge`, verifying the merge commit's CI (publish/deploy workflow)
+by re-running `gh run list` across multiple turns is both a token waste and a
+stall risk: each between-turns poll is an announcement without action
+(instance 2026-08-29, reference-letters PR #26 — the turn ended on
+"Verifying gh-pages deployment:" with zero calls and drew a "Take action now"
+interrupt, after every prior step had executed correctly).
+
+Prefer a single blocking chain in the announce turn:
+
+```bash
+# capture the run for the merge commit (runs appear seconds after the push to main)
+sleep 10
+RUN_ID=$(gh run list --workflow publish.yml --limit 1 --json databaseId,headSha \
+  --jq ".[0].databaseId")
+gh run watch "$RUN_ID" --exit-status   # blocks; non-zero exit on failure
+```
+
+- Set a GENEROUS bash-tool timeout on the watch call: publish workflows run
+  for minutes and the default 120s timeout truncates the watch mid-run
+  (600000ms is a sane default).
+- `--exit-status` makes the watch exit non-zero on failure — chain the
+  artifact and URL checks after it with `&&` so a failed publish stops the
+  chain before a URL is handed to anyone.
+- For GitHub Pages-style deploys the full tail is: watch run ->
+  `gh api repos/<owner>/<repo>/contents?ref=gh-pages` (artifact landed) ->
+  propagation sleep (60-120s) -> `curl -sI -o /dev/null -w "%{http_code}" <url>`
+  returning 200 BEFORE handing the URL over (reference-letters AGENTS.md
+  publish protocol). All waiting happens inside tool calls (sleep/watch),
+  never as a turn boundary.
