@@ -1,0 +1,19 @@
+skills/gh-activity-summary/SKILL.md
+  s_f9639b3fcf6b81::t_e67798971e479c 67-70,72-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1ceee8ad235fbdd13efbe3cf96982571eeadc815",
+  "prompts": {},
+  "sessions": {
+    "s_f9639b3fcf6b81": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0e2cd-fef4-709b-bf2f-043588618b2f",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
