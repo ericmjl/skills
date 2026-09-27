@@ -1,6 +1,7 @@
 ---
 name: stacked-pr-decomposition
-description: Break long-lived pull request branches into a mergeable stack of small PRs with clear dependency order and story flow. Use when a branch has grown too large, when the user asks to split a PR into stacked PRs, when a stacked PR shows no CI checks because workflows filter on main (fix: gh stack init), when a freshly gh-stack-registered stack shows no workflow runs (stack creation fires no pull_request event — fix: push one real commit to fire synchronize), when the user asks about GitHub's native stacked-PR feature or gh stack commands, when MERGING a registered/native stack (gh stack merge: atomic all-or-nothing, draft-PR gate — gh stack submit creates drafts by default, async enqueue-then-poll, branches not auto-deleted), or when each PR must be reviewable in about 5 minutes while preserving logical narrative across the stack.
+description: >-
+  Break long-lived pull request branches into a mergeable stack of small PRs with clear dependency order and story flow. Use when a branch has grown too large, when the user asks to split a PR into stacked PRs, when a stacked PR shows no CI checks because workflows filter on main (fix: gh stack init), when a freshly gh-stack-registered stack shows no workflow runs (fix: push one real commit to fire synchronize), when the user asks about GitHub's native stacked-PR feature or gh stack commands, when MERGING a registered/native stack (gh stack merge: atomic all-or-nothing, draft-PR gate, async enqueue-then-poll), when each PR must be reviewable in about 5 minutes, or when merging UNREGISTERED stacked PRs one-by-one (deleting a base branch auto-closes dependent PRs — retarget dependents FIRST; recover closed+deleted-base PRs by recreating them, reopen is impossible).
 license: MIT
 ---
 
@@ -235,11 +236,14 @@ Rules:
   `main` after the base merges") so a check-less PR is not a surprise to
   reviewers.
 
-Retargeting nuance: GitHub auto-retargets a dependent PR only when its base
-branch is **deleted** after merge. If the base PR merges with the branch kept
-(e.g. rebase-merge without auto-delete), the child PR stays based on a
-merged/dead branch — retarget manually (`gh pr edit <N> --base main`) and
-confirm CI then kicks off.
+Retargeting nuance (CORRECTED 2026-08-27): earlier this section claimed base
+deletion reliably triggers auto-retarget — for UNREGISTERED stacks merged via
+`gh pr merge --delete-branch` it does NOT; dependents may be auto-CLOSED
+instead (with or without a retarget). See "Merging an UNREGISTERED stack
+one-by-one: the base-deletion collapse" below for the retarget-first protocol
+and recovery. If the base PR merges with the branch KEPT, the child PR stays
+based on a merged/dead branch — retarget manually (`gh pr edit <N> --base
+main`, open PRs only) and confirm CI then kicks off.
 
 ### Fix: register the stack natively with `gh stack init` (public preview 2026-07-30)
 
@@ -367,3 +371,83 @@ Semantics (from `gh stack merge --help`):
   — `git fetch origin && git merge --ff-only origin/main` (preserves unrelated
   unstaged changes) to catch up. Stack worktrees hold the stack's `.stack`
   files — safe to remove after the merge lands.
+
+### Merging an UNREGISTERED stack one-by-one: the base-deletion collapse (retarget dependents FIRST)
+
+Discovered 2026-08-27 merging learn-anything PRs #84-#89 (a plain 6-branch
+chain opened with `gh pr create`, NOT `gh stack`-registered): merging a
+stacked PR with `gh pr merge <n> --rebase --delete-branch` DELETES its
+branch, and any OPEN PR based on that branch gets **CLOSED**, not cleanly
+retargeted. Observed outcomes were inconsistent: one dependent PR (#85) was
+closed with its base left pointing at the deleted branch
+(`docs/tony-kulesa-reply`); another (#88) had its base retargeted to `main`
+but was STILL closed. Do not rely on GitHub's auto-retarget for unregistered
+stacks — and do not burn turns theorizing about which variant fires; check
+`gh pr view <N> --json state,baseRefName` and act.
+
+Prevention (the protocol, in order):
+
+1. BEFORE merging the bottom PR, retarget every open dependent while it is
+   still open and its base still exists: `gh pr edit <N> --base main` (base
+   edits work only on OPEN PRs).
+2. OR merge without `--delete-branch` and delete branches at the end
+   (`git push origin --delete <branch>` per merged branch).
+3. Merge bottom-up, rebase-merge only (standing user rule).
+
+Recovery from the collapse (classified by observed state):
+
+- **Closed PR, base branch DELETED** → dead end, do not fight it: `gh pr
+  reopen` fails with "Could not open the pull request" (a PR whose base
+  branch is gone cannot be reopened), and a closed PR's base cannot be
+  edited — chicken-and-egg. Recreate instead:
+  `gh pr create --base main --head <branch>` — GitHub dedupes
+  already-merged commits (the new PR's commits list shows only the unique
+  ones; verified for #85 where only the Shemra commit appeared), so the
+  recreated PR diffs cleanly against `main`. Then rebase-merge it.
+- **Closed PR, base retargeted to `main`** → `gh pr reopen <N>` works (base
+  exists); then verify `gh pr view <N> --json commits,mergeable` FRESH — the
+  commits list may be stale/cached and show already-merged ancestor commits
+  that a rebase merge will not actually replay.
+- **Still-OPEN PR whose base branch still exists** → retarget it to `main`
+  NOW, before anything deletes that base (merging the PR below it without
+  retargeting first would auto-close it again).
+
+Side gotcha: if the PR's branch is checked out in a worktree, `gh pr merge
+--delete-branch` still merges remotely and deletes the REMOTE branch, but
+fails to delete the LOCAL branch ("error deleting local branch") — that
+local-delete error does NOT mean the merge failed. Confirm with
+`gh pr view <n> --json state,mergeCommit`.
+
+#### Per-boundary stale-stack recurrence (rebase-merge mode)
+
+Validated 2026-08-27 on learn-anything (6-PR atomic stack, PRs #84-#90): a
+retargeted child PR that still carries its base PR's commits under the OLD
+SHAs goes CONFLICTING **again** the moment the base PR rebase-merges — even
+if the child was freshly rebuilt and MERGEABLE beforehand, and even though a
+local content-level 3-way merge would be clean. GitHub's rebase-merge
+mergeable computation does NOT dedupe same-patch commits (local `git rebase`
+auto-drops empty / already-upstream patches; GitHub's infrastructure flags
+them as conflicts). Do not bet a merge order on GitHub deduping the child's
+commit list after the base lands — it will not.
+
+Rules:
+
+- Right after any merge, `mergeable: UNKNOWN` means GitHub is recomputing
+  asynchronously — wait and re-poll rather than concluding conflict. But a
+  computed `CONFLICTING` on a stacked child carrying merged-ancestor commits
+  is real until you rebuild the branch.
+- Re-apply the `rebase --onto` drop at EACH boundary: after a base PR merges,
+  in the child's worktree run `git rebase --onto origin/main <merged-SHA>`
+  (upstream = the now-merged commit to drop) + `git push --force-with-lease`,
+  then verify `gh pr view <child> --json mergeable` = MERGEABLE and the
+  commit list shows only the child's own commits. The fix is per-boundary,
+  not one-time: a three-deep stack needs it after each of the first two
+  merges. A child rebuilt to sit DIRECTLY on main (carrying only its own
+  commits) stays MERGEABLE through the base merge — the flag comes
+  specifically from carrying the base's commits. Content-dependent children
+  cannot pre-flatten (their diff needs the base's content), so for those,
+  plan the post-merge rebase as a required step of the merge sequence itself.
+- `gh pr merge <n> --rebase --delete-branch` also tries to delete the LOCAL
+  branch; when that branch is checked out in a worktree the local delete
+  fails with a warning — cosmetic (the remote delete succeeds). Clean the
+  worktrees after the whole stack lands.
