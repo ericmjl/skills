@@ -1,0 +1,19 @@
+skills/gh-cli/SKILL.md
+  s_63ac998537a833::t_7dfc8192bc46bc 3-4,23-41,367-400,852-883
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4ace941d307fae6c451dd268a0953186a462596e",
+  "prompts": {},
+  "sessions": {
+    "s_63ac998537a833": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0e049-8263-709b-bf2f-04324f8ffb44",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
