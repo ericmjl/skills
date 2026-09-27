@@ -1,0 +1,21 @@
+skills/opencode-mcp-server-setup/PURPOSE.md
+  s_63ac998537a833::t_3d07bb2f57e522 1-15
+skills/opencode-mcp-server-setup/SKILL.md
+  s_63ac998537a833::t_ee094a7a1a7780 1-190
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9fabd01c727e4df6c3d76dec54341f16527e8b8f",
+  "prompts": {},
+  "sessions": {
+    "s_63ac998537a833": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a0e049-8263-709b-bf2f-04324f8ffb44",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
