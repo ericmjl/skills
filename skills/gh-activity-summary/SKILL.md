@@ -64,10 +64,10 @@ bash skills/gh-activity-summary/gh-activity.sh
 bash skills/gh-activity-summary/gh-activity.sh 2025-12-15
 ```
 
-Where `activity-report.sh` aggregates a range via `gh search` (best for
-"what did I do this week"), `gh-activity.sh` replays the GitHub events API
-for one day (best for "what happened on the 15th", including pushes, PR
-comments, and issue activity in order).
+Where `activity-report.sh` aggregates a range via `gh search` (best
+for "what did I do this week"), `gh-activity.sh` replays the GitHub
+events API for one day (best for "what happened on the 15th",
+including pushes, PR comments, and issue activity in order).
 
-Consolidated 2026-09-27: absorbs gh-daily-timeline (deleted; its script and
-docs live here).
+Consolidated 2026-09-27: absorbs gh-daily-timeline (deleted; its
+script and docs live here).
