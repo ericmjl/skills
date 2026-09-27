@@ -1,27 +1,14 @@
 ---
 name: voss-advisor
-description: >
-  Advanced negotiation and communication advisor grounded in Chris Voss's
-  tactical empathy methodology (Never Split the Difference, The Black Swan
-  Group). Use this skill whenever the user needs help with any interpersonal
-  situation involving influence, persuasion, or navigating difficult dynamics.
-  This includes but is not limited to: analyzing conversations, call
-  transcripts, or email threads; preparing for negotiations (salary, vendor,
-  client, partner); drafting tactful responses; handling pushback, objections,
-  or conflict; navigating difficult workplace conversations; preparing for
-  performance reviews or raises; buying a car, house, or any big purchase;
-  dealing with landlords, contractors, or service providers; resolving personal
-  disagreements; practicing negotiation through role-play; or any situation
-  where the user says things like "how should I respond to this", "they're
-  pushing back", "I need to have a tough conversation", "how do I ask for...",
-  "they ghosted me", "I'm not sure how to handle this person", "counter-offer",
-  "pricing", "deal", "objection", or "difficult conversation". Activate broadly
-  — most interpersonal communication benefits from tactical empathy whether or
-  not the user frames it as "negotiation." This skill integrates FBI hostage
-  negotiation techniques (93% success rate) with behavioral economics
-  (Kahneman's Prospect Theory) and neuroscience (amygdala hijacking, loss
-  aversion).
-license: MIT
+description: >-
+  Advanced negotiation and communication advisor grounded in Chris Voss's tactical empathy
+  methodology (Never Split the Difference). Use for any interpersonal situation involving influence,
+  persuasion, or difficult dynamics: preparing for negotiations (salary, vendor, client, partner),
+  drafting tactful responses, handling pushback or objections, tough workplace conversations,
+  performance reviews, landlords and contractors, personal disagreements, negotiation role-play, or
+  asks like "how should I respond", "they're pushing back", "I need a tough conversation", "counter-
+  offer", "difficult conversation". Integrates FBI hostage negotiation techniques with behavioral
+  economics (Prospect Theory) and neuroscience.
 ---
 <!-- markdownlint-disable MD013 -->
 
@@ -600,3 +587,8 @@ This summary must demonstrate:
 
 If you get "you're right" instead of "that's right," you haven't achieved
 understanding. Go back to discovery.
+
+## Pre-compression description (preserved verbatim)
+
+Advanced negotiation and communication advisor grounded in Chris Voss's tactical empathy methodology (Never Split the Difference, The Black Swan Group). Use this skill whenever the user needs help with any interpersonal situation involving influence, persuasion, or navigating difficult dynamics. This includes but is not limited to: analyzing conversations, call transcripts, or email threads; preparing for negotiations (salary, vendor, client, partner); drafting tactful responses; handling pushback, objections, or conflict; navigating difficult workplace conversations; preparing for performance reviews or raises; buying a car, house, or any big purchase; dealing with landlords, contractors, or service providers; resolving personal disagreements; practicing negotiation through role-play; or any situation where the user says things like "how should I respond to this", "they're pushing back", "I need to have a tough conversation", "how do I ask for...", "they ghosted me", "I'm not sure how to handle this person", "counter-offer", "pricing", "deal", "objection", or "difficult conversation". Activate broadly — most interpersonal communication benefits from tactical empathy whether or not the user frames it as "negotiation." This skill integrates FBI hostage negotiation techniques (93% success rate) with behavioral economics (Kahneman's Prospect Theory) and neuroscience (amygdala hijacking, loss aversion).
+
