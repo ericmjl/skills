@@ -108,7 +108,7 @@ distilled in `references/points-of-view.md`. A project style guide overrides
 - ENC1 `[E]` Encoding accuracy ranking, best to worst: position on a common
   scale > length > angle/slope > area > volume > color saturation. Reserve
   pies/donuts for the rare single-part-to-whole glance; never for comparison
-  or trends. Cite: [CM84], [HB10], [T14]; POV: [W10-Design].
+  or trends. Cite: [CM84], [HB10], [T14], [H24]; POV: [W10-Design].
 - ENC2 `[E]` Lines only over an ordered axis (usually time). Bars for discrete
   categories. Never connect unordered categories with a line. Cite: [Z99];
   POV: [W10-Design].
@@ -149,7 +149,7 @@ distilled in `references/points-of-view.md`. A project style guide overrides
   [K13-Axes], [W10-Salience].
 - LAY4 `[P]` Simplify to clarify: remove gridlines, borders, boxes, and
   legends that carry no information ("chartjunk"); maximize the data-ink
-  share. Cite: [T83], [A22]; POV: [W11-Simplify].
+  share. Cite: [T83], [A22], [SC25]; POV: [W11-Simplify].
 
 ### Text and elements
 
@@ -173,7 +173,7 @@ distilled in `references/points-of-view.md`. A project style guide overrides
 - INT1 `[E]` Bars start at zero. Truncated bar baselines exaggerate
   differences and deceive a majority of readers even after warnings. Line
   charts may use a non-zero range when stated. Cite: [P15], [C20], [Y21],
-  [WSB22].
+  [WSB22], [LK24].
 - INT2 `[E]` No dual y-axes; no inverted value axes; no 3D effect charts;
   aspect ratio must not distort the perceived effect. Cite: [P15], [F08];
   POV: [G12-3D].
