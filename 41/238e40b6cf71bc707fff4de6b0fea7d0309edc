@@ -1,0 +1,19 @@
+skills/coherent-writing/SKILL.md
+  s_1ae4ab23a01bfe::t_72045cac36f7d1 3,339-437
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "41238e40b6cf71bc707fff4de6b0fea7d0309edc",
+  "prompts": {},
+  "sessions": {
+    "s_1ae4ab23a01bfe": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a10e1c-bb2c-77c4-8211-7ff7d4ddc193",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
