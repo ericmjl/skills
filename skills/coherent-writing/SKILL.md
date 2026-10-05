@@ -1,6 +1,6 @@
 ---
 name: coherent-writing
-description: "Improve coherence in drafts through a five-pass sub-agent workflow: resolve cross-draft argument conflicts, fix within-paragraph logic (self-contradictions, sudden topic jumps, disconnects, unsignaled pivots), smooth section transitions, smooth paragraph-boundary transitions, and run a final coherence audit. Use when a user says things like 'make this coherent', 'tighten the flow', 'this feels choppy', 'this paragraph contradicts itself', 'fix the logic jumps inside this paragraph', 'the sentences don't connect', 'can you smooth transitions', or asks to revise prose in Markdown, notes, essays, blog posts, emails, or docs so ideas connect cleanly without adding new points."
+description: "Improve coherence in drafts through a five-pass sub-agent workflow: resolve cross-draft argument conflicts, fix within-paragraph logic (self-contradictions, sudden topic jumps, disconnects, unsignaled pivots), smooth section transitions, smooth paragraph-boundary transitions, and run a final coherence audit. Use when a user says things like 'make this coherent', 'tighten the flow', 'this feels choppy', 'this paragraph contradicts itself', 'fix the logic jumps inside this paragraph', 'the sentences don't connect', 'can you smooth transitions', or asks to revise prose in Markdown, notes, essays, blog posts, emails, or docs so ideas connect cleanly without adding new points. ALSO covers information redundancy across sections and takeaway coverage: use when the user says 'less repetitive', 'too repetitive', 'this restates what was already said', flags a concept explained multiple times (intro re-explains, body re-derives, later section re-states), or says the takeaway/summary doesn't reflect what the piece went deep into."
 license: MIT
 ---
 
@@ -336,3 +336,102 @@ Use this checkpoint rubric during every pass:
 - **Alignment:** Does every section support the core claim?
 - **No interior incoherence:** Is every paragraph free of self-contradiction, sudden jumps, disconnects, and unsignaled pivots?
 - **Constraint compliance:** No new points; length preserved; audience and tone intact.
+
+## Information redundancy and takeaway coverage (dedup passes)
+
+Absorbed from the former blog-explainer-prose-dedup skill. The five passes
+above govern TRANSITIONS and FLOW; this section governs INFORMATION
+REDUNDANCY across sections (the same fact appearing 2-3 times in different
+wording) and whether the takeaway faithfully compresses the piece. Applies
+when tightening long-form explainer / pedagogical / educational prose.
+
+### Pass D1 - Index every fact to its sections
+
+Read the full post and index each fact, concept, or mechanism to the
+sections that mention it. A fact mentioned in 2+ sections is a dedup
+candidate.
+
+### Pass D2 - Best home, then cut with references
+
+For each repeated fact, identify where it is FIRST NEEDED or MOST FULLY
+explained; that is its home. Cut the other mentions and replace each with a
+forward- or back-reference ("which is where we head next", "the Bloch
+circle already showed this", "as planted in the intro") so the reader stays
+oriented without re-reading an explanation. Use a PLANT/HARVEST structure:
+the intro PLANTS a seed (one foreshadowing sentence), the main section USES
+it (full explanation), a later section HARVESTS it (applies it to a new
+case) - each mention serves a distinct rhetorical purpose, never
+re-explanation.
+
+Redundancy patterns to audit for:
+
+- (a) TRIPLE-STATED SIGNIFICANCE - a key property (e.g. "amplitudes are
+  signed") stated in the intro, restated in the main section, re-explained
+  later. Fix: state once in its proper home, forward-reference elsewhere.
+- (b) RE-DERIVED SQUARING - a formula or mechanism re-derived in multiple
+  sections when an earlier widget/section already demonstrated it. Fix:
+  reference the earlier demonstration, do not re-derive.
+- (c) RE-STATED WIDGET COVERAGE - prose re-describing what an interactive
+  widget on the same page already shows. Fix: replace with the
+  BEFORE/AFTER orientation scaffolding below; deleting alone leaves the
+  reader disoriented.
+
+### Pass D3 - Widget-prose redundancy
+
+When the post embeds interactive widgets, the prose SURROUNDING a widget
+does ORIENTATION work, not EXPLANATION work - the widget IS the equation,
+visualized; do not re-derive in symbols what the widget shows
+interactively.
+
+- BEFORE the widget: frame in plain words what it does and tell the reader
+  what to look for. No equations.
+- AFTER the widget: walk through ONE concrete interactive case, then invite
+  exploration. The only "math" allowed is in words.
+
+Watch for the ENGINE-PARAGRAPH anti-pattern: a dense summary paragraph
+right after a widget that re-explains the mechanism the reader just
+interacted with ("This is the engine that does the work..."). Trim the
+re-explained mechanism; keep only the core insight that does NOT appear in
+the widget (e.g. "gates arrange interference to concentrate amplitude on
+good answers and cancel the rest"). (Distilled from the quantum-ML post
+edits, 2026-08-07.)
+
+### Pass D4 - Heading-arc coherence and buried-thesis rescue
+
+After trimming, verify the section headings form a clean narrative arc
+(e.g. Fundamentals -> Many qubits -> Probability view -> Entanglement ->
+Interference -> Takeaway) with no heading orphaned by its section's
+trimmed content.
+
+Watch for the BURIED-THESIS-PARAGRAPH: the post's key "why the reader
+should care" bridge wedged between a dense mechanism summary and a payoff
+reflection with no visual separation. PROMOTE it to its own `###` section
+so the mechanism section and the payoff section are cleanly separated - a
+thesis buried between paragraphs reads as digression; the same thesis
+under its own heading reads as structure.
+
+### Pass D5 - Takeaway coverage alignment (the inverse of dedup)
+
+The inverse failure: a takeaway/summary that UNDER-represents the piece's
+actual deep arc. Signature (summary drift): the takeaway was last edited
+before the body went deep, so it names only the generic frame while
+omitting the load-bearing mechanisms the piece actually argues.
+
+Procedure when revising a takeaway (or when the user flags "the takeaway
+doesn't reflect what we went deep into"):
+
+1. Re-read the piece's actual section arc in order. Do NOT trust the
+   existing takeaway as the spec - it is the thing being audited.
+2. For each deep section, write ONE building-block sentence naming that
+   section's contribution in the piece's own vocabulary. A generic synonym
+   that omits the mechanism is the failure.
+3. Keep the closing personal/payoff paragraph, but anchor it in the
+   piece's actual vocabulary, not a stale generic.
+4. Mirror any structural parallel with a structural echo using the piece's
+   real terms ("Your prior and likelihood shape a posterior; a quantum
+   circuit's gates shape amplitudes.").
+
+D5 is distinct from D2: D2 removes repeated facts; D5 adds missing
+coverage. They compose - dedup the body first, then ensure the takeaway
+faithfully compresses the trimmed body. (Stated 2026-08-07 on the
+quantum-ML post.)
