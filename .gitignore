@@ -1,3 +1,4 @@
 .DS_Store
 *.skill
 __marimo__/
+__pycache__/
