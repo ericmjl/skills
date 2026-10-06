@@ -1,0 +1,19 @@
+README.md
+  s_665774e9c9e844::t_44f877a0e8fcae 92-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "22bf6d878fc9b3169fa421c1fcab18c970325fc2",
+  "prompts": {},
+  "sessions": {
+    "s_665774e9c9e844": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a11393-b132-7701-9f76-81d5bc2d7f3e",
+        "model": "unknown"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
