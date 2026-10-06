@@ -89,6 +89,12 @@ Location: `skills/video-script-writing/`
 
 Retention-first video script writing for any purpose (founder story, landing-page conversion, YouTube explainer, short-form, demo/testimonial). Grounded in viewer-attention research: hook concreteness tests, open-loop architecture, spoken-register drafting, speech-rate bands, cut rhythm and caption specs, and per-purpose benchmarks. Use when writing, revising, or auditing a video script, or when asked whether a script will hold attention.
 
+### motion-graphics-video
+
+Location: `skills/motion-graphics-video/`
+
+Create finished motion graphics videos (MP4) end to end with a free, local, deterministic pipeline: story brief with a crew persona, reference-derived style guide plus a banned-defaults list, audio-first production (ACE-Step 1.5 local music generation, code-synthesized sound effects, optional Kokoro voiceover, bundled scripts for SFX/beat-grid/contact-sheet/verification), shot list cut to a measured beat grid, Hyperframes HTML+GSAP compositions rendered by headless Chrome and FFmpeg, and contact-sheet self-critique loops until every shot grades 8+. Use when asked for a motion graphics video, kinetic typography piece, lyric video, product teaser, launch film, or showreel-style MP4. For Remotion/React codebases use `remotion-video` instead.
+
 ### evident-charts
 
 Location: `skills/evident-charts/`
