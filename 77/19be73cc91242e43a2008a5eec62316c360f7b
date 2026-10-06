@@ -1,0 +1,39 @@
+skills/motion-graphics-video/SKILL.md
+  s_665774e9c9e844::t_4aec4667ccc80e 1-45,47-48,52-63,74-210
+  s_665774e9c9e844::t_e752c1b2785775 50
+  s_665774e9c9e844::t_666dd710290b08 46,49,51,64-73
+skills/motion-graphics-video/references/render-and-critique.md
+  s_665774e9c9e844::t_7b3718b16aa103 1-62,64-101
+  s_665774e9c9e844::t_378298830bce93 63
+skills/motion-graphics-video/references/brief-and-style.md
+  s_665774e9c9e844::t_c0b0ba7f0d6b59 1-124
+skills/motion-graphics-video/scripts/verify_render.sh
+  s_665774e9c9e844::t_402d21e0b2fa46 45
+  s_665774e9c9e844::t_e423fa673cba6a 1-44,46-65
+skills/motion-graphics-video/scripts/sfx_synth.py
+  s_665774e9c9e844::t_20d04d847b17d3 1-159
+skills/motion-graphics-video/scripts/beat_grid.py
+  s_665774e9c9e844::t_db475f00af6b27 1-59,62-146
+  s_665774e9c9e844::t_f6241441f9ec40 60-61
+skills/motion-graphics-video/references/audio.md
+  s_665774e9c9e844::t_d73ecd10d6075e 1-71,76-121
+  s_665774e9c9e844::t_f4b306ab0a178f 72-75
+skills/motion-graphics-video/scripts/contact_sheet.sh
+  s_665774e9c9e844::t_ec2b6e4995c6f6 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7719be73cc91242e43a2008a5eec62316c360f7b",
+  "prompts": {},
+  "sessions": {
+    "s_665774e9c9e844": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a11393-b132-7701-9f76-81d5bc2d7f3e",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
