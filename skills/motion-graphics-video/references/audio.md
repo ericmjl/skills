@@ -119,3 +119,7 @@ ffmpeg -i out/final.mp4 -af loudnorm=I=-14:TP=-1.5:LRA=11 -c:v copy out/final_lo
 ```
 
 - Verify with `scripts/verify_render.sh`, which prints measured loudness.
+- loudnorm's single-pass dynamic mode is approximate on short clips (can
+  land 1-2 LU off). Prefer a measured gain adjustment: render, measure with
+  `verify_render.sh`, apply `ffmpeg -af volume=<XdB>` with the signed
+  difference, re-verify.
