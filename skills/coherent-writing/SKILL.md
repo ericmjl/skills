@@ -1,6 +1,6 @@
 ---
 name: coherent-writing
-description: "Improve coherence in drafts through a five-pass sub-agent workflow: resolve cross-draft argument conflicts, fix within-paragraph logic (self-contradictions, sudden topic jumps, disconnects, unsignaled pivots), smooth section transitions, smooth paragraph-boundary transitions, and run a final coherence audit. Use when a user says things like 'make this coherent', 'tighten the flow', 'this feels choppy', 'this paragraph contradicts itself', 'fix the logic jumps inside this paragraph', 'the sentences don't connect', 'can you smooth transitions', or asks to revise prose in Markdown, notes, essays, blog posts, emails, or docs so ideas connect cleanly without adding new points. ALSO covers information redundancy across sections and takeaway coverage: use when the user says 'less repetitive', 'too repetitive', 'this restates what was already said', flags a concept explained multiple times (intro re-explains, body re-derives, later section re-states), or says the takeaway/summary doesn't reflect what the piece went deep into."
+description: "Improve coherence in drafts through a five-pass sub-agent workflow: resolve cross-draft argument conflicts, fix within-paragraph logic (self-contradictions, sudden topic jumps, disconnects, unsignaled pivots), smooth section transitions, smooth paragraph-boundary transitions, and run a final coherence audit. Use when a user says things like 'make this coherent', 'tighten the flow', 'this feels choppy', 'this paragraph contradicts itself', 'fix the logic jumps inside this paragraph', 'the sentences don't connect', 'can you smooth transitions', or asks to revise prose in Markdown, notes, essays, blog posts, or docs so ideas connect cleanly without adding new points. ALSO covers information redundancy across sections and takeaway coverage: use when the user says 'less repetitive', 'too repetitive', 'this restates what was already said', flags a concept explained multiple times (intro re-explains, body re-derives, later re-states), or says the takeaway/summary doesn't reflect what the piece went deep into."
 license: MIT
 ---
 
@@ -116,6 +116,28 @@ For sub-agent prompt templates, read `references/subagent-prompts.md`.
 4. Final word count.
 
 The orchestrator replaces the working draft with this output before Pass 2.
+
+### Pass 1 upgrade - whole-draft claim-conflict audit
+
+Three safeguards for Pass 1, absorbed from the former
+blog-explainer-prose-dedup skill (2026-10-13 quality-chain pass):
+
+- **Re-read from disk at pass start.** Earlier passes in an editing chain
+  may have rewritten the draft; never audit a stale in-memory copy.
+- **Flag conflicts at whole-draft scale, not only adjacent paragraphs:**
+  self-contradictions between distant claims (e.g. "shipped days earlier"
+  vs "the same day it shipped"), cross-draft argument drift, and
+  re-derivations of the same point in a lessons/summary section (keep the
+  body as the single home, compress the lesson).
+- **Pass-report contract.** The digest also lists CHECKED-AND-NOT-CONFLICTS
+  with the reconciliation (different sessions, ban lifted for a later
+  attempt, hedged prose) so later passes do not re-flag them. Close with a
+  one-line MERGE VERDICT (OK / OK with notes / BLOCKED) plus the net word
+  delta vs baseline. Residual issues the constraints forbid fixing are
+  logged as numbered FINDINGS with the forbidding constraint named, never
+  silently dropped and never fixed by breaking a constraint. Restate
+  baseline counts (words, headings, blockquote lines, image embeds) in the
+  verification line.
 
 ### Pass 2 — Within-paragraph coherence (1 sub-agent per paragraph)
 
@@ -435,3 +457,18 @@ D5 is distinct from D2: D2 removes repeated facts; D5 adds missing
 coverage. They compose - dedup the body first, then ensure the takeaway
 faithfully compresses the trimmed body. (Stated 2026-08-07 on the
 quantum-ML post.)
+
+### Notebook cell prose is in scope
+
+The dedup audit applies to marimo notebook cell prose (docstrings, markdown
+cells, intro cells), not only blog posts: each fact is stated ONCE across
+all cells. Eric 2026-10-13 (laya notebook 07): "A modal app wraps the
+checkpoint" appearing in two adjacent cells drew "we really are being
+repetitive" - the fix keeps the sentence in the one cell where it does
+orientation work and cuts the other. Trigger on notebook work too when the
+user says "repetitive" about cell prose.
+
+Related, from the same session: when Eric flags example sentences, he
+expects a WHOLE-DOCUMENT sweep for that slop class (grep the pattern across
+every cell/docstring), not a fix of only the flagged instances. Flagged
+examples are evidence of a class.
