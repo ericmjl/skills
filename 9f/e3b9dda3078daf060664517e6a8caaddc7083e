@@ -1,0 +1,28 @@
+README.md
+  h_923f9eef54c2c1 114-119
+skills/prompt-card/SKILL.md
+  h_923f9eef54c2c1 1-99
+skills/prompt-card/assets/examples/ingest-a-source/in-note.html
+  h_923f9eef54c2c1 1-6
+skills/prompt-card/assets/examples/ingest-a-source/obsidian-snippet.css
+  h_923f9eef54c2c1 1-83
+skills/prompt-card/assets/examples/ingest-a-source/standalone.html
+  h_923f9eef54c2c1 1-149
+skills/prompt-card/assets/obsidian-note-snippet.html
+  h_923f9eef54c2c1 1-6
+skills/prompt-card/assets/obsidian-snippet.css
+  h_923f9eef54c2c1 1-83
+skills/prompt-card/assets/template.html
+  h_923f9eef54c2c1 1-150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9fe3b9dda3078daf060664517e6a8caaddc7083e",
+  "prompts": {},
+  "humans": {
+    "h_923f9eef54c2c1": {
+      "author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
