@@ -111,6 +111,12 @@ Master skill for creating, critiquing, and improving data visualizations. Synthe
 
 Self-improving: a scheduled GitHub Actions workflow runs the `pi` coding agent, which searches the visualization literature, verifies sources, and opens pull requests proposing cited rule updates (`references/research-protocol.md` is the agent's operating manual; `references/research-log.md` holds the run history).
 
+### prompt-card
+
+Location: `skills/prompt-card/`
+
+Builds a brief, interactive prompt card that teaches readers one fill-in prompt. Each numbered, color-coded slot shows a "why it matters" note on hover, and an "Interacts with" section names the skill or `AGENTS.md` instructions the prompt relies on. It ships as a standalone HTML page or as an inline Obsidian snippet with companion CSS. Use when you want to show readers the prompt you use for a skill or workflow, for example at the end of a blog post section.
+
 ## Self-improving skill automation
 
 `.github/workflows/dataviz-research.yml` runs monthly on the first Sunday (14:00 UTC — cron can't express "first Sunday", so the job gates on day-of-month ≤ 7 and skips other Sundays) and on demand (with an optional focus topic; dispatch bypasses the gate). Each run:
