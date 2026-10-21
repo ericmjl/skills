@@ -117,6 +117,12 @@ Location: `skills/prompt-card/`
 
 Builds a brief, interactive prompt card that teaches readers one fill-in prompt. Each numbered, color-coded slot shows a "why it matters" note on hover, and an "Interacts with" section names the skill or `AGENTS.md` instructions the prompt relies on. It ships as a standalone HTML page or as an inline Obsidian snippet with companion CSS. Use when you want to show readers the prompt you use for a skill or workflow, for example at the end of a blog post section.
 
+### obsidian-landing-page
+
+Location: `skills/obsidian-landing-page/`
+
+Builds a polished DataviewJS landing page for an Obsidian knowledge vault laid out as an index note plus flat `raw/`, `MOCs/`, and `evergreen/` folders. It walks the agent through eight steps, from a read-only survey of the vault to checking that the page renders, and ships a starter CSS snippet, a starter dataviewjs note, and a read-only stats script. Every count comes from links and file times, not custom frontmatter. Use when you want a home page or dashboard for your vault.
+
 ## Self-improving skill automation
 
 `.github/workflows/dataviz-research.yml` runs monthly on the first Sunday (14:00 UTC — cron can't express "first Sunday", so the job gates on day-of-month ≤ 7 and skips other Sundays) and on demand (with an optional focus topic; dispatch bypasses the gate). Each run:

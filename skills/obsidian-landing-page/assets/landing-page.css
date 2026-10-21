@@ -1,0 +1,125 @@
+/* ==========================================================================
+   Landing page snippet (from the obsidian-landing-page skill)
+   Scoped to notes with cssclasses: landing-page, in both Live Preview
+   (.markdown-source-view) and Reading view (.markdown-preview-view).
+   Every other note keeps its normal look.
+   Restyle by changing the --lp- variables. Defaults follow the active theme.
+   Never write a path glob with a slash-star inside a CSS comment: it ends
+   the comment early and silently drops the next rule.
+   ========================================================================== */
+.markdown-source-view.landing-page,
+.markdown-preview-view.landing-page {
+  --lp-accent: var(--interactive-accent);
+  --lp-ink: var(--text-normal);
+  --lp-muted: var(--text-muted);
+  --lp-panel: color-mix(in srgb, var(--background-primary) 72%, transparent);
+  --lp-line: color-mix(in srgb, var(--text-normal) 14%, transparent);
+  --lp-glow-1: color-mix(in srgb, var(--lp-accent) 22%, transparent);
+  --lp-glow-2: color-mix(in srgb, var(--color-green, #3fa66b) 16%, transparent);
+  --lp-fresh: var(--color-green, #3fa66b);
+  --lp-radius: 14px;
+  --lp-backdrop:
+    radial-gradient(900px 500px at 10% -10%, var(--lp-glow-1), transparent 60%),
+    radial-gradient(800px 500px at 100% 0%, var(--lp-glow-2), transparent 55%),
+    var(--background-primary);
+  /* Paint the backdrop on this view only, so no other pane shows it. */
+  background: var(--lp-backdrop) center center / cover no-repeat fixed !important;
+  /* The official knob for readable line length. 100% uses the full pane. */
+  --file-line-width: 100%;
+}
+/* Clear any leftover width rail in Live Preview and Reading view. */
+.markdown-source-view.landing-page .cm-sizer,
+.markdown-source-view.landing-page .cm-contentContainer,
+.markdown-source-view.landing-page .cm-content,
+.markdown-preview-view.landing-page .markdown-preview-sizer {
+  max-width: 100% !important;
+  width: 100%;
+}
+
+/* Hide chrome that has no business on a landing page. */
+.landing-page .inline-title,
+.landing-page .metadata-container,
+.landing-page .frontmatter-container,
+.landing-page .edit-block-button,
+.landing-page .copy-code-button,
+.landing-page .block-language-dataviewjs .ops {
+  display: none !important;
+}
+.landing-page .cm-embed-block {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.landing-page .lp { container-type: inline-size; color: var(--lp-ink); min-width: 0; padding: 6px 0 32px; }
+.landing-page .lp-header { margin: 4px 0 18px; }
+.landing-page .lp-title { font-size: 1.8em; font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; }
+.landing-page .lp-totals { color: var(--lp-muted); margin-top: 4px; font-size: 0.85em; }
+.landing-page .lp-section { font-size: 0.85em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--lp-muted); margin: 24px 0 10px; }
+.landing-page .lp a.internal-link { color: var(--lp-ink); text-decoration: none; }
+.landing-page .lp a.internal-link:hover { color: var(--lp-accent); }
+
+/* Frosted panels */
+.landing-page .lp-card {
+  min-width: 0;
+  background: var(--lp-panel);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
+  backdrop-filter: blur(20px) saturate(130%);
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-radius);
+  padding: 14px 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.landing-page .lp-stat:hover,
+.landing-page .lp-map:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--lp-accent) 45%, transparent);
+}
+
+/* Responsive grids. minmax(0, 1fr) means content can never blow a track out.
+   Container queries follow the pane width, so a narrow pane reflows too. */
+.landing-page .lp-grid { display: grid; gap: 12px; }
+.landing-page .lp-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.landing-page .lp-maps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@container (max-width: 760px) {
+  .landing-page .lp-stats,
+  .landing-page .lp-maps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (max-width: 440px) {
+  .landing-page .lp-stats,
+  .landing-page .lp-maps { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Stat cards */
+.landing-page .lp-stat-label { font-size: 0.75em; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lp-muted); }
+.landing-page .lp-stat-value { margin-top: 6px; font-size: 1.9em; font-weight: 700; line-height: 1.1; }
+.landing-page .lp-stat-sub { margin-top: 4px; font-size: 0.82em; color: var(--lp-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Sparkline: a 14-day line with a soft fill */
+.landing-page .lp-spark { display: block; width: 100%; height: 30px; margin-top: 10px; }
+.landing-page .lp-spark-fill { fill: color-mix(in srgb, var(--lp-accent) 16%, transparent); }
+.landing-page .lp-spark-line { fill: none; stroke: var(--lp-accent); stroke-width: 1.5; stroke-linejoin: round; }
+
+/* Map cards */
+.landing-page .lp-map-head { display: flex; align-items: center; gap: 8px; font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.landing-page .lp-map-blurb { color: var(--lp-muted); font-size: 0.85em; margin-top: 2px; }
+.landing-page .lp-map-counts { display: flex; gap: 12px; margin-top: 8px; font-size: 0.78em; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lp-muted); }
+.landing-page .lp-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--lp-fresh); }
+
+/* Recent activity chip rows */
+.landing-page .lp-row + .lp-row { margin-top: 12px; }
+.landing-page .lp-row-title { font-size: 0.78em; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lp-muted); margin-bottom: 6px; }
+.landing-page .lp-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.landing-page .lp-chip { display: inline-flex; align-items: baseline; gap: 7px; max-width: 100%; border: 1px solid var(--lp-line); border-radius: 999px; padding: 3px 12px; font-size: 0.85em; transition: border-color 0.12s ease, background 0.12s ease; }
+.landing-page .lp-chip:hover { border-color: color-mix(in srgb, var(--lp-accent) 45%, transparent); }
+.landing-page .lp-chip-date { font-size: 0.8em; color: var(--lp-muted); }
+.landing-page .lp-empty { color: var(--lp-muted); font-size: 0.85em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-page .lp-card,
+  .landing-page .lp-chip { transition: none; }
+  .landing-page .lp-stat:hover,
+  .landing-page .lp-map:hover { transform: none; }
+}
+/* ==================== end landing page ==================== */

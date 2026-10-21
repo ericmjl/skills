@@ -98,3 +98,4 @@ Before overwriting, save the previous file as `*.vN.html` (and its PNG). Bump th
 - `assets/obsidian-note-snippet.html`: in-note markup with placeholders.
 - `assets/examples/ingest-a-source/`: a filled-in card for "Ingest <url/file> into my <name of vault> please." Contains `standalone.html`, `in-note.html`, `obsidian-snippet.css`, and `hover.png`.
 - `assets/examples/make-a-prompt-card/`: a filled-in card for "Make a prompt card for <your prompt> and <its skill> to go in my <blog post or note>." Contains `standalone.html`, `in-note.html`, `obsidian-snippet.css`, `default.png`, and `hover.png`.
+- `assets/examples/build-a-landing-page/`: a filled-in card for "Build a landing page for my <name of vault> please, in <look or palette>." Contains `standalone.html`, `in-note.html`, `obsidian-snippet.css`, `default.png`, and `hover.png`.
