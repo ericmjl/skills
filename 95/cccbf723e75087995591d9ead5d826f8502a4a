@@ -1,0 +1,20 @@
+skills/prompt-card/SKILL.md
+  h_923f9eef54c2c1 100
+skills/prompt-card/assets/examples/make-a-prompt-card/in-note.html
+  h_923f9eef54c2c1 1-6
+skills/prompt-card/assets/examples/make-a-prompt-card/obsidian-snippet.css
+  h_923f9eef54c2c1 1-83
+skills/prompt-card/assets/examples/make-a-prompt-card/standalone.html
+  h_923f9eef54c2c1 1-150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "95cccbf723e75087995591d9ead5d826f8502a4a",
+  "prompts": {},
+  "humans": {
+    "h_923f9eef54c2c1": {
+      "author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
