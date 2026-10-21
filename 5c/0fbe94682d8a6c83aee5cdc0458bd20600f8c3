@@ -1,0 +1,30 @@
+README.md
+  h_923f9eef54c2c1 120-125
+skills/obsidian-landing-page/SKILL.md
+  h_923f9eef54c2c1 1-153
+skills/obsidian-landing-page/assets/landing-page.css
+  h_923f9eef54c2c1 1-125
+skills/obsidian-landing-page/assets/landing-page.md
+  h_923f9eef54c2c1 1-124
+skills/obsidian-landing-page/scripts/vault_stats.py
+  h_923f9eef54c2c1 1-155
+skills/prompt-card/SKILL.md
+  h_923f9eef54c2c1 101
+skills/prompt-card/assets/examples/build-a-landing-page/in-note.html
+  h_923f9eef54c2c1 1-6
+skills/prompt-card/assets/examples/build-a-landing-page/obsidian-snippet.css
+  h_923f9eef54c2c1 1-83
+skills/prompt-card/assets/examples/build-a-landing-page/standalone.html
+  h_923f9eef54c2c1 1-150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5c0fbe94682d8a6c83aee5cdc0458bd20600f8c3",
+  "prompts": {},
+  "humans": {
+    "h_923f9eef54c2c1": {
+      "author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
