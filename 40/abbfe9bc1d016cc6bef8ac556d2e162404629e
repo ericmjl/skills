@@ -1,0 +1,14 @@
+scripts/build_site.py
+  h_923f9eef54c2c1 9,445,447-453,460,488,499,538
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "40abbfe9bc1d016cc6bef8ac556d2e162404629e",
+  "prompts": {},
+  "humans": {
+    "h_923f9eef54c2c1": {
+      "author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
