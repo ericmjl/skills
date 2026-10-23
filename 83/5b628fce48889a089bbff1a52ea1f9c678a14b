@@ -1,0 +1,25 @@
+site/cards/review-a-pr.html
+  s_60d509889055cf::t_ca2741fabb1be4 6
+  s_60d509889055cf::t_8b654952932f83 106
+  s_60d509889055cf::t_174f207cf5580f 1-5,7-105,107-151
+site/cards/mine-your-chat-logs.html
+  s_60d509889055cf::t_0d0aad4ec90907 1-5,7-105,107-151
+  s_60d509889055cf::t_8b654952932f83 106
+  s_60d509889055cf::t_66d857b5f0c015 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "835b628fce48889a089bbff1a52ea1f9c678a14b",
+  "prompts": {},
+  "sessions": {
+    "s_60d509889055cf": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a168d5-011e-76f4-9403-87646f195340",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
