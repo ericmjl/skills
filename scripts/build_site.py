@@ -45,10 +45,58 @@ CARD_HEIGHTS = {
     "ingest-a-source": 378,
     "mine-your-chat-logs": 516,
     "review-a-pr": 456,
+    # One card per skill, shown on that skill's page (SKILL_CARDS below).
+    "agents-md-improver": 438,
+    "atomic-commits": 438,
+    "audit-before-rewrite": 450,
+    "awesome-marimo-notebook": 468,
+    "blog-explainer-prose-dedup": 438,
+    "codebase-study-parallel-reporters": 438,
+    "coherent-writing": 438,
+    "cybersecurity-review": 438,
+    "data-visualization-master": 468,
+    "debug-github-ci": 420,
+    "design-driven-dev": 468,
+    "docker-offline-verification": 420,
+    "dom-anchored-svg-connectors": 420,
+    "epistemic-resourcefulness": 438,
+    "evident-charts": 438,
+    "gh-activity-summary": 420,
+    "gh-cli": 420,
+    "git-rebase-noninteractive-editor": 420,
+    "github-auto-merge-setup": 438,
+    "html-presentations": 438,
+    "jupyterlab-collab-mcp-setup": 438,
+    "large-file-edit-truncation-guardrail": 420,
+    "marimo-notebook-patterns": 408,
+    "marimo": 408,
+    "ml-experimentation": 438,
+    "motion-graphics-video": 456,
+    "npm-trusted-publishing-oidc-setup": 438,
+    "opencode-bash-background-process-survival": 420,
+    "opencode-mcp-server-setup": 420,
+    "opencode-ollama-provider-setup": 438,
+    "opencode-plugin-authoring": 420,
+    "pdf-form-filler": 390,
+    "plaud-ingestion": 390,
+    "publish-to-google-docs": 420,
+    "python-importtime-optimization": 438,
+    "remotion-video": 438,
+    "scientific-eda": 420,
+    "skill-creator": 420,
+    "slack-cli": 420,
+    "stacked-pr-decomposition": 438,
+    "typewriter-video": 438,
+    "video-script-writing": 438,
+    "voss-advisor": 420,
+    "webfetch-empty-use-agent-browser": 438,
+    "xarray-linked-data": 420,
+    "youtube": 390,
 }
 
 # Prompt cards embedded on the home page, in display order.
-# fields: slug, title, blurb, source path, taught skill (name, tree url or None)
+# fields: slug, title, blurb, source path, taught skill (name, tree url or None),
+# and an optional "home" flag (default True) for whether the home page shows it
 CARDS = [
     {
         "slug": "make-a-prompt-card",
@@ -85,6 +133,115 @@ CARDS = [
         "src": NEW_CARDS_DIR / "review-a-pr.html",
         "skill": ("gh-pr-code-review", f"{SKILL_TREE_URL}/gh-pr-code-review"),
     },
+]
+
+# One card per remaining skill, each saying when to reach for that skill.
+# These appear only on their skill's detail page, not on the home page.
+# fields: skill name (also the card slug and site/cards/<name>.html), title, blurb
+SKILL_CARDS = [
+    ("agents-md-improver", "Turn a correction into a rule",
+     "Reach for this right after you correct your agent and want the fix to stick in the repo's AGENTS.md, so you don't repeat it next session."),
+    ("atomic-commits", "Split a messy working tree into commits",
+     "Reach for this when your working tree holds several unrelated changes and you want a clean history with one logical change per commit."),
+    ("audit-before-rewrite", "Rewrite a file without losing features",
+     "Reach for this before an agent rewrites, restyles, or regenerates a whole file that has picked up features over earlier turns."),
+    ("awesome-marimo-notebook", "Bring a paper to life in marimo",
+     "Reach for this when you want an interactive marimo notebook that explains a research paper or dataset, for a tutorial, a competition entry, or a blog companion."),
+    ("blog-explainer-prose-dedup", "Cut repetition from an explainer post",
+     "Reach for this when a long explainer or tutorial post says the same thing in several sections, or its takeaway doesn't match what the post went deep on."),
+    ("codebase-study-parallel-reporters", "Study an unfamiliar codebase",
+     "Reach for this when you need a thorough, cited account of how something works in a repo you don't know, or how two repos handle the same thing."),
+    ("coherent-writing", "Make a draft read as one argument",
+     "Reach for this when a draft feels choppy, jumps between ideas, or contradicts itself, and you want it to flow without new points being added."),
+    ("cybersecurity-review", "Check code for security holes",
+     "Reach for this before you merge new code or adopt an open source dependency, or when you want an existing repo audited for vulnerabilities."),
+    ("data-visualization-master", "Critique and fix a figure",
+     "Reach for this when you are making or critiquing a chart or figure, especially a multi-panel or publication figure, and want choices backed by the visualization literature."),
+    ("debug-github-ci", "Fix a failing CI run",
+     "Reach for this when a GitHub Actions run fails, or when you want the agent to watch a PR's checks until they finish."),
+    ("design-driven-dev", "Design a feature before coding it",
+     "Reach for this when you start a new feature or a major refactor and want the design agreed before any code is written."),
+    ("docker-offline-verification", "Prove a container works offline",
+     "Reach for this when you need to show that a containerized app serves every route with no network access, or when ports on a --network none container seem unreachable."),
+    ("dom-anchored-svg-connectors", "Draw arrows that stay on their boxes",
+     "Reach for this when you draw connector lines between HTML elements, like gantt dependencies or flowchart edges, or when existing connectors drift away from their boxes."),
+    ("epistemic-resourcefulness", "Stop guessing and find the source",
+     "Reach for this when your agent keeps retrying the same failing command or guessing names, or is about to tell you it has no access to something."),
+    ("evident-charts", "Make a chart whose point is obvious",
+     "Reach for this when you make or revise a chart for readers, in a blog, report, slide, or social post, and want the point to land at a glance."),
+    ("gh-activity-summary", "Summarize your GitHub week",
+     "Reach for this when you need a status update, a retro, or a record of what you did on GitHub over a date range or on one day."),
+    ("gh-cli", "Open and merge a PR from the terminal",
+     "Reach for this for everyday GitHub chores from the command line: opening and merging PRs, reading Actions logs, managing issues and project boards."),
+    ("git-rebase-noninteractive-editor", "Unstick a rebase in an agent's shell",
+     "Reach for this when git rebase --continue hangs or times out in an agent's shell, CI, or a script, or before running an interactive rebase with no terminal."),
+    ("github-auto-merge-setup", "Make auto-merge work",
+     "Reach for this when gh pr merge --auto fails, when you want dependency PRs to merge once CI is green, or when a PR stays blocked despite green checks."),
+    ("html-presentations", "Build a single-file HTML deck",
+     "Reach for this when you want a slide deck as one HTML file that opens in any browser, with no framework or build step."),
+    ("jupyterlab-collab-mcp-setup", "Connect your agent to JupyterLab",
+     "Reach for this when you want your agent to edit and run notebooks through the jupyterlab-collab-mcp server, or when its Jupyter tools are missing or can't connect."),
+    ("large-file-edit-truncation-guardrail", "Edit a big file without losing its end",
+     "Reach for this when an agent edits a file of 1000 or more lines, or when an edit reported success but sections near the end went missing."),
+    ("marimo-notebook-patterns", "Fix a marimo notebook that won't run",
+     "Reach for this when you write or edit a marimo .py notebook, or when one fails with errors like a name defined in more than one cell."),
+    ("marimo", "Embed live marimo cells in a blog post",
+     "Reach for this for any marimo task. This card shows one that the other marimo cards don't: putting interactive marimo cells into a static blog or site."),
+    ("ml-experimentation", "Run one ML experiment properly",
+     "Reach for this when you want to test an idea with a model: train, compare, and write up results with a record of what you tried."),
+    ("motion-graphics-video", "Make a motion graphics video",
+     "Reach for this when you want a finished MP4 such as a product teaser, kinetic typography, a lyric video, or a launch film, with music and sound effects."),
+    ("npm-trusted-publishing-oidc-setup", "Publish to npm without a token",
+     "Reach for this when you set up a GitHub Actions workflow to publish an npm package, or npmjs.com asks you to switch to Trusted Publishing."),
+    ("opencode-bash-background-process-survival", "Keep a dev server alive between turns",
+     "Reach for this when a server your agent started in the background is dead by the next turn, or before starting one that has to outlive the command (opencode on macOS)."),
+    ("opencode-mcp-server-setup", "Add an MCP server to opencode",
+     "Reach for this when you want a new MCP server's tools in opencode, or when a server you expected is missing from your sessions."),
+    ("opencode-ollama-provider-setup", "Use an Ollama model in opencode",
+     "Reach for this when you want a model served by Ollama, on your laptop or another machine, to show up as a model in opencode."),
+    ("opencode-plugin-authoring", "Write an opencode plugin",
+     "Reach for this when you build an opencode plugin, such as one that notifies you when the agent finishes, or install a local plugin from source."),
+    ("pdf-form-filler", "Fill this year's PDF form",
+     "Reach for this when you have to fill out a PDF form, especially a yearly one like a school enrollment or a renewal where last year's filled copy exists."),
+    ("plaud-ingestion", "Sync Plaud recordings into your vault",
+     "Reach for this when you want new PLAUD recordings (transcripts, speakers, AI notes) pulled into your Obsidian vault, or a backfill of older ones."),
+    ("publish-to-google-docs", "Turn a markdown note into a Google Doc",
+     "Reach for this when you want a markdown note as a styled Google Doc or Word file, using your template's fonts and headings."),
+    ("python-importtime-optimization", "Speed up a slow Python import",
+     "Reach for this when importing your Python package takes seconds, a CI import-time benchmark is slipping, or a CLI starts slowly."),
+    ("remotion-video", "Make a short video with Remotion",
+     "Reach for this when you want an animated short-form video built with Remotion: an explainer, a product demo, testimonials, a data dashboard, or overlays."),
+    ("scientific-eda", "Explore a scientific dataset step by step",
+     "Reach for this when you open a new scientific data file (CSV, FASTA, and so on) and want a careful, guided look rather than a pile of plots."),
+    ("skill-creator", "Turn a workflow into a skill",
+     "Reach for this when you want to write a new agent skill, or fix one that agents don't load when they should."),
+    ("slack-cli", "Run a Slack CLI command safely",
+     "Reach for this when you build, run, or deploy a Slack app with the slack CLI, or need the right command and flags for a task."),
+    ("stacked-pr-decomposition", "Break a huge branch into stacked PRs",
+     "Reach for this when a branch has grown too big to review and you want a chain of small PRs, each reviewable in about five minutes."),
+    ("typewriter-video", "Make a code typing video",
+     "Reach for this when you want a VS Code-style typing animation with keyboard sounds, for a code walkthrough or as B-roll."),
+    ("video-script-writing", "Write a video script that holds attention",
+     "Reach for this when you need a script for a YouTube explainer, founder story, landing-page video, ad, or short, or want to fix a script's hook or pacing."),
+    ("voss-advisor", "Plan a tough conversation",
+     "Reach for this before a negotiation or a hard conversation (salary, a vendor, a landlord, pushback at work), or when you need to answer a tricky message."),
+    ("webfetch-empty-use-agent-browser", "Read a page that fetching can't",
+     "Reach for this when fetching a web page comes back empty, too large, or as a bare JavaScript shell, as with many job boards and single-page apps."),
+    ("xarray-linked-data", "Put linked lab data in one xarray",
+     "Reach for this when measurements, derived estimates, and model outputs sit in separate files but share samples or conditions, and you want them in one aligned xarray structure."),
+    ("youtube", "Get a YouTube transcript",
+     "Reach for this when you want the transcript of a YouTube video, or for other YouTube work: downloading video or audio, reading metadata, or working through a playlist."),
+]
+CARDS += [
+    {
+        "slug": name,
+        "title": title,
+        "blurb": blurb,
+        "src": NEW_CARDS_DIR / f"{name}.html",
+        "skill": (name, f"{SKILL_TREE_URL}/{name}"),
+        "home": False,
+    }
+    for name, title, blurb in SKILL_CARDS
 ]
 
 TRIGGER_MARKERS = (" Use when", " Use this", " Use it", " Triggers", " Also use", " Also triggers")
@@ -480,7 +637,7 @@ def index_page(skills: list[Skill], skills_json: str) -> str:
 </div>"""
         for s in skills
     )
-    prompt_cards = "\n".join(card_block(c, "") for c in CARDS)
+    prompt_cards = "\n".join(card_block(c, "") for c in CARDS if c.get("home", True))
     body = f"""{hero()}
 <main>
 <section id="skills">
@@ -496,7 +653,7 @@ def index_page(skills: list[Skill], skills_json: str) -> str:
 
 <section id="prompt-cards">
   <h2>Prompt cards</h2>
-  <p class="section-sub">A prompt card teaches one prompt with blanks to fill: hover a highlight to see why each part is there, copy the blank template, and fill in your own details. Some cards teach how to use a skill from the library above; others stand on their own. <a href="https://github.com/ericmjl/skills/tree/main/skills/prompt-card">The prompt-card skill</a> explains the format.</p>
+  <p class="section-sub">A prompt card teaches one prompt with blanks to fill: hover a highlight to see why each part is there, copy the blank template, and fill in your own details. Some cards teach how to use a skill from the library above; others stand on their own. Every skill in the library has a card on its detail page; the cards below are a sample. <a href="https://github.com/ericmjl/skills/tree/main/skills/prompt-card">The prompt-card skill</a> explains the format.</p>
   {prompt_cards}
 </section>
 </main>
