@@ -1,6 +1,6 @@
 ---
 name: gh-pr-code-review
-description: PR code review workflow: pull diff, two-pass findings, draft and prioritize comments, then optionally post via gh api.
+description: "PR code review workflow: pull diff, two-pass findings, draft and prioritize comments, then optionally post via gh api."
 license: MIT
 ---
 
