@@ -1,0 +1,21 @@
+skills/prompt-card/assets/examples/build-a-landing-page/in-note.html
+  s_60d509889055cf::t_7ff60a06772740 3
+skills/prompt-card/assets/examples/build-a-landing-page/standalone.html
+  s_60d509889055cf::t_2faa56d4f5e3b9 105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1e61980b4bba274f4379024f2ece45c6cd14161b",
+  "prompts": {},
+  "sessions": {
+    "s_60d509889055cf": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a168d5-011e-76f4-9403-87646f195340",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
