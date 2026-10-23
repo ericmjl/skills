@@ -6,7 +6,7 @@
 
 Scans skills/*/SKILL.md for frontmatter, generates a searchable index page,
 a detail page per skill (frontmatter metadata, rendered instructions, and
-the prompt cards that invoke it), standalone prompt-card widgets, and the
+any prompt cards that invoke it), standalone prompt-card widgets, and the
 agent-skills overview deck. Run with: uv run scripts/build_site.py
 """
 
@@ -46,7 +46,6 @@ CARD_HEIGHTS = {
     "mine-your-chat-logs": 516,
     "review-a-pr": 456,
 }
-INVOKE_HEIGHT = 460  # measured spread is 392-446; buffer absorbed by the white embed panel
 
 # Prompt cards embedded on the home page, in display order.
 # fields: slug, title, blurb, source path, taught skill (name, tree url or None)
@@ -414,123 +413,6 @@ class Skill:
         return {"name": self.name, "blurb": self.blurb, "full": self.full}
 
 
-INVOKE_CARD_TEMPLATE = """<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prompt card · Invoke __NAME__</title>
-__FAVICON__
-<style>
-.prompt-card {
-  --pc-card: #fafafa; --pc-surface: #ffffff; --pc-border: #dddddd; --pc-rule: #eeeeee;
-  --pc-ink: #333333; --pc-ink-strong: #222222; --pc-body: #444444; --pc-faint: #888888;
-  --pc-accent: #0066cc;
-  --pc-1: #0066cc; --pc-1-bg: #eef4ff; --pc-1-line: #b9d3f5;
-  --pc-2: #1a7a4b; --pc-2-bg: #e7f6ee; --pc-2-line: #a9dcc0;
-  --pc-3: #a05a0c; --pc-3-bg: #fdf3e3; --pc-3-line: #f0d3a6;
-  --pc-4: #475569; --pc-4-bg: #eef1f4; --pc-4-line: #c3cdd4;
-  font-family: var(--font-monospace, monospace);
-  background: var(--pc-card); border: 1px solid var(--pc-border); border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06); max-width: 640px; margin: 16px auto; padding: 18px;
-  color: var(--pc-ink); font-size: 13px; line-height: 1.5; text-align: left;
-}
-.prompt-card * { box-sizing: border-box; }
-.prompt-card .pc-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-.prompt-card .pc-titles { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.prompt-card .pc-title { font-size: 15px; font-weight: bold; color: var(--pc-ink-strong); margin: 0; }
-.prompt-card .pc-eyebrow, .prompt-card .pc-hint { font-size: 12px; color: var(--pc-faint); }
-.prompt-card .pc-template { background: var(--pc-surface); border: 1px solid #e2e6ea; border-radius: 6px; padding: 12px; font-size: 15px; line-height: 2; color: var(--pc-ink-strong); }
-.prompt-card .pc-slot { position: relative; display: inline; border-radius: 3px; padding: 2px 4px; border-bottom: 2px solid transparent; cursor: help; outline: none; }
-.prompt-card .pc-slot:focus-visible { box-shadow: 0 0 0 2px var(--pc-accent); }
-.prompt-card .pc-tag { display: inline-block; width: 18px; height: 18px; line-height: 18px; border-radius: 50%; color: #fff; font-size: 12px; font-weight: bold; text-align: center; margin-right: 4px; vertical-align: 1px; }
-.prompt-card .pc-s1 { background: var(--pc-1-bg); border-bottom-color: var(--pc-1); color: var(--pc-1); }
-.prompt-card .pc-s2 { background: var(--pc-2-bg); border-bottom-color: var(--pc-2); color: var(--pc-2); }
-.prompt-card .pc-s1 .pc-tag { background: var(--pc-1); }
-.prompt-card .pc-s2 .pc-tag { background: var(--pc-2); }
-.prompt-card .pc-pop { position: absolute; left: 0; top: calc(100% + 8px); z-index: 20; width: 300px; max-width: 80vw; background: var(--pc-surface); border: 1px solid var(--pc-border); border-left: 4px solid currentColor; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); padding: 8px 10px; font-size: 12px; line-height: 1.5; font-weight: normal; color: var(--pc-body); white-space: normal; }
-.prompt-card .pc-pop-end { left: auto; right: 0; }
-.prompt-card a.pc-chip { text-decoration: none; }
-.prompt-card .pc-pop b { display: block; margin-bottom: 2px; }
-.prompt-card .pc-s1 .pc-pop b { color: var(--pc-1); }
-.prompt-card .pc-s2 .pc-pop b { color: var(--pc-2); }
-.prompt-card .pc-s1 .pc-pop { border-left-color: var(--pc-1); }
-.prompt-card .pc-s2 .pc-pop { border-left-color: var(--pc-2); }
-.prompt-card .pc-slot:hover .pc-pop,
-.prompt-card .pc-slot:focus .pc-pop,
-.prompt-card .pc-slot:focus-within .pc-pop { display: block !important; }
-.prompt-card .pc-interacts { margin-top: 14px; background: var(--pc-4-bg); border: 1px dashed var(--pc-4-line); border-radius: 6px; padding: 10px 12px; }
-.prompt-card .pc-interacts-title { font-size: 13px; font-weight: bold; color: var(--pc-4); margin-bottom: 4px; }
-.prompt-card .pc-interacts-text { font-size: 12px; color: var(--pc-body); margin: 0 0 8px; }
-.prompt-card .pc-chips { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 12px; }
-.prompt-card .pc-chip { background: var(--pc-surface); border: 1px solid var(--pc-4-line); color: var(--pc-4); border-radius: 6px; padding: 3px 8px; font-weight: bold; }
-.prompt-card .pc-op { color: var(--pc-faint); }
-.prompt-card code { font-family: var(--font-monospace, monospace); background: #f4f4f4; color: inherit; border-radius: 3px; padding: 0 3px; font-size: 12px; }
-.prompt-card .pc-foot { margin-top: 10px; font-size: 12px; color: var(--pc-faint); }
-body { margin: 0; padding: 16px; background: #ffffff; }
-.prompt-card { margin: 0 auto; }
-.prompt-card .pc-copy { padding: 6px 14px; font-family: var(--font-monospace, monospace); font-size: 12px; border-radius: 6px; cursor: pointer; background: #0066cc; color: #fff; border: none; white-space: nowrap; }
-.prompt-card .pc-copy.ok { background: #1a9e5b; }
-.prompt-card .pc-hint-below { margin: 6px 0 0; }
-@media print { body { padding: 0; } .prompt-card { box-shadow: none; } .prompt-card .pc-copy { display: none; } }
-</style>
-</head>
-<body>
-<article class="prompt-card" aria-labelledby="pc-title">
-<div class="pc-head"><div class="pc-titles"><h1 class="pc-title" id="pc-title">Invoke __NAME__</h1><span class="pc-eyebrow">prompt card</span></div><button type="button" class="pc-copy" id="pc-copy">Copy blank template</button></div>
-<div class="pc-template">Use the __NAME__ skill to <span class="pc-slot pc-s1 pc-pop-end" tabindex="0" title="Name the outcome, not the steps. Mentioning the skill by name is what loads its instructions, and the skill then picks the steps that fit."><span class="pc-tag">1</span>&lt;what you need done&gt;<span class="pc-pop pc-pop-end" style="display:none"><b>&lt;what you need done&gt;</b>Name the outcome, not the steps. Mentioning the skill by name is what loads its instructions, and the skill then picks the steps that fit.</span></span>. <span class="pc-slot pc-s2 pc-pop-end" tabindex="0" title="Files, formats, limits, or preferences you already know. Constraints steer the skill's playbook instead of leaving the agent to guess."><span class="pc-tag">2</span>&lt;context or constraints it should respect&gt;<span class="pc-pop pc-pop-end" style="display:none"><b>&lt;context or constraints it should respect&gt;</b>Files, formats, limits, or preferences you already know. Constraints steer the skill's playbook instead of leaving the agent to guess.</span></span>.</div>
-<p class="pc-hint pc-hint-below">Hover or tab to a highlight to see why it matters.</p>
-<div class="pc-interacts"><div class="pc-interacts-title">Interacts with</div><p class="pc-interacts-text">An agent with this skill installed loads it when the name comes up.__TRIGGER__ Install it with <code>__INSTALL__</code>, or paste the skill's SKILL.md into your agent's instructions.</p><div class="pc-chips"><a class="pc-chip" href="__TREE__">skills/__NAME__</a><span class="pc-op">+</span><span class="pc-chip">AGENTS.md</span></div></div>
-<div class="pc-foot">prompt card · v0.1 · __DATE__</div>
-<textarea id="pc-plain" hidden readonly>Use the __NAME_RAW__ skill to &lt;what you need done&gt;. &lt;context or constraints it should respect&gt;.</textarea>
-</article>
-<script>
-(function () {
-  'use strict';
-  var btn = document.getElementById('pc-copy');
-  var plain = document.getElementById('pc-plain');
-  function done() {
-    var label = btn.textContent;
-    btn.textContent = 'Copied';
-    btn.classList.add('ok');
-    setTimeout(function () { btn.textContent = label; btn.classList.remove('ok'); }, 1600);
-  }
-  function fallback() {
-    plain.hidden = false; plain.select();
-    try { document.execCommand('copy'); done(); } catch (e) {}
-    plain.hidden = true;
-  }
-  if (btn && plain) {
-    btn.addEventListener('click', function () {
-      var text = plain.value;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done).catch(fallback);
-      } else { fallback(); }
-    });
-  }
-})();
-</script>
-</body>
-</html>
-"""
-
-
-def invoke_card_page(skill: Skill) -> str:
-    """A standalone prompt card that teaches how to invoke one skill."""
-    trigger = ""
-    if skill.trigger:
-        trigger = f' Its own trigger list: "{html.escape(skill.trigger)}"'
-    return (
-        INVOKE_CARD_TEMPLATE
-        .replace("__NAME__", html.escape(skill.name))
-        .replace("__NAME_RAW__", skill.name)
-        .replace("__TRIGGER__", trigger)
-        .replace("__INSTALL__", INSTALL_CMD)
-        .replace("__TREE__", f"{SKILL_TREE_URL}/{skill.name}")
-        .replace("__DATE__", date.today().strftime("%b %d, %Y"))
-        .replace("__FAVICON__", FAVICON)
-    )
-
 def skill_meta_rows(skill: Skill) -> str:
     rows = []
 
@@ -560,32 +442,22 @@ def skill_meta_rows(skill: Skill) -> str:
 
 def skill_page(skill: Skill, cards_for_skill: list[dict]) -> str:
     base = "../../"
-    embeds = []
+    invoke = ""
     if cards_for_skill:
-        intro = "Prompt cards that show how to invoke this skill."
-        for card in cards_for_skill:
-            embeds.append(card_block(card, base))
-    else:
-        intro = "A fill-in prompt that loads this skill. Hover the highlights to see why each part is there, or copy the blank template."
-        embeds.append(f"""<div class="card-embed">
-  <div class="card-embed-head">
-    <h3>Invoke {html.escape(skill.name)}</h3>
-    <a class="standalone-link" href="{base}cards/invoke-{skill.name}.html" target="_blank" rel="noopener">open standalone ↗</a>
-  </div>
-  {embed_iframe(f"{base}cards/invoke-{skill.name}.html", INVOKE_HEIGHT, f"Prompt card: invoke {skill.name}")}
-</div>""")
+        embeds = "".join(card_block(card, base) for card in cards_for_skill)
+        invoke = f"""
+  <section id="invoke">
+    <h2>Invoke it</h2>
+    <p class="section-sub">Prompt cards that show how to invoke this skill. Browse <a href="{base}index.html#prompt-cards">all prompt cards</a> on the home page.</p>
+    {embeds}
+  </section>"""
     lede = normalize(skill.description)
     body = f"""{topbar("../../")}
 <main class="skillpage">
   <div class="eyebrow">agent skill</div>
   <h1 class="name">{html.escape(skill.name)}</h1>
   <p class="lede">{html.escape(lede)}</p>
-  <div class="meta-panel">{skill_meta_rows(skill)}</div>
-  <section id="invoke">
-    <h2>Invoke it</h2>
-    <p class="section-sub">{intro} Browse <a href="{base}index.html#prompt-cards">all prompt cards</a> on the home page.</p>
-    {"".join(embeds)}
-  </section>
+  <div class="meta-panel">{skill_meta_rows(skill)}</div>{invoke}
   <section id="instructions">
     <h2>What the skill tells the agent</h2>
     <p class="section-sub">The full <a href="{BLOB_URL}/{skill.name}/SKILL.md">SKILL.md</a>, rendered. Agents load this on demand when the skill's name or triggers come up.</p>
@@ -613,7 +485,7 @@ def index_page(skills: list[Skill], skills_json: str) -> str:
 <main>
 <section id="skills">
   <h2>The skills</h2>
-  <p class="section-sub">Every skill is a folder with a <span class="mono">SKILL.md</span> that an agent loads on demand. Search by name or by what you want done; each card opens a detail page with the skill's metadata, its instructions, and prompt cards that invoke it.</p>
+  <p class="section-sub">Every skill is a folder with a <span class="mono">SKILL.md</span> that an agent loads on demand. Search by name or by what you want done; each card opens a detail page with the skill's metadata, its instructions, and any prompt cards that invoke it.</p>
   <div class="search-row">
     <input type="search" id="search" placeholder="Search skills… e.g. review, notebook, vault" autocomplete="off">
     <span id="count"></span>
@@ -624,7 +496,7 @@ def index_page(skills: list[Skill], skills_json: str) -> str:
 
 <section id="prompt-cards">
   <h2>Prompt cards</h2>
-  <p class="section-sub">A prompt card teaches one fill-in prompt: hover a highlight to see why each part is there, copy the blank template, and fill in your own details. Some cards teach how to use a skill from the library above; others stand on their own. Every skill's detail page carries a card for invoking it. <a href="https://github.com/ericmjl/skills/tree/main/skills/prompt-card">The prompt-card skill</a> explains the format.</p>
+  <p class="section-sub">A prompt card teaches one prompt with blanks to fill: hover a highlight to see why each part is there, copy the blank template, and fill in your own details. Some cards teach how to use a skill from the library above; others stand on their own. <a href="https://github.com/ericmjl/skills/tree/main/skills/prompt-card">The prompt-card skill</a> explains the format.</p>
   {prompt_cards}
 </section>
 </main>
@@ -660,11 +532,10 @@ def main() -> None:
         page_dir.mkdir(parents=True)
         (page_dir / "index.html").write_text(
             skill_page(skill, cards_by_skill.get(skill.name, [])), encoding="utf-8")
-        (cards_out / f"invoke-{skill.name}.html").write_text(invoke_card_page(skill), encoding="utf-8")
 
     shutil.copy(OVERVIEW_SRC, OUT / "overview.html")
 
-    print(f"Built {len(skills)} skill pages, {len(skills)} invoke cards, "
+    print(f"Built {len(skills)} skill pages, "
           f"{len(CARDS)} prompt cards into {OUT}/")
 
 
