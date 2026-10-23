@@ -1,0 +1,24 @@
+scripts/build_site.py
+  h_923f9eef54c2c1 56
+site/cards/codebase-study-parallel-reporters.html
+  h_923f9eef54c2c1 106
+site/cards/cybersecurity-review.html
+  h_923f9eef54c2c1 106,111
+site/cards/docker-offline-verification.html
+  h_923f9eef54c2c1 106
+site/cards/evident-charts.html
+  h_923f9eef54c2c1 108
+site/cards/scientific-eda.html
+  h_923f9eef54c2c1 106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "24be36c878b27571a5a6e15e5c2d02d64db902b7",
+  "prompts": {},
+  "humans": {
+    "h_923f9eef54c2c1": {
+      "author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
