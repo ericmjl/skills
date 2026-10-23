@@ -95,14 +95,18 @@
 body { margin: 0; padding: 16px; background: #ffffff; }
 .prompt-card { margin: 0 auto; }
 .prompt-card .pc-copy { padding: 6px 14px; font-family: var(--font-monospace, monospace); font-size: 12px; border-radius: 6px; cursor: pointer; background: #0066cc; color: #fff; border: none; white-space: nowrap; }
+.prompt-card .pc-copy:hover { background: #0052a3; }
+.prompt-card .pc-copy:focus-visible { outline: 2px solid #0066cc; outline-offset: 2px; }
 .prompt-card .pc-copy.ok { background: #1a9e5b; }
+.prompt-card .pc-copy.fail { background: #a05a0c; }
+.prompt-card .pc-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .prompt-card .pc-hint-below { margin: 6px 0 0; }
 @media print { body { padding: 0; } .prompt-card { box-shadow: none; } .prompt-card .pc-copy { display: none; } }
 </style>
 </head>
 <body>
 <article class="prompt-card" aria-labelledby="pc-title">
-<div class="pc-head"><div class="pc-titles"><h1 class="pc-title" id="pc-title">Publish to npm without a token</h1><span class="pc-eyebrow">prompt card</span></div><button type="button" class="pc-copy" id="pc-copy">Copy blank template</button></div>
+<div class="pc-head"><div class="pc-titles"><h1 class="pc-title" id="pc-title">Publish to npm without a token</h1><span class="pc-eyebrow">prompt card</span></div><button type="button" class="pc-copy" id="pc-copy" aria-label="Copy blank template to clipboard">Copy blank template</button><span class="pc-sr" id="pc-copy-status" role="status" aria-live="polite"></span></div>
 <div class="pc-template">Use the npm-trusted-publishing-oidc-setup skill to publish <span class="pc-slot pc-s1" tabindex="0" title="The package&#x27;s repository.url in package.json must match the GitHub repo, so the skill checks it along with the workflow."><span class="pc-tag">1</span>&lt;package&gt;<span class="pc-pop pc-pop-end" style="display:none"><b>&lt;package&gt;</b>The package&#x27;s repository.url in package.json must match the GitHub repo, so the skill checks it along with the workflow.</span></span> from <span class="pc-slot pc-s2" tabindex="0" title="The repo and workflow file name go into the Trusted Publisher form on npmjs.com, which you fill in yourself."><span class="pc-tag">2</span>&lt;owner/repo&gt;<span class="pc-pop" style="display:none"><b>&lt;owner/repo&gt;</b>The repo and workflow file name go into the Trusted Publisher form on npmjs.com, which you fill in yourself.</span></span> with Trusted Publishing. The package <span class="pc-slot pc-s3" tabindex="0" title="A brand-new package can&#x27;t make its first publish through OIDC. It has to go out once by hand before CI can take over."><span class="pc-tag">3</span>&lt;has or hasn&#x27;t&gt;<span class="pc-pop pc-pop-end" style="display:none"><b>&lt;has or hasn&#x27;t&gt;</b>A brand-new package can&#x27;t make its first publish through OIDC. It has to go out once by hand before CI can take over.</span></span> been published before.</div>
 <p class="pc-hint pc-hint-below">Hover or tab to a highlight to see why it matters.</p>
 <div class="pc-interacts"><div class="pc-interacts-title">Interacts with</div><p class="pc-interacts-text">The npm-trusted-publishing-oidc-setup skill supplies the known pitfalls, including Node 24 for a new enough npm, id-token: write, and no NODE_AUTH_TOKEN on the publish step.</p><div class="pc-chips"><a class="pc-chip" href="https://github.com/ericmjl/skills/tree/main/skills/npm-trusted-publishing-oidc-setup">npm-trusted-publishing-oidc-setup skill</a></div></div>
@@ -113,8 +117,6 @@ body { margin: 0; padding: 16px; background: #ffffff; }
 <script>
 (function () {
   'use strict';
-  var btn = document.getElementById('pc-copy');
-  var plain = document.getElementById('pc-plain');
   function fit() {
     try {
       var f = window.frameElement;
@@ -123,23 +125,53 @@ body { margin: 0; padding: 16px; background: #ffffff; }
       f.style.height = document.body.scrollHeight + 'px';
     } catch (e) {}
   }
-  function done() {
-    var label = btn.textContent;
-    btn.textContent = 'Copied';
-    btn.classList.add('ok');
-    setTimeout(function () { btn.textContent = label; btn.classList.remove('ok'); }, 1600);
+  // Copy button. Copies the plain prompt from #pc-plain (no tags or notes).
+  // Tries the Clipboard API first, then falls back to a temporary textarea
+  // and execCommand, which still works in iframes that block the API.
+  var btn = document.getElementById('pc-copy');
+  var plain = document.getElementById('pc-plain');
+  var status = document.getElementById('pc-copy-status');
+  var label = btn ? btn.textContent : '';
+  var timer = null;
+  function show(ok) {
+    btn.textContent = ok ? 'Copied' : 'Copy failed';
+    btn.classList.toggle('ok', ok);
+    btn.classList.toggle('fail', !ok);
+    if (status) status.textContent = ok ? 'Prompt copied to the clipboard.' : 'Copy failed. Select the prompt and copy it by hand.';
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      btn.textContent = label;
+      btn.classList.remove('ok', 'fail');
+      if (status) status.textContent = '';
+    }, 1600);
   }
-  function fallback() {
-    plain.hidden = false; plain.select();
-    try { document.execCommand('copy'); done(); } catch (e) {}
-    plain.hidden = true;
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.setAttribute('aria-hidden', 'true');
+    ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    btn.focus();
+    return ok;
   }
   if (btn && plain) {
     btn.addEventListener('click', function () {
       var text = plain.value;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done).catch(fallback);
-      } else { fallback(); }
+      if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(
+          function () { show(true); },
+          function () { show(legacyCopy(text)); }
+        );
+      } else {
+        show(legacyCopy(text));
+      }
     });
   }
   window.addEventListener('load', fit);

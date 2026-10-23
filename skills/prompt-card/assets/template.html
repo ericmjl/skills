@@ -93,7 +93,11 @@
 body { margin: 0; padding: 16px; background: #ffffff; }
 .prompt-card { margin: 0 auto; }
 .prompt-card .pc-copy { padding: 6px 14px; font-family: var(--font-monospace, monospace); font-size: 12px; border-radius: 6px; cursor: pointer; background: #0066cc; color: #fff; border: none; white-space: nowrap; }
+.prompt-card .pc-copy:hover { background: #0052a3; }
+.prompt-card .pc-copy:focus-visible { outline: 2px solid #0066cc; outline-offset: 2px; }
 .prompt-card .pc-copy.ok { background: #1a9e5b; }
+.prompt-card .pc-copy.fail { background: #a05a0c; }
+.prompt-card .pc-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .prompt-card .pc-hint-below { margin: 6px 0 0; }
 @media print { body { padding: 0; } .prompt-card { box-shadow: none; } .prompt-card .pc-copy { display: none; } }
 </style>
@@ -101,7 +105,8 @@ body { margin: 0; padding: 16px; background: #ffffff; }
 <body>
 <article class="prompt-card" aria-labelledby="pc-title">
 <!-- Replace every ALL-CAPS placeholder and the slot labels. Keep the why text identical in title= and the popover. -->
-<div class="pc-head"><div class="pc-titles"><h1 class="pc-title" id="pc-title">CARD TITLE</h1><span class="pc-eyebrow">prompt card</span></div><button type="button" class="pc-copy" id="pc-copy">Copy blank template</button></div>
+<!-- The Copy button is required on every card that can run scripts. Keep the button, the pc-copy-status region, the pc-plain textarea, and the script below. -->
+<div class="pc-head"><div class="pc-titles"><h1 class="pc-title" id="pc-title">CARD TITLE</h1><span class="pc-eyebrow">prompt card</span></div><button type="button" class="pc-copy" id="pc-copy" aria-label="Copy blank template to clipboard">Copy blank template</button><span class="pc-sr" id="pc-copy-status" role="status" aria-live="polite"></span></div>
 <div class="pc-template"><span class="pc-slot pc-s1" tabindex="0" title="WHY 1: one sentence on what this part does and what goes wrong without it."><span class="pc-tag">1</span>&lt;verb&gt;<span class="pc-pop" style="display:none"><b>&lt;verb&gt;</b>WHY 1: one sentence on what this part does and what goes wrong without it.</span></span> <span class="pc-slot pc-s2" tabindex="0" title="WHY 2: one sentence on what this part does and what goes wrong without it."><span class="pc-tag">2</span>&lt;input&gt;<span class="pc-pop" style="display:none"><b>&lt;input&gt;</b>WHY 2: one sentence on what this part does and what goes wrong without it.</span></span> for my <span class="pc-slot pc-s3" tabindex="0" title="WHY 3: one sentence on what this part does and what goes wrong without it."><span class="pc-tag">3</span>&lt;target&gt;<span class="pc-pop pc-pop-end" style="display:none"><b>&lt;target&gt;</b>WHY 3: one sentence on what this part does and what goes wrong without it.</span></span> please.</div>
 <p class="pc-hint pc-hint-below">Hover or tab to a highlight to see why it matters.</p>
 <div class="pc-interacts"><div class="pc-interacts-title">Interacts with</div><p class="pc-interacts-text">INTERACTS: one or two sentences naming the standing instructions this prompt relies on (an agent skill, or else an <code>AGENTS.md</code> section) and what they supply.</p><div class="pc-chips"><span class="pc-chip">SKILL-NAME skill</span><span class="pc-op">or</span><span class="pc-chip">AGENTS.md</span></div></div>
@@ -112,8 +117,6 @@ body { margin: 0; padding: 16px; background: #ffffff; }
 <script>
 (function () {
   'use strict';
-  var btn = document.getElementById('pc-copy');
-  var plain = document.getElementById('pc-plain');
   function fit() {
     try {
       var f = window.frameElement;
@@ -122,23 +125,53 @@ body { margin: 0; padding: 16px; background: #ffffff; }
       f.style.height = document.body.scrollHeight + 'px';
     } catch (e) {}
   }
-  function done() {
-    var label = btn.textContent;
-    btn.textContent = 'Copied';
-    btn.classList.add('ok');
-    setTimeout(function () { btn.textContent = label; btn.classList.remove('ok'); }, 1600);
+  // Copy button. Copies the plain prompt from #pc-plain (no tags or notes).
+  // Tries the Clipboard API first, then falls back to a temporary textarea
+  // and execCommand, which still works in iframes that block the API.
+  var btn = document.getElementById('pc-copy');
+  var plain = document.getElementById('pc-plain');
+  var status = document.getElementById('pc-copy-status');
+  var label = btn ? btn.textContent : '';
+  var timer = null;
+  function show(ok) {
+    btn.textContent = ok ? 'Copied' : 'Copy failed';
+    btn.classList.toggle('ok', ok);
+    btn.classList.toggle('fail', !ok);
+    if (status) status.textContent = ok ? 'Prompt copied to the clipboard.' : 'Copy failed. Select the prompt and copy it by hand.';
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      btn.textContent = label;
+      btn.classList.remove('ok', 'fail');
+      if (status) status.textContent = '';
+    }, 1600);
   }
-  function fallback() {
-    plain.hidden = false; plain.select();
-    try { document.execCommand('copy'); done(); } catch (e) {}
-    plain.hidden = true;
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.setAttribute('aria-hidden', 'true');
+    ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    btn.focus();
+    return ok;
   }
   if (btn && plain) {
     btn.addEventListener('click', function () {
       var text = plain.value;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done).catch(fallback);
-      } else { fallback(); }
+      if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(
+          function () { show(true); },
+          function () { show(legacyCopy(text)); }
+        );
+      } else {
+        show(legacyCopy(text));
+      }
     });
   }
   window.addEventListener('load', fit);
