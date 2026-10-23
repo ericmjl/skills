@@ -48,7 +48,7 @@ CARD_HEIGHTS = {
     # One card per skill, shown on that skill's page (SKILL_CARDS below).
     "agents-md-improver": 438,
     "atomic-commits": 438,
-    "audit-before-rewrite": 450,
+    "audit-before-rewrite": 432,
     "awesome-marimo-notebook": 468,
     "blog-explainer-prose-dedup": 438,
     "codebase-study-parallel-reporters": 438,
@@ -84,7 +84,7 @@ CARD_HEIGHTS = {
     "remotion-video": 438,
     "scientific-eda": 420,
     "skill-creator": 420,
-    "slack-cli": 420,
+    "slack-cli": 438,
     "stacked-pr-decomposition": 438,
     "typewriter-video": 438,
     "video-script-writing": 438,
