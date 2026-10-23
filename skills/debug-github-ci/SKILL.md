@@ -1,6 +1,6 @@
 ---
 name: debug-github-ci
-description: Debug GitHub Actions and CI failures using gh CLI: watch PR checks, fetch run logs, analyze failures, reproduce locally, and suggest fixes. Use when CI fails, when the user wants to watch or verify CI, or when debugging workflow runs.
+description: "Debug GitHub Actions and CI failures using gh CLI: watch PR checks, fetch run logs, analyze failures, reproduce locally, and suggest fixes. Use when CI fails, when the user wants to watch or verify CI, or when debugging workflow runs."
 license: MIT
 ---
 
