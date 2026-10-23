@@ -95,14 +95,18 @@
 body { margin: 0; padding: 16px; background: #ffffff; }
 .prompt-card { margin: 0 auto; }
 .prompt-card .pc-copy { padding: 6px 14px; font-family: var(--font-monospace, monospace); font-size: 12px; border-radius: 6px; cursor: pointer; background: #0066cc; color: #fff; border: none; white-space: nowrap; }
+.prompt-card .pc-copy:hover { background: #0052a3; }
+.prompt-card .pc-copy:focus-visible { outline: 2px solid #0066cc; outline-offset: 2px; }
 .prompt-card .pc-copy.ok { background: #1a9e5b; }
+.prompt-card .pc-copy.fail { background: #a05a0c; }
+.prompt-card .pc-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .prompt-card .pc-hint-below { margin: 6px 0 0; }
 @media print { body { padding: 0; } .prompt-card { box-shadow: none; } .prompt-card .pc-copy { display: none; } }
 </style>
 </head>
 <body>
 <article class="prompt-card" aria-labelledby="pc-title">
-<div class="pc-head"><div class="pc-titles"><h1 class="pc-title" id="pc-title">Read a page that fetching can&#x27;t</h1><span class="pc-eyebrow">prompt card</span></div><button type="button" class="pc-copy" id="pc-copy">Copy blank template</button></div>
+<div class="pc-head"><div class="pc-titles"><h1 class="pc-title" id="pc-title">Read a page that fetching can&#x27;t</h1><span class="pc-eyebrow">prompt card</span></div><button type="button" class="pc-copy" id="pc-copy" aria-label="Copy blank template to clipboard">Copy blank template</button><span class="pc-sr" id="pc-copy-status" role="status" aria-live="polite"></span></div>
 <div class="pc-template">Fetching <span class="pc-slot pc-s1" tabindex="0" title="Job boards, dashboards, docs portals, and other pages built in the browser are the usual cases."><span class="pc-tag">1</span>&lt;URL&gt;<span class="pc-pop" style="display:none"><b>&lt;URL&gt;</b>Job boards, dashboards, docs portals, and other pages built in the browser are the usual cases.</span></span> came back <span class="pc-slot pc-s2" tabindex="0" title="Empty or too large means switching to agent-browser, which runs the page&#x27;s JavaScript. Garbled binary from a PDF link means the download worked, so the skill extracts the text instead."><span class="pc-tag">2</span>&lt;empty, too large, or garbled&gt;<span class="pc-pop" style="display:none"><b>&lt;empty, too large, or garbled&gt;</b>Empty or too large means switching to agent-browser, which runs the page&#x27;s JavaScript. Garbled binary from a PDF link means the download worked, so the skill extracts the text instead.</span></span>. Use the webfetch-empty-use-agent-browser skill to <span class="pc-slot pc-s3" tabindex="0" title="The skill checks that agent-browser is installed first, and never guesses the page from its title or URL."><span class="pc-tag">3</span>get the real content<span class="pc-pop pc-pop-end" style="display:none"><b>get the real content</b>The skill checks that agent-browser is installed first, and never guesses the page from its title or URL.</span></span>.</div>
 <p class="pc-hint pc-hint-below">Hover or tab to a highlight to see why it matters.</p>
 <div class="pc-interacts"><div class="pc-interacts-title">Interacts with</div><p class="pc-interacts-text">The webfetch-empty-use-agent-browser skill needs the agent-browser CLI for the browser route. It also covers search engine CAPTCHAs, whole docs sites, and checking citation links.</p><div class="pc-chips"><a class="pc-chip" href="https://github.com/ericmjl/skills/tree/main/skills/webfetch-empty-use-agent-browser">webfetch-empty-use-agent-browser skill</a><span class="pc-op">+</span><span class="pc-chip">agent-browser</span></div></div>
@@ -113,8 +117,6 @@ body { margin: 0; padding: 16px; background: #ffffff; }
 <script>
 (function () {
   'use strict';
-  var btn = document.getElementById('pc-copy');
-  var plain = document.getElementById('pc-plain');
   function fit() {
     try {
       var f = window.frameElement;
@@ -123,23 +125,53 @@ body { margin: 0; padding: 16px; background: #ffffff; }
       f.style.height = document.body.scrollHeight + 'px';
     } catch (e) {}
   }
-  function done() {
-    var label = btn.textContent;
-    btn.textContent = 'Copied';
-    btn.classList.add('ok');
-    setTimeout(function () { btn.textContent = label; btn.classList.remove('ok'); }, 1600);
+  // Copy button. Copies the plain prompt from #pc-plain (no tags or notes).
+  // Tries the Clipboard API first, then falls back to a temporary textarea
+  // and execCommand, which still works in iframes that block the API.
+  var btn = document.getElementById('pc-copy');
+  var plain = document.getElementById('pc-plain');
+  var status = document.getElementById('pc-copy-status');
+  var label = btn ? btn.textContent : '';
+  var timer = null;
+  function show(ok) {
+    btn.textContent = ok ? 'Copied' : 'Copy failed';
+    btn.classList.toggle('ok', ok);
+    btn.classList.toggle('fail', !ok);
+    if (status) status.textContent = ok ? 'Prompt copied to the clipboard.' : 'Copy failed. Select the prompt and copy it by hand.';
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      btn.textContent = label;
+      btn.classList.remove('ok', 'fail');
+      if (status) status.textContent = '';
+    }, 1600);
   }
-  function fallback() {
-    plain.hidden = false; plain.select();
-    try { document.execCommand('copy'); done(); } catch (e) {}
-    plain.hidden = true;
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.setAttribute('aria-hidden', 'true');
+    ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    btn.focus();
+    return ok;
   }
   if (btn && plain) {
     btn.addEventListener('click', function () {
       var text = plain.value;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done).catch(fallback);
-      } else { fallback(); }
+      if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(
+          function () { show(true); },
+          function () { show(legacyCopy(text)); }
+        );
+      } else {
+        show(legacyCopy(text));
+      }
     });
   }
   window.addEventListener('load', fit);

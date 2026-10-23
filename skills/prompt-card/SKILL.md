@@ -28,8 +28,10 @@ The hover notes explain why each word is there, so they have to say what the use
 
 Infer the destination from context, such as the file you're editing, the folder it's in, or how the user describes the card. Ask only if it's unclear.
 
-- A blog post or website gets the standalone HTML widget, embedded with an iframe, with a Copy blank template button.
+- A blog post or website gets the standalone HTML widget, embedded with an iframe. Start from `assets/template.html`.
 - An Obsidian note gets in-note markup plus a CSS snippet, because Obsidian strips scripts.
+
+The Copy blank template button is part of the spec. Every card that can run scripts, whether embedded in a blog post or opened as a standalone page, must have it. The Obsidian in-note card is the only exception, because Obsidian strips scripts.
 
 Either way, a card embedded in a post or note stays the slim hover widget described below. Anything longer belongs in the prose around it or on a standalone page.
 
@@ -76,7 +78,7 @@ The shared CSS lives in `assets/obsidian-snippet.css`. `assets/template.html` in
 
 ## Two delivery targets
 
-**Standalone blog widget.** Start from `assets/template.html`. It's self-contained, with inline `<style>` and `<script>` and no dependencies. The Copy blank template button copies the plain-text prompt from a hidden textarea. `fit()` resizes the iframe by setting its height to `0px` first and then to `scrollHeight`, and runs on load and resize. Embed it with a borderless iframe:
+**Standalone blog widget.** Always start from `assets/template.html` and keep its copy button. It's self-contained, with inline `<style>` and `<script>` and no dependencies. The Copy blank template button copies the plain-text prompt from the hidden `pc-plain` textarea, without the number tags or why notes, so keep that textarea in step with the template text. It tries the Clipboard API first and falls back to a temporary textarea with `execCommand('copy')`, which still works in an iframe that blocks the Clipboard API. It shows Copied for a moment, has an `aria-label`, and announces the result through a status region. `fit()` resizes the iframe by setting its height to `0px` first and then to `scrollHeight`, and runs on load and resize. Embed it with a borderless iframe:
 
 ```html
 <iframe src="prompt-card.html" width="100%" scrolling="no" style="border:0" onload="this.style.height=this.contentDocument.body.scrollHeight+'px'"></iframe>
@@ -87,7 +89,7 @@ The shared CSS lives in `assets/obsidian-snippet.css`. `assets/template.html` in
 - Paste the markup from `assets/obsidian-note-snippet.html` straight into the note. Don't leave blank lines inside the block, because Markdown breaks out of HTML at a blank line. Don't include `<style>` or `<script>`.
 - Append `assets/obsidian-snippet.css` to a vault CSS snippet that's already enabled (check `enabledCssSnippets` in `.obsidian/appearance.json`), or add a new snippet and enable it. Back the snippet file up first. Only add rules; don't change existing ones.
 - `:hover`, `:focus`, and `:focus-within` reveal the popovers. Each popover also has an inline `style="display:none"` so it stays hidden if the snippet is off, and `title=` still shows the why text.
-- Leave out the copy button. It needs a script.
+- Leave out the copy button. It needs a script, so this is the one card without it.
 - Edit the note by replacing the exact card block string only, and diff against a backup to confirm nothing else changed.
 
 ## Verify before you deliver
@@ -95,7 +97,7 @@ The shared CSS lives in `assets/obsidian-snippet.css`. `assets/template.html` in
 1. Render in headless Chromium or Playwright. For the Obsidian version, render the note markup with only the snippet CSS and no script.
 2. Hover each slot, then focus one with the keyboard. Confirm the popover's computed `display` changes from `none` to `block`, and take a screenshot of each hover.
 3. Check there are no console or page errors. A missing favicon from a local test server doesn't count.
-4. Click Copy and read the clipboard back. Serve the file over `http://localhost` and grant clipboard permissions, because `file://` won't work.
+4. Click Copy and read the clipboard back. It must match the template text exactly, with no number tags or why notes. Serve the file over `http://localhost` and grant clipboard permissions, because `file://` won't work.
 5. Load the card in a same-origin iframe and confirm `fit()` set a height. A cross-origin host can't reach `frameElement`.
 6. Check every file you wrote for em-dashes with `grep -nP '\x{2014}' <file>`.
 
@@ -111,7 +113,7 @@ Before overwriting, save the previous file as `*.vN.html` (and its PNG). Bump th
 
 ## Files
 
-- `assets/template.html`: standalone card with placeholders (CARD TITLE, WHY 1 to 3, INTERACTS, SKILL-NAME, footer date).
+- `assets/template.html`: standalone card with the required copy button and placeholders (CARD TITLE, WHY 1 to 3, INTERACTS, SKILL-NAME, footer date).
 - `assets/obsidian-snippet.css`: the scoped card CSS for a vault snippet, including an optional slot 4.
 - `assets/obsidian-note-snippet.html`: in-note markup with placeholders.
 - `assets/examples/ingest-a-source/`: a filled-in card for "Ingest <url/file> into my <name of vault> please." Contains `standalone.html`, `in-note.html`, `obsidian-snippet.css`, and `hover.png`.
