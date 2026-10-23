@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
+<title>Prompt card · Prove a container works offline</title>
+<style>
+/* ==========================================================================
+   Prompt card styles (from the prompt-card skill)
+   Additive rules only, all scoped under .prompt-card. Mirrors the website
+   widget house style (monospace, #fafafa card, #ddd border, 8px radius,
+   12px minimum text). Hover or focus a slot to reveal its popover.
+   Popovers carry an inline display:none so they stay hidden when these
+   rules are absent; the !important below is what reveals them.
+   Never write a path glob with a slash-star inside a CSS comment: it ends
+   the comment early and silently breaks the rule after it.
+   ========================================================================== */
+.prompt-card {
+  --pc-card: #fafafa;
+  --pc-surface: #ffffff;
+  --pc-border: #dddddd;
+  --pc-rule: #eeeeee;
+  --pc-ink: #333333;
+  --pc-ink-strong: #222222;
+  --pc-body: #444444;
+  --pc-faint: #888888;
+  --pc-accent: #0066cc;
+  --pc-1: #0066cc; --pc-1-bg: #eef4ff; --pc-1-line: #b9d3f5;
+  --pc-2: #1a7a4b; --pc-2-bg: #e7f6ee; --pc-2-line: #a9dcc0;
+  --pc-3: #a05a0c; --pc-3-bg: #fdf3e3; --pc-3-line: #f0d3a6;
+  --pc-4: #475569; --pc-4-bg: #eef1f4; --pc-4-line: #c3cdd4;
+  font-family: var(--font-monospace, monospace);
+  background: var(--pc-card);
+  border: 1px solid var(--pc-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  max-width: 640px;
+  margin: 16px auto;
+  padding: 18px;
+  color: var(--pc-ink);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+}
+.prompt-card * { box-sizing: border-box; }
+.prompt-card .pc-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.prompt-card .pc-titles { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.prompt-card .pc-title { font-size: 15px; font-weight: bold; color: var(--pc-ink-strong); margin: 0; }
+.prompt-card .pc-eyebrow, .prompt-card .pc-hint { font-size: 12px; color: var(--pc-faint); }
+.prompt-card .pc-template { background: var(--pc-surface); border: 1px solid #e2e6ea; border-radius: 6px; padding: 12px; font-size: 15px; line-height: 2; color: var(--pc-ink-strong); }
+
+/* highlighted slots */
+.prompt-card .pc-slot { position: relative; display: inline; border-radius: 3px; padding: 2px 4px; border-bottom: 2px solid transparent; cursor: help; outline: none; }
+.prompt-card .pc-slot:focus-visible { box-shadow: 0 0 0 2px var(--pc-accent); }
+.prompt-card .pc-tag { display: inline-block; width: 18px; height: 18px; line-height: 18px; border-radius: 50%; color: #fff; font-size: 12px; font-weight: bold; text-align: center; margin-right: 4px; vertical-align: 1px; }
+.prompt-card .pc-s1 { background: var(--pc-1-bg); border-bottom-color: var(--pc-1); color: var(--pc-1); }
+.prompt-card .pc-s2 { background: var(--pc-2-bg); border-bottom-color: var(--pc-2); color: var(--pc-2); }
+.prompt-card .pc-s3 { background: var(--pc-3-bg); border-bottom-color: var(--pc-3); color: var(--pc-3); }
+.prompt-card .pc-s4 { background: var(--pc-4-bg); border-bottom-color: var(--pc-4); color: var(--pc-4); }
+.prompt-card .pc-s1 .pc-tag { background: var(--pc-1); }
+.prompt-card .pc-s2 .pc-tag { background: var(--pc-2); }
+.prompt-card .pc-s3 .pc-tag { background: var(--pc-3); }
+.prompt-card .pc-s4 .pc-tag { background: var(--pc-4); }
+
+/* hover / focus popovers */
+.prompt-card .pc-pop { position: absolute; left: 0; top: calc(100% + 8px); z-index: 20; width: 300px; max-width: 80vw; background: var(--pc-surface); border: 1px solid var(--pc-border); border-left: 4px solid currentColor; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); padding: 8px 10px; font-size: 12px; line-height: 1.5; font-weight: normal; color: var(--pc-body); white-space: normal; }
+.prompt-card .pc-pop-end { left: auto; right: 0; }
+.prompt-card a.pc-chip { text-decoration: none; }
+.prompt-card .pc-pop b { display: block; margin-bottom: 2px; }
+.prompt-card .pc-s1 .pc-pop b { color: var(--pc-1); }
+.prompt-card .pc-s2 .pc-pop b { color: var(--pc-2); }
+.prompt-card .pc-s3 .pc-pop b { color: var(--pc-3); }
+.prompt-card .pc-s4 .pc-pop b { color: var(--pc-4); }
+.prompt-card .pc-s1 .pc-pop { border-left-color: var(--pc-1); }
+.prompt-card .pc-s2 .pc-pop { border-left-color: var(--pc-2); }
+.prompt-card .pc-s3 .pc-pop { border-left-color: var(--pc-3); }
+.prompt-card .pc-s4 .pc-pop { border-left-color: var(--pc-4); }
+.prompt-card .pc-slot:hover .pc-pop,
+.prompt-card .pc-slot:focus .pc-pop,
+.prompt-card .pc-slot:focus-within .pc-pop { display: block !important; }
+
+/* interacts with */
+.prompt-card .pc-interacts { margin-top: 14px; background: var(--pc-4-bg); border: 1px dashed var(--pc-4-line); border-radius: 6px; padding: 10px 12px; }
+.prompt-card .pc-interacts-title { font-size: 13px; font-weight: bold; color: var(--pc-4); margin-bottom: 4px; }
+.prompt-card .pc-interacts-text { font-size: 12px; color: var(--pc-body); margin: 0 0 8px; }
+.prompt-card .pc-chips { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 12px; }
+.prompt-card .pc-chip { background: var(--pc-surface); border: 1px solid var(--pc-4-line); color: var(--pc-4); border-radius: 6px; padding: 3px 8px; font-weight: bold; }
+.prompt-card .pc-op { color: var(--pc-faint); }
+.prompt-card code { font-family: var(--font-monospace, monospace); background: #f4f4f4; color: inherit; border-radius: 3px; padding: 0 3px; font-size: 12px; }
+.prompt-card .pc-foot { margin-top: 10px; font-size: 12px; color: var(--pc-faint); }
+/* ==================== end prompt card ==================== */
+
+/* standalone page only */
+body { margin: 0; padding: 16px; background: #ffffff; }
+.prompt-card { margin: 0 auto; }
+.prompt-card .pc-copy { padding: 6px 14px; font-family: var(--font-monospace, monospace); font-size: 12px; border-radius: 6px; cursor: pointer; background: #0066cc; color: #fff; border: none; white-space: nowrap; }
+.prompt-card .pc-copy.ok { background: #1a9e5b; }
+.prompt-card .pc-hint-below { margin: 6px 0 0; }
+@media print { body { padding: 0; } .prompt-card { box-shadow: none; } .prompt-card .pc-copy { display: none; } }
+</style>
+</head>
+<body>
+<article class="prompt-card" aria-labelledby="pc-title">
+<div class="pc-head"><div class="pc-titles"><h1 class="pc-title" id="pc-title">Prove a container works offline</h1><span class="pc-eyebrow">prompt card</span></div><button type="button" class="pc-copy" id="pc-copy">Copy blank template</button></div>
+<div class="pc-template">Use the docker-offline-verification skill to prove <span class="pc-slot pc-s1" tabindex="0" title="The skill runs the container with --network none and no -p flag, so it needs the image or container to start."><span class="pc-tag">1</span>&lt;image or container&gt;<span class="pc-pop pc-pop-end" style="display:none"><b>&lt;image or container&gt;</b>The skill runs the container with --network none and no -p flag, so it needs the image or container to start.</span></span> serves <span class="pc-slot pc-s2" tabindex="0" title="Each route gets its own request and expected status, so list every page or endpoint that has to work offline."><span class="pc-tag">2</span>&lt;the routes to check&gt;<span class="pc-pop" style="display:none"><b>&lt;the routes to check&gt;</b>Each route gets its own request and expected status, so list every page or endpoint that has to work offline.</span></span> with no network. Check each one <span class="pc-slot pc-s3" tabindex="0" title="With --network none, -p publishes nothing, without any error. The skill uses docker exec and requests localhost from inside instead."><span class="pc-tag">3</span>from inside the container<span class="pc-pop" style="display:none"><b>from inside the container</b>With --network none, -p publishes nothing, without any error. The skill uses docker exec and requests localhost from inside instead.</span></span> and report the status codes.</div>
+<p class="pc-hint pc-hint-below">Hover or tab to a highlight to see why it matters.</p>
+<div class="pc-interacts"><div class="pc-interacts-title">Interacts with</div><p class="pc-interacts-text">The docker-offline-verification skill supplies the no-network run, the docker exec pattern, and a per-route check with curl or wget. It needs Docker.</p><div class="pc-chips"><a class="pc-chip" href="https://github.com/ericmjl/skills/tree/main/skills/docker-offline-verification">docker-offline-verification skill</a></div></div>
+<div class="pc-foot">prompt card · v0.1 · Oct 23, 2026</div>
+<!-- Plain-text prompt the Copy button puts on the clipboard. Escape angle brackets. -->
+<textarea id="pc-plain" hidden readonly>Use the docker-offline-verification skill to prove &lt;image or container&gt; serves &lt;the routes to check&gt; with no network. Check each one from inside the container and report the status codes.</textarea>
+</article>
+<script>
+(function () {
+  'use strict';
+  var btn = document.getElementById('pc-copy');
+  var plain = document.getElementById('pc-plain');
+  function fit() {
+    try {
+      var f = window.frameElement;
+      if (!f) return;
+      f.style.height = '0px';
+      f.style.height = document.body.scrollHeight + 'px';
+    } catch (e) {}
+  }
+  function done() {
+    var label = btn.textContent;
+    btn.textContent = 'Copied';
+    btn.classList.add('ok');
+    setTimeout(function () { btn.textContent = label; btn.classList.remove('ok'); }, 1600);
+  }
+  function fallback() {
+    plain.hidden = false; plain.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    plain.hidden = true;
+  }
+  if (btn && plain) {
+    btn.addEventListener('click', function () {
+      var text = plain.value;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(fallback);
+      } else { fallback(); }
+    });
+  }
+  window.addEventListener('load', fit);
+  window.addEventListener('resize', fit);
+  fit();
+})();
+</script>
+</body>
+</html>
