@@ -1,0 +1,104 @@
+site/cards/agents-md-improver.html
+  h_923f9eef54c2c1 1-151
+site/cards/atomic-commits.html
+  h_923f9eef54c2c1 1-151
+site/cards/audit-before-rewrite.html
+  h_923f9eef54c2c1 1-151
+site/cards/awesome-marimo-notebook.html
+  h_923f9eef54c2c1 1-151
+site/cards/blog-explainer-prose-dedup.html
+  h_923f9eef54c2c1 1-151
+site/cards/codebase-study-parallel-reporters.html
+  h_923f9eef54c2c1 1-151
+site/cards/coherent-writing.html
+  h_923f9eef54c2c1 1-151
+site/cards/cybersecurity-review.html
+  h_923f9eef54c2c1 1-151
+site/cards/data-visualization-master.html
+  h_923f9eef54c2c1 1-151
+site/cards/debug-github-ci.html
+  h_923f9eef54c2c1 1-151
+site/cards/design-driven-dev.html
+  h_923f9eef54c2c1 1-151
+site/cards/docker-offline-verification.html
+  h_923f9eef54c2c1 1-151
+site/cards/dom-anchored-svg-connectors.html
+  h_923f9eef54c2c1 1-151
+site/cards/epistemic-resourcefulness.html
+  h_923f9eef54c2c1 1-151
+site/cards/evident-charts.html
+  h_923f9eef54c2c1 1-151
+site/cards/gh-activity-summary.html
+  h_923f9eef54c2c1 1-151
+site/cards/gh-cli.html
+  h_923f9eef54c2c1 1-151
+site/cards/git-rebase-noninteractive-editor.html
+  h_923f9eef54c2c1 1-151
+site/cards/github-auto-merge-setup.html
+  h_923f9eef54c2c1 1-151
+site/cards/html-presentations.html
+  h_923f9eef54c2c1 1-151
+site/cards/jupyterlab-collab-mcp-setup.html
+  h_923f9eef54c2c1 1-151
+site/cards/large-file-edit-truncation-guardrail.html
+  h_923f9eef54c2c1 1-151
+site/cards/marimo-notebook-patterns.html
+  h_923f9eef54c2c1 1-151
+site/cards/marimo.html
+  h_923f9eef54c2c1 1-151
+site/cards/ml-experimentation.html
+  h_923f9eef54c2c1 1-151
+site/cards/motion-graphics-video.html
+  h_923f9eef54c2c1 1-151
+site/cards/npm-trusted-publishing-oidc-setup.html
+  h_923f9eef54c2c1 1-151
+site/cards/opencode-bash-background-process-survival.html
+  h_923f9eef54c2c1 1-151
+site/cards/opencode-mcp-server-setup.html
+  h_923f9eef54c2c1 1-151
+site/cards/opencode-ollama-provider-setup.html
+  h_923f9eef54c2c1 1-151
+site/cards/opencode-plugin-authoring.html
+  h_923f9eef54c2c1 1-151
+site/cards/pdf-form-filler.html
+  h_923f9eef54c2c1 1-151
+site/cards/plaud-ingestion.html
+  h_923f9eef54c2c1 1-151
+site/cards/publish-to-google-docs.html
+  h_923f9eef54c2c1 1-151
+site/cards/python-importtime-optimization.html
+  h_923f9eef54c2c1 1-151
+site/cards/remotion-video.html
+  h_923f9eef54c2c1 1-151
+site/cards/scientific-eda.html
+  h_923f9eef54c2c1 1-151
+site/cards/skill-creator.html
+  h_923f9eef54c2c1 1-151
+site/cards/slack-cli.html
+  h_923f9eef54c2c1 1-151
+site/cards/stacked-pr-decomposition.html
+  h_923f9eef54c2c1 1-151
+site/cards/typewriter-video.html
+  h_923f9eef54c2c1 1-151
+site/cards/video-script-writing.html
+  h_923f9eef54c2c1 1-151
+site/cards/voss-advisor.html
+  h_923f9eef54c2c1 1-151
+site/cards/webfetch-empty-use-agent-browser.html
+  h_923f9eef54c2c1 1-151
+site/cards/xarray-linked-data.html
+  h_923f9eef54c2c1 1-151
+site/cards/youtube.html
+  h_923f9eef54c2c1 1-151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fc28d5b92a3a2af42a117efb5ea8e634c2470c6f",
+  "prompts": {},
+  "humans": {
+    "h_923f9eef54c2c1": {
+      "author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
