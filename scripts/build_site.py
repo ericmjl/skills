@@ -53,7 +53,7 @@ CARD_HEIGHTS = {
     "blog-explainer-prose-dedup": 438,
     "codebase-study-parallel-reporters": 438,
     "coherent-writing": 438,
-    "cybersecurity-review": 438,
+    "cybersecurity-review": 468,
     "data-visualization-master": 468,
     "debug-github-ci": 420,
     "design-driven-dev": 468,
