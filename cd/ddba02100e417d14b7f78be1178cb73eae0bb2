@@ -1,0 +1,21 @@
+skills/debug-github-ci/SKILL.md
+  s_60d509889055cf::t_a7919fcc4dff33 3
+skills/gh-pr-code-review/SKILL.md
+  s_60d509889055cf::t_36577effcc7210 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cdddba02100e417d14b7f78be1178cb73eae0bb2",
+  "prompts": {},
+  "sessions": {
+    "s_60d509889055cf": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a168d5-011e-76f4-9403-87646f195340",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
