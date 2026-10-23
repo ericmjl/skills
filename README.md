@@ -2,6 +2,8 @@
 
 This repository contains custom skills following the [Anthropic Agent Skills Specification](https://github.com/anthropics/skills).
 
+**[Browse all skills →](https://ericmjl.github.io/skills/)** — a searchable catalog of every skill in this repo, plus prompt cards that teach how to use them.
+
 **[What are agent skills?](docs/agent-skills-overview.html)** — Single-file HTML overview (open in a browser): definition, how they work, FAQ, and spotlights on selected skills.
 
 ## What are skills?
