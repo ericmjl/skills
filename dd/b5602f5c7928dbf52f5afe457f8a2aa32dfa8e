@@ -1,0 +1,16 @@
+skills/prompt-card/assets/examples/make-a-prompt-card/in-note.html
+  h_923f9eef54c2c1 3-4
+skills/prompt-card/assets/examples/make-a-prompt-card/standalone.html
+  h_923f9eef54c2c1 105,107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ddb5602f5c7928dbf52f5afe457f8a2aa32dfa8e",
+  "prompts": {},
+  "humans": {
+    "h_923f9eef54c2c1": {
+      "author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
