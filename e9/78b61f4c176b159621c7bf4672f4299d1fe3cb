@@ -1,0 +1,25 @@
+scripts/build_site.py
+  s_60d509889055cf::t_ae2c366db9a657 1-363
+.gitignore
+  s_60d509889055cf::t_ce4c95934f963d 5
+.github/workflows/deploy-site.yml
+  s_60d509889055cf::t_5a367d5dc2a735 1-46
+README.md
+  s_60d509889055cf::t_0cf801f69e713a 5-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e978b61f4c176b159621c7bf4672f4299d1fe3cb",
+  "prompts": {},
+  "sessions": {
+    "s_60d509889055cf": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a168d5-011e-76f4-9403-87646f195340",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
