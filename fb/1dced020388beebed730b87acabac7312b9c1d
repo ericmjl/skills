@@ -1,0 +1,44 @@
+scripts/build_site.py
+  h_923f9eef54c2c1 189,215
+site/cards/agents-md-improver.html
+  h_923f9eef54c2c1 106
+site/cards/atomic-commits.html
+  h_923f9eef54c2c1 106
+site/cards/audit-before-rewrite.html
+  h_923f9eef54c2c1 108
+site/cards/awesome-marimo-notebook.html
+  h_923f9eef54c2c1 106
+site/cards/blog-explainer-prose-dedup.html
+  h_923f9eef54c2c1 106
+site/cards/epistemic-resourcefulness.html
+  h_923f9eef54c2c1 108
+site/cards/evident-charts.html
+  h_923f9eef54c2c1 106
+site/cards/git-rebase-noninteractive-editor.html
+  h_923f9eef54c2c1 106
+site/cards/jupyterlab-collab-mcp-setup.html
+  h_923f9eef54c2c1 106
+site/cards/ml-experimentation.html
+  h_923f9eef54c2c1 106
+site/cards/motion-graphics-video.html
+  h_923f9eef54c2c1 106
+site/cards/opencode-mcp-server-setup.html
+  h_923f9eef54c2c1 106
+site/cards/typewriter-video.html
+  h_923f9eef54c2c1 108
+site/cards/video-script-writing.html
+  h_923f9eef54c2c1 106
+site/cards/youtube.html
+  h_923f9eef54c2c1 106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fb1dced020388beebed730b87acabac7312b9c1d",
+  "prompts": {},
+  "humans": {
+    "h_923f9eef54c2c1": {
+      "author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
