@@ -2,3 +2,4 @@
 *.skill
 __marimo__/
 __pycache__/
+_site/
