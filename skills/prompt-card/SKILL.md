@@ -1,6 +1,6 @@
 ---
 name: prompt-card
-description: "Build a brief, interactive prompt card: a small card that teaches a reader one fill-in prompt, with numbered color-coded slots whose 'why it matters' notes pop up on hover, and an 'Interacts with' section naming the skill or AGENTS.md instructions the prompt relies on. Use when someone wants a prompt card for a prompt, agent skill, or workflow, to embed at the end of a blog post section, paste into an Obsidian note, or publish as a standalone HTML page. Triggers include 'make a prompt card', 'turn this prompt into a card', 'add a prompt card to this post', or 'show readers the prompt I use'."
+description: "Build a brief, interactive prompt card: a small card that teaches a reader one prompt, with numbered color-coded slots whose 'why it matters' notes pop up on hover, and, when the prompt relies on one, an 'Interacts with' section naming the skill or AGENTS.md instructions behind it. Takes the prompt, optionally the skill it uses, and optionally the user's explanation of what they mean; if the intent isn't already clear from the conversation, interviews the user about it. Works out from context whether the card goes in a blog post (standalone HTML widget) or an Obsidian note (note markup plus CSS snippet). Use when someone wants a prompt card for a prompt, agent skill, or workflow. Triggers include 'make a prompt card', 'turn this prompt into a card', 'add a prompt card to this post', or 'show readers the prompt I use'."
 license: MIT
 ---
 
@@ -10,11 +10,28 @@ license: MIT
 
 Use this skill when someone wants to show readers a prompt they actually use, in a form readers can copy and understand. The card sits at the bottom of a blog section or inside a note, so it has to be brief: roughly 350 to 500px tall at 640px wide.
 
-Ask for these when missing:
+The card takes up to three inputs:
 
-- The exact prompt, with its blanks.
-- The skill or AGENTS.md instructions the prompt relies on, and where they live.
-- Where the card goes: a blog post, an Obsidian note, or both.
+- **The prompt (required).** The exact prompt the user types, with its blanks. Ask for it if it's missing.
+- **The skill or AGENTS.md instructions it uses (optional).** Where they live, so you can read them. A card can be for a bare prompt. In that case, leave out the Interacts with section, or cut it to one line saying the prompt needs no setup.
+- **What the user means by it (optional).** Their explanation of the key words: why each one is there and what goes wrong without it.
+
+## Learn the intent behind the key words
+
+The hover notes explain why each word is there, so they have to say what the user means, not what you guess. Settle this before you write any hover note.
+
+- If you iterated on the prompt with the user in this conversation, use what you learned there.
+- If the user explained what they mean, use that, and ask only about gaps.
+- Otherwise, interview the user. Ask a few short questions about the key words and blanks: what each one is for, and what goes wrong without it. If a skill is given, read it first, so your questions reflect what it actually does and you can offer a likely answer for the user to confirm or correct.
+
+## Work out where the card goes
+
+Infer the destination from context, such as the file you're editing, the folder it's in, or how the user describes the card. Ask only if it's unclear.
+
+- A blog post or website gets the standalone HTML widget, embedded with an iframe, with a Copy blank template button.
+- An Obsidian note gets in-note markup plus a CSS snippet, because Obsidian strips scripts.
+
+Either way, a card embedded in a post or note stays the slim hover widget described below. Anything longer belongs in the prose around it or on a standalone page.
 
 ## What the card contains
 
@@ -23,14 +40,15 @@ Keep to these parts, in this order, and nothing else:
 1. **Header.** The card title, a small "prompt card" label, and the hint "Hover a highlight to see why it matters". The standalone version puts the Copy blank template button in the header and the hint just under the template.
 2. **The template.** The prompt in a white box. The parts that matter most are numbered, color-coded slots: 1 blue, 2 green, 3 amber, and 4 slate only if you truly need a fourth. Three slots is the sweet spot.
 3. **Why notes as popovers.** Each slot reveals its note on hover or keyboard focus. Don't add an always-visible list of notes. Put the same text in the slot's `title=` attribute as a fallback.
-4. **Interacts with.** A slate section with no number badge. One or two sentences on the standing instructions the prompt relies on (an agent skill, or else an AGENTS.md instruction) and what they supply, followed by chips naming them. This is what explains why a short prompt works.
+4. **Interacts with.** A slate section with no number badge. One or two sentences on the standing instructions the prompt relies on (an agent skill, or else an AGENTS.md instruction) and what they supply, followed by chips naming them. This is what explains why a short prompt works. If the prompt stands alone, leave this section out or cut it to one line.
 5. **Footer.** One line: label, version, date.
 
 Leave out metadata tables, skill lists, intended use, worked examples, limitations, and next steps. If the post needs those, they belong in the prose around the card.
 
 ## Ground it before you write
 
-- Read the real skill and AGENTS.md the prompt relies on before writing any why note or the Interacts with text. Describe what they actually tell the agent to do.
+- If the prompt relies on a skill or AGENTS.md, read the real instructions before writing any why note or the Interacts with text. Describe what they actually tell the agent to do.
+- Base each why note on the user's intent from the step above, not on your own reading of the words.
 - Don't invent capabilities. If a note implies something the instructions don't say, reword it or flag it to the user.
 - Never link a private repo. Name a private skill as plain text. Link public skills only after you've confirmed the folder exists.
 - Report any gaps between what the blog post claims and what the instructions say, rather than smoothing them over on the card.
@@ -97,5 +115,5 @@ Before overwriting, save the previous file as `*.vN.html` (and its PNG). Bump th
 - `assets/obsidian-snippet.css`: the scoped card CSS for a vault snippet, including an optional slot 4.
 - `assets/obsidian-note-snippet.html`: in-note markup with placeholders.
 - `assets/examples/ingest-a-source/`: a filled-in card for "Ingest <url/file> into my <name of vault> please." Contains `standalone.html`, `in-note.html`, `obsidian-snippet.css`, and `hover.png`.
-- `assets/examples/make-a-prompt-card/`: a filled-in card for "Make a prompt card for <your prompt> and <its skill> to go in my <blog post or note>." Contains `standalone.html`, `in-note.html`, `obsidian-snippet.css`, `default.png`, and `hover.png`.
+- `assets/examples/make-a-prompt-card/`: a filled-in card whose template has three lines: "Make a prompt card for this prompt: <your prompt>", "It uses this skill: <its skill>", and "Here's what I mean by it: <your explanation>". The second and third lines are optional. Contains `standalone.html`, `in-note.html`, `obsidian-snippet.css`, `default.png`, and `hover.png`.
 - `assets/examples/build-a-landing-page/`: a filled-in card for "Build a landing page for my <name of vault> please, in <look or palette>." Contains `standalone.html`, `in-note.html`, `obsidian-snippet.css`, `default.png`, and `hover.png`.
