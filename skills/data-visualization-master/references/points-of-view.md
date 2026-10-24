@@ -247,7 +247,7 @@ distance, reciprocal exchange), and say which you mean.
 Nature Methods reintroduced the series in June 2026, now written by Helena
 Jambor (announcement editorial: Nat. Methods 23, 1069,
 https://doi.org/10.1038/s41592-026-03143-5). New columns are tracked here as
-they become verifiable. Column tracked so far:
+they become verifiable. Columns tracked so far (verified 2026-10-04):
 
 ### Color scales and the birth of viridis — [J26-Viridis] (Jambor, 2026)
 
@@ -257,3 +257,33 @@ palette viridis is replacing rainbow color schemes in scientific figures,
 for good reason." It echoes the original series' first column [W10-Color]
 and is consistent with rule [COL3] in `SKILL.md` (sequential,
 perceptually ordered scales for magnitude; never rainbow).
+
+### Click to plot — [J26-Click] (Jambor & Lex, 2026)
+
+*Abstract-only entry: full text paywalled at verification time
+(2026-10-04); distillation pending.* Standfirst: "Biological figures
+increasingly originate in the browser." Covers web-based, interactive
+plotting tools for biological figures; backs no rule yet.
+
+### Code to plot — [J26-Code] (Lex & Jambor, 2026)
+
+*Abstract-only entry: full text paywalled at verification time
+(2026-10-04); distillation pending.* Standfirst: "Biologists can reuse,
+remix and vibe code scientific figures." Covers plotting with code
+libraries and chat interfaces; backs no rule yet.
+
+### The graphical abstract — [J26-GraphAbs] (Jambor & Dürr, 2026)
+
+*Abstract-only entry: full text paywalled at verification time
+(2026-10-04); distillation pending.* Standfirst: "Graphical abstracts are
+visual summaries that help communicate scientific discoveries." Its
+reference list cites the original series' overview-figure column
+[W11-Overview]; adjacent to rule FIG3 but backs no rule yet.
+
+### Engaging figures — [J26-Engaging] (Jambor et al., 2026)
+
+*Advance-online entry: Crossref record verified 2026-10-04 but volume/pages
+not yet assigned; full text paywalled; distillation pending.* Standfirst:
+"Some visualizations resonate while others are forgotten. Why that is can
+be understood with the principles of creating 'proximity'." Six authors
+(Jambor, Rajabiyazdi, Prantl, Flotho, Möller, Turkay); backs no rule yet.
