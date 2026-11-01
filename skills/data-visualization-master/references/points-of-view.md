@@ -247,7 +247,7 @@ distance, reciprocal exchange), and say which you mean.
 Nature Methods reintroduced the series in June 2026, now written by Helena
 Jambor (announcement editorial: Nat. Methods 23, 1069,
 https://doi.org/10.1038/s41592-026-03143-5). New columns are tracked here as
-they become verifiable. Column tracked so far:
+they become verifiable. Columns tracked so far:
 
 ### Color scales and the birth of viridis — [J26-Viridis] (Jambor, 2026)
 
@@ -257,3 +257,42 @@ palette viridis is replacing rainbow color schemes in scientific figures,
 for good reason." It echoes the original series' first column [W10-Color]
 and is consistent with rule [COL3] in `SKILL.md` (sequential,
 perceptually ordered scales for magnitude; never rainbow).
+
+### Click to plot — [JL26-Click] (Jambor & Lex, 2026)
+
+*Abstract-only entry: full text paywalled at verification (2026-11-01);
+distillation pending.* Dek: "Biological figures increasingly originate in
+the browser." A practical tour of web-based/interactive plotting (Shiny and
+kin) — the interactive-figure counterpart of the original series.
+
+### Code to plot — [LJ26-Code] (Lex & Jambor, 2026)
+
+*Abstract-only entry: full text paywalled at verification (2026-11-01);
+distillation pending.* Covers making the same plot across plotting libraries
+(matplotlib, seaborn, ggplot2, plotly) and with chat interfaces; figures as
+reproducible code.
+
+### The graphical abstract — [JD26-GraphAbs] (Jambor & Dürr, 2026)
+
+*Abstract-only entry: full text paywalled at verification (2026-11-01);
+distillation pending.* Dek: "Graphical abstracts are visual summaries that
+help communicate scientific discoveries." Extends the overview-figure idea
+[W11-Overview] to the graphical-abstract format.
+
+### Engaging figures — [JR26-Engaging] (Jambor, Rajabiyazdi, Prantl, Flotho,
+Möller & Turkay, 2026)
+
+*Abstract-only entry: full text paywalled at verification (2026-11-01);
+distillation pending.* Dek: "Some visualizations resonate while others are
+forgotten." Frames memorability via 'proximity' principles: credibility,
+plausibility, importance, temporal proximity, individual-level focus,
+anticipation of consequences.
+
+### The companion website — [BJ26-Companion] (Bueckle, Stahl, Krause, Möller
+& Jambor, 2026)
+
+*Abstract-only entry: full text paywalled at verification (2026-11-01);
+distillation pending.* Dek: "How biologists can make the most of
+supplementary materials for impact." Guidance on companion websites and
+interactive supplementary content. Advance-online 2026-10-13 at
+verification time.

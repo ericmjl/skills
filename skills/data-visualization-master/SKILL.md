@@ -109,8 +109,10 @@ distilled in `references/points-of-view.md`. A project style guide overrides
   scale > length > angle/slope > area > volume > color saturation. Reserve
   pies/donuts for the rare single-part-to-whole glance; never for comparison
   or trends. Cite: [CM84], [HB10], [T14]; POV: [W10-Design].
-- ENC2 `[E]` Lines only over an ordered axis (usually time). Bars for discrete
-  categories. Never connect unordered categories with a line. Cite: [Z99];
+- ENC2 `[E]` Lines only over an ordered axis (usually time), with tick spacing
+  proportional to the intervals — evenly spaced uneven time steps produced the
+  largest measured deception effect. Bars for discrete categories. Never
+  connect unordered categories with a line. Cite: [Z99], [RR24];
   POV: [W10-Design].
 - ENC3 `[P]` Encode at most ~4 data dimensions per chart. Beyond that, use
   small multiples instead of stuffing more channels into one plot. Cite:
@@ -154,7 +156,8 @@ distilled in `references/points-of-view.md`. A project style guide overrides
 ### Text and elements
 
 - TXT1 `[E]` Direct-label the data instead of forcing legend lookups when
-  labels fit; drop the legend when direct labels exist. Cite: PSPI21;
+  labels fit; drop the legend when direct labels exist; direct value labels
+  also mitigate axis-range distortion. Cite: PSPI21, [MO26];
   POV: [K13-Labels].
 - TXT2 `[E]` Minimum ~12 px text at display size; journal figures: text must
   be legible at final printed column width (typically 8 pt minimum after
@@ -171,12 +174,14 @@ distilled in `references/points-of-view.md`. A project style guide overrides
 ### Integrity (breakable never)
 
 - INT1 `[E]` Bars start at zero. Truncated bar baselines exaggerate
-  differences and deceive a majority of readers even after warnings. Line
-  charts may use a non-zero range when stated. Cite: [P15], [C20], [Y21],
-  [WSB22].
+  differences and deceive a majority of readers even after warnings; the
+  measured harm concentrates in ratio judgments, and direct value labels
+  mitigate it. Line charts may use a non-zero range when stated.
+  Cite: [P15], [C20], [Y21], [WSB22], [MO26].
 - INT2 `[E]` No dual y-axes; no inverted value axes; no 3D effect charts;
-  aspect ratio must not distort the perceived effect. Cite: [P15], [F08];
-  POV: [G12-3D].
+  aspect ratio must not distort the perceived effect. Measured: inverted
+  y-axes ≈7× and dual axes ≈6× lower odds of a correct reading. Cite: [P15],
+  [F08], [RR24]; POV: [G12-3D].
 - INT3 `[E]` Show uncertainty when comparing groups or claiming differences:
   intervals or n; never rank tiny samples. Cite: [H20], [CG14], [HRA15];
   POV: [SG14-Bars].
