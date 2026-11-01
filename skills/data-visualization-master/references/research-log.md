@@ -61,5 +61,4 @@ foundational experimental literature. No automated runs yet.
   change yet) and [Ch20] [UNVERIFIED] watch item (no comprehension advantage
   of direct vs indirect annotation labels in news graphics; candidate TXT1
   nuance — needs full-text read before any rule change).
-- PR: n/a (branch research/dataviz-2026-11-01; URL to be appended after
-  opening the PR)
+- PR: https://github.com/ericmjl/skills/pull/54
