@@ -88,10 +88,19 @@ topics with modern tools.
 | Key | Column | Citation | DOI |
 |---|---|---|---|
 | J26-Viridis | Color scales and the birth of viridis | Jambor H.K., Nat. Methods 23, 1071–1072 (2026) | https://doi.org/10.1038/s41592-026-03114-w |
+| JL26-Click | Click to plot | Jambor H.K. & Lex A., Nat. Methods 23, 1254–1255 (2026) | https://doi.org/10.1038/s41592-026-03147-1 |
+| LJ26-Code | Code to plot | Lex A. & Jambor H.K., Nat. Methods 23, 1473–1474 (2026) | https://doi.org/10.1038/s41592-026-03173-z |
+| JD26-GraphAbs | The graphical abstract | Jambor H.K. & Dürr S.L., Nat. Methods 23, 1664–1665 (2026) | https://doi.org/10.1038/s41592-026-03207-6 |
+| JR26-Engaging | Engaging figures | Jambor H.K., Rajabiyazdi F., Prantl V., Flotho M., Möller T. & Turkay C., Nat. Methods 23, 1921–1923 (2026) | https://doi.org/10.1038/s41592-026-03241-4 |
+| BJ26-Companion | The companion website | Bueckle A., Stahl M., Krause K., Möller T. & Jambor H.K., Nat. Methods 23 (2026) | https://doi.org/10.1038/s41592-026-03276-7 |
 
 J26-Viridis: bibliographic record verified via Crossref and the publisher
 abstract read 2026-09-26; full text paywalled, so it backs no rule yet.
-Distillation pending in `references/points-of-view.md`.
+Columns July–October 2026 (JL26-Click through BJ26-Companion): Crossref
+records resolved (authors, volume, pages) and publisher pages fetched
+2026-11-01; all paywalled, so they back no rule yet. Distillations pending
+in `references/points-of-view.md`. BJ26-Companion was advance-online on
+2026-10-13 at verification time (no volume/page assigned yet by Crossref).
 
 ## Foundational and research literature
 
@@ -179,6 +188,23 @@ Distillation pending in `references/points-of-view.md`.
   https://doi.org/10.1177/14738716241259432 [UNVERIFIED] (record and author
   abstract via Crossref; SAGE full text bot-blocked on 2026-09-26 — fetch
   and read full text before citing in a rule)
+- [MO26] McKinley OG & Ottley A 2026, Taking truncation to task: A task-based
+  exploration of axis truncation in bar charts, Proc. CHI '26 (ACM, Article
+  111). https://doi.org/10.1145/3772318.3790617
+- [RR24] Rho J, Rau MA, Bharti SK, Luu R, McMahan J, Wang A & Zhu X 2024,
+  Various misleading visual features in misleading graphs: Do they truly
+  deceive us? Proc. CogSci 46, 2219–2225.
+  https://doi.org/10.3929/ethz-b-000712100 (repository DOI, verified via
+  DataCite — CogSci proceedings carry no Crossref DOI; full OA text read via
+  eScholarship. Extended journal version: Rho J, Rau MA & Zhu X 2026,
+  Computers & Education 242:105508, https://doi.org/10.1016/j.compedu.2025.105508)
+- [Ch20] Chun RS 2020, Giving guidance to graphs: Evaluating annotations of
+  data visualizations for the news, Visual Communication Quarterly 27(2),
+  84–97. https://doi.org/10.1080/15551393.2020.1749842 [UNVERIFIED] (Crossref
+  record and publisher abstract verified 2026-11-01; full text paywalled.
+  Reports no comprehension advantage of direct over indirect annotation
+  labels in news graphics — candidate nuance for TXT1; fetch and read full
+  text before citing in a rule)
 
 ## Chart-level bibliography
 
