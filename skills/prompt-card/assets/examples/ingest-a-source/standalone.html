@@ -119,8 +119,13 @@ body { margin: 0; padding: 16px; background: #ffffff; }
     try {
       var f = window.frameElement;
       if (!f) return;
+      var h = document.body.scrollHeight + 'px';
+      // Write only on a real change: resetting to 0px on every call resized
+      // this frame's own viewport and fired our resize listener, which called
+      // fit() again in an endless loop that pinned the page.
+      if (f.style.height === h) return;
       f.style.height = '0px';
-      f.style.height = document.body.scrollHeight + 'px';
+      f.style.height = h;
     } catch (e) {}
   }
   // Copy button. Copies the plain prompt from #pc-plain (no tags or notes).
