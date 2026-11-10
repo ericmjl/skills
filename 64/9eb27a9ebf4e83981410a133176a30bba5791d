@@ -1,0 +1,27 @@
+skills/prompt-card/SKILL.md
+  s_2a10a8f99a6fc5::t_6093ca2d225f40 81
+skills/prompt-card/assets/examples/build-a-landing-page/standalone.html
+  s_2a10a8f99a6fc5::t_7f2a46b87528b1 123-127,129
+skills/prompt-card/assets/examples/ingest-a-source/standalone.html
+  s_2a10a8f99a6fc5::t_0d16d53673a00c 122-126,128
+skills/prompt-card/assets/examples/make-a-prompt-card/standalone.html
+  s_2a10a8f99a6fc5::t_4916f7509e7338 125-129,131
+skills/prompt-card/assets/template.html
+  s_2a10a8f99a6fc5::t_6b41642d222a9d 124-128,130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "649eb27a9ebf4e83981410a133176a30bba5791d",
+  "prompts": {},
+  "sessions": {
+    "s_2a10a8f99a6fc5": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a1c61d-edbf-73dd-a46e-c6b15179c8d0",
+        "model": "glm-5.3-flash"
+      },
+      "human_author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
