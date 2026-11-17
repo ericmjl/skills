@@ -77,27 +77,33 @@ Open PRs get their own classification:
 - `stale` — author gone, no activity, conflicts → candidate for housekeeping
 
 **Map dependencies between items.** Build a dependency graph of the open
-pool before ranking anything — **from GitHub metadata only**. Do not open
-files, diff code, or investigate the codebase for this step; that study is
-reserved for the one selected item in Phase 4. Cheap sources:
+pool before ranking anything, grounded in **strong reasoning over the
+codebase** — not just issue titles and linked references. These references are
+hypotheses; the code is the evidence.
+
+Sources, cheapest first, escalating as needed:
 
 - **Issue → issue:** "blocks", "depends on", "parent of" mentions in bodies
   and comments (`gh issue view <N> --json body,comments`), plus tracking-issue
-  checklists (`- [ ] #123`).
+  checklists (`- [ ] #123`). Hypotheses only.
 - **Issue → PR:** PRs that fix an issue (`closedByPullRequestsReferences`).
 - **PR → PR:** stacked PRs (`gh pr view <N> --json headRefName,body` — "based on
   #X", "requires #X"), shared branch bases, and review chains.
+- **Codebase:** for each candidate cluster, study the affected paths
+  (`git log`, `rg`, reading the modules involved) to verify whether two issues
+  actually trace to the same root cause or the same code path. A "depends on #N"
+  claim the code contradicts is dropped; a code-derived dependency nobody
+  wrote down is added.
+
+The deliverable is a graph you trust: issues sharing a root-cause path in code
+form a cluster whose root is the prerequisite; explicit references confirm or
+extend what the code shows.
 
 Record for each workable item: what it blocks (its dependents) and what it is
 blocked by (its prerequisites, whether open, closed, or external). A dependent
 item is not `workable` until its prerequisites land — classify it as
 `in-progress` or `workable` accordingly, but remember that finishing its
 prerequisite unblocks it.
-
-If metadata is ambiguous, do not dig deeper — record the edge as "unclear"
-and let the selection rules handle it. An approximate graph from metadata is
-cheap and good enough; an exact one from code study defeats the purpose of
-picking one item per run.
 
 **Verify before believing.** Spot-check 1–3 of the reporter's testable claims
 against the codebase: does the referenced setting/command/API exist, does the
@@ -149,7 +155,8 @@ work, and report the blockers.
 
 **Issue selected → new PR:**
 
-Now, and only now, study the codebase — for this one item:
+Phase 2's codebase study already grounded the pick. Now go deep on this one
+item:
 
 1. Reproduce the bug (or verify the feature gap). If you cannot reproduce, say
    so honestly — do not guess at causes; report and stop.
