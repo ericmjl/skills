@@ -76,6 +76,29 @@ Open PRs get their own classification:
 - `needs-work` — failing CI, or unaddressed review comments → **workable**
 - `stale` — author gone, no activity, conflicts → candidate for housekeeping
 
+**Map dependencies between items.** Build a dependency graph of the open
+pool before ranking anything — **from GitHub metadata only**. Do not open
+files, diff code, or investigate the codebase for this step; that study is
+reserved for the one selected item in Phase 4. Cheap sources:
+
+- **Issue → issue:** "blocks", "depends on", "parent of" mentions in bodies
+  and comments (`gh issue view <N> --json body,comments`), plus tracking-issue
+  checklists (`- [ ] #123`).
+- **Issue → PR:** PRs that fix an issue (`closedByPullRequestsReferences`).
+- **PR → PR:** stacked PRs (`gh pr view <N> --json headRefName,body` — "based on
+  #X", "requires #X"), shared branch bases, and review chains.
+
+Record for each workable item: what it blocks (its dependents) and what it is
+blocked by (its prerequisites, whether open, closed, or external). A dependent
+item is not `workable` until its prerequisites land — classify it as
+`in-progress` or `workable` accordingly, but remember that finishing its
+prerequisite unblocks it.
+
+If metadata is ambiguous, do not dig deeper — record the edge as "unclear"
+and let the selection rules handle it. An approximate graph from metadata is
+cheap and good enough; an exact one from code study defeats the purpose of
+picking one item per run.
+
 **Verify before believing.** Spot-check 1–3 of the reporter's testable claims
 against the codebase: does the referenced setting/command/API exist, does the
 error string appear in the code, does the described behavior match the
@@ -88,25 +111,45 @@ Cite evidence for every disposition, prefixed `[issue]`, `[shell]`, or `[code]`.
 
 ### Phase 3 — Select exactly one
 
-Pick **one and only one** item from the `workable` pool (an issue to fix, or a
-PR to update). Score candidates:
+Topologically sort the `workable` pool using the dependency graph from Phase 2,
+then pick **one and only one** item.
 
-1. **Quick fix first** — obviously small, well-understood fix wins.
-2. **Then impact** — severity of the bug, maintainer-marked labels
-   (`high priority`, `good first issue`, `help wanted`).
-3. **Then freshness** — recent activity beats stale.
+**Default rule: work from the roots of the dependency graph.** Prefer an item
+that others depend on (high dependent count) and whose own prerequisites are
+resolved, over a leaf item. Unblocking dependents multiplies progress — a root
+fix may close several downstream items or make their PRs mergeable. In
+particular, a dependency edge from a PR that cannot merge until its base lands
+makes the base the default pick.
 
-PRs with unaddressed review comments rank high: finishing existing work is
-cheaper than starting new work.
+**Depart from the default only for a stated reason**, which you must write
+down. Valid reasons:
 
-State the pick in one sentence with the reason, e.g. "Working on #123 — small
-repro, confirmed claim in `src/foo.ts`, no open PR covers it." If nothing is
-workable (everything is `needs-info`, `in-progress`, or `solved`), say so
-instead of inventing work, and report the blockers.
+- A quick fix elsewhere is trivially small and the root is a multi-day effort —
+  but even then, only if the quick fix has no dependents waiting.
+- The root is blocked by something external (maintainer decision, upstream
+  repo, missing access) — record the blocker, work the next available item.
+- A PR with unaddressed review comments is a dependent whose prerequisite (the
+  review) is already resolved — finishing it is often the cheapest action
+  available, so it competes well with graph roots.
+
+Within the same dependency tier, score candidates:
+
+1. **Impact** — severity, dependents, maintainer-marked labels (`high
+   priority`, `good first issue`, `help wanted`).
+2. **Freshness** — recent activity beats stale.
+
+State the pick in one or two sentences: the reason and, if you departed from
+the topo default, the stated reason. E.g. "Working on #123 — three issues
+depend on it and its prerequisite #100 is closed. Skipped #45 (the other
+root): blocked on a maintainer decision." If nothing is workable (everything
+is `needs-info`, `in-progress`, or `solved`), say so instead of inventing
+work, and report the blockers.
 
 ### Phase 4 — Execute the pick
 
 **Issue selected → new PR:**
+
+Now, and only now, study the codebase — for this one item:
 
 1. Reproduce the bug (or verify the feature gap). If you cannot reproduce, say
    so honestly — do not guess at causes; report and stop.
