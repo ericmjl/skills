@@ -140,25 +140,32 @@ we made?"* If not, add the file, line, or reason — or delete the entry.
 
 ### Emit the resume prompt
 
-**File mode (default):** write the handoff file, then end by printing a paste-ready
-block for the next session, e.g.:
+Both modes end with ONE paste-ready prompt, emitted inside a single fenced code
+block so markdown-rendering agent UIs show a copy button — one click grabs the
+whole thing. Introduce it with one prose line ("Copy the block below into your
+next session:") and keep all other commentary outside the fence. Use a
+four-backtick outer fence with no language tag: handoff content often quotes
+fenced code or terminal output, and a longer outer fence survives inner
+triple-backtick fences. (If any inner fence is itself four backticks, make the
+outer fence longer than the longest inner fence.) Everything the next agent
+needs goes INSIDE the block; nothing the next agent needs stays outside it.
 
-```
-PASTE THIS INTO YOUR NEXT SESSION:
+**File mode (default):** write the handoff file, then emit:
+
+````
 Read .handoffs/<YYYY-MM-DD>-<slug>.md fully before any work. It is a verified
 handoff: re-check its state against `git status`/`git log` before acting, resolve
 its Open Questions with me before guessing, and start at its Next Steps.
-```
+````
 
 Report the exact file path written and a one-line summary of what's in it.
 
 **Single-prompt mode (INLINE):** write no file. Fold the full handoff — header with
 trust rule, Goal, Verified State, Decisions, Dead Ends, Known Traps, Next Steps,
 Open Questions — into ONE paste-ready block, with the trust rule and resume
-instructions INSIDE it (the next agent sees only what is pasted):
+instructions INSIDE it (the next agent sees only what is pasted). Emit:
 
-```
-PASTE THIS INTO YOUR NEXT SESSION (everything between the markers is the handoff):
+`````
 --- HANDOFF START ---
 # Handoff: <one-line title>
 Generated: <ISO timestamp> · Git HEAD: <short SHA> · Branch: <branch>
@@ -170,7 +177,7 @@ user before guessing, and start at Next Steps.
 ## Goal & Acceptance Criteria
 ... (all sections, same content rules as the file template)
 --- HANDOFF END ---
-```
+`````
 
 Verification steps and the quality gate are identical in both modes; only the
 delivery vehicle differs. Keep the same ≤250-line target / 400 hard ceiling — a
@@ -205,4 +212,5 @@ first; fall back to file mode only as a last resort, and say why.
 | Overwriting the old handoff | Archive it; carry forward its unresolved dead ends. |
 | Single prompt so long it gets cut off on paste | Respect the 250-line target; tighten content before falling back to file mode. |
 | Inlining when the next session can read the repo | Prefer file mode — it keeps the dead-ends archive chain alive. |
+| Handoff emitted as prose or split across blocks | Copy buttons in markdown UIs attach to fenced blocks only — emit one contiguous fence, long enough to contain any inner fences. |
 | Saving only at 90% context | Write at ~50-60%, while recall is sharp. Finish the current micro-step first, then save. |
