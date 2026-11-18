@@ -8,6 +8,9 @@ description: >-
   "prepare a handoff", "I'm switching windows/models", or when a session shows
   degradation (contradicting earlier decisions, re-exploring settled ground,
   misremembering files). Covers both writing the handoff and resuming from one.
+  By default it writes a `.handoffs/` file; on request it folds everything into
+  one self-contained paste-ready prompt instead ("single prompt", "one prompt",
+  "stuff it all into the prompt", "no file").
 license: MIT
 ---
 
@@ -25,8 +28,14 @@ license: MIT
   degrading — want me to write a handoff so a fresh agent picks up cleanly?") and stop.
   Never write the file without confirmation.
 
+- **Single-prompt mode (INLINE)** when the user says "just give me one prompt",
+  "stuff it all into the prompt", "no file", or the next session cannot read this
+  repo's files (different machine, sandbox, web chat, non-coding agent). Same
+  verification discipline and content — only the delivery changes: the entire
+  handoff goes inside one paste-ready prompt instead of a file.
+
 **Resume from a handoff (GRAB mode)** when starting work where a handoff exists
-(check for one first — see How It Works).
+(check for one first — see How It Works), or when the user pastes one in.
 
 **Do not use** for a finished task (nothing to hand off) or durable architecture
 rationale (that belongs in a design doc or the project's persistent memory, not a
@@ -35,14 +44,18 @@ handoff).
 ## Requirements
 
 - No dependencies. Works in any git or non-git project.
-- Writes one markdown file (default: `.handoffs/<YYYY-MM-DD>-<slug>.md` at the repo root;
-  add `.handoffs/` to `.gitignore` — it is local scratch, not committed — unless the user
-  asks to commit it).
+- **File mode (default):** writes one markdown file (`.handoffs/<YYYY-MM-DD>-<slug>.md`
+  at the repo root; add `.handoffs/` to `.gitignore` — it is local scratch, not
+  committed — unless the user asks to commit it) plus a resume prompt pointing at it.
+- **Single-prompt mode:** writes no file; the full handoff is embedded in one
+  paste-ready prompt (see Emit the resume prompt). Ask the user if they also want a
+  record copy saved.
 
 ## What It Does
 
-Produces a single handoff file plus a paste-ready resume prompt, and on resume,
-re-verifies that file against repo reality before continuing. The handoff captures what
+Produces a verified handoff — as a file plus resume prompt (default), or folded into
+a single paste-ready prompt on request — and on resume, re-verifies that content
+against repo reality before continuing. The handoff captures what
 the next agent **cannot reconstruct from the code or git history**: the intent, the dead
 ends already ruled out, and the exact next step — grounded in verified repo state, not
 the chat narrative.
@@ -69,7 +82,8 @@ a lead, not a fact.
 5. If an older handoff exists, read its dead-ends and open-questions sections, carry
    forward anything still relevant (re-tagged `[?]` unless re-verified), then **archive
    it** (move to `.handoffs/archive/`), never delete it — its dead-ends section may be
-   the only record of what not to retry.
+   the only record of what not to retry. Single-prompt mode still archives an older
+   file handoff — it just doesn't write a new one.
 
 ### Mine the conversation
 
@@ -126,7 +140,8 @@ we made?"* If not, add the file, line, or reason — or delete the entry.
 
 ### Emit the resume prompt
 
-End by printing a paste-ready block for the next session, e.g.:
+**File mode (default):** write the handoff file, then end by printing a paste-ready
+block for the next session, e.g.:
 
 ```
 PASTE THIS INTO YOUR NEXT SESSION:
@@ -137,9 +152,36 @@ its Open Questions with me before guessing, and start at its Next Steps.
 
 Report the exact file path written and a one-line summary of what's in it.
 
+**Single-prompt mode (INLINE):** write no file. Fold the full handoff — header with
+trust rule, Goal, Verified State, Decisions, Dead Ends, Known Traps, Next Steps,
+Open Questions — into ONE paste-ready block, with the trust rule and resume
+instructions INSIDE it (the next agent sees only what is pasted):
+
+```
+PASTE THIS INTO YOUR NEXT SESSION (everything between the markers is the handoff):
+--- HANDOFF START ---
+# Handoff: <one-line title>
+Generated: <ISO timestamp> · Git HEAD: <short SHA> · Branch: <branch>
+Trust rule: [V] = verified during the handoff run. [?] = unverified memory —
+re-check before relying on it. You have only this prompt: re-check state against
+the repo's `git status`/`git log` before acting, resolve Open Questions with the
+user before guessing, and start at Next Steps.
+
+## Goal & Acceptance Criteria
+... (all sections, same content rules as the file template)
+--- HANDOFF END ---
+```
+
+Verification steps and the quality gate are identical in both modes; only the
+delivery vehicle differs. Keep the same ≤250-line target / 400 hard ceiling — a
+prompt much past that risks truncation on paste. If it won't fit: tighten content
+first; fall back to file mode only as a last resort, and say why.
+
 ### GRAB mode: resume from a handoff
 
-1. **Find it:** the newest file in `.handoffs/` (or the one the user names).
+1. **Find it:** the newest file in `.handoffs/` (or the one the user names). If the
+   user pastes an inline handoff instead, treat the pasted block as the handoff and
+   skip to step 3.
 2. **Read only that file** — do not load old session history.
 3. **Trust but verify:** re-check its state against real `git status`/`git log` and the
    HEAD SHA in its header; re-run tests if the file claims they passed. Report drift
@@ -161,4 +203,6 @@ Report the exact file path written and a one-line summary of what's in it.
 | Dead ends omitted | Naming what didn't work is the highest-value content — it saves a full re-derivation. |
 | Padding thin sections | Invention is worse than a gap; write "not started, no design chosen" honestly. |
 | Overwriting the old handoff | Archive it; carry forward its unresolved dead ends. |
+| Single prompt so long it gets cut off on paste | Respect the 250-line target; tighten content before falling back to file mode. |
+| Inlining when the next session can read the repo | Prefer file mode — it keeps the dead-ends archive chain alive. |
 | Saving only at 90% context | Write at ~50-60%, while recall is sharp. Finish the current micro-step first, then save. |
