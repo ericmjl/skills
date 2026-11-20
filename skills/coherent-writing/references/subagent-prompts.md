@@ -1,6 +1,6 @@
 # Sub-Agent Prompt Templates
 
-Copy the relevant template into each Task tool call. Replace placeholders in ALL CAPS.
+Copy the relevant template into each subagent prompt (if your agent can start one). Replace placeholders in ALL CAPS.
 
 Every prompt follows **diagnose-first**: emit an issue list BEFORE proposing fixes. Each issue is one line: `location + type + one-line description`.
 
