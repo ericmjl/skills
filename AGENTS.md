@@ -21,6 +21,12 @@ commits (one skill per commit) over mixed batches.
 2. Add `SKILL.md` with YAML frontmatter: `name`, `description` (min 20 chars), `license`
 3. The `name` field must match the directory name exactly
 
+## Writing
+
+For any writing or drafting task, load the `writing` skill before producing
+text. It is a short router that names the specialized writing skills to run
+and the order to run them in. Then load those skills instead of improvising.
+
 ## Shell Script Style
 
 - Shebang: `#!/usr/bin/env bash`

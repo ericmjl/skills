@@ -85,6 +85,12 @@ Location: `skills/publish-to-google-docs/`
 
 Quickly publish markdown notes to styled Google Docs using pandoc and a Word template. Converts markdown to docx with template styling, then uploads to Google Drive. Use when you want to publish markdown content to Google Docs with consistent branding.
 
+### writing
+
+Location: `skills/writing/`
+
+A short router for any writing or drafting task. Load it first; it names the order of passes (coherence, then dedup when it applies, then voice if a voice skill is available, then processing-friendly-prose last) and which specialized skill to use for blogs, notebooks, video scripts, handoffs, and email.
+
 ### video-script-writing
 
 Location: `skills/video-script-writing/`
