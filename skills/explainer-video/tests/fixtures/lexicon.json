@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "updated": "2026-11-20",
+  "entries": [
+    {
+      "term": "pixi",
+      "cmu": "[P] [IH1] [K] [S] [IY0]",
+      "respelling": "pixie",
+      "ipa": "",
+      "note": "Fixture only. The shipped lexicon is allowed to move past this.",
+      "match": "insensitive",
+      "verified": false
+    }
+  ]
+}

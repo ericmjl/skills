@@ -115,6 +115,12 @@ Location: `skills/processing-friendly-prose/`
 
 Revise prose so it is easier for a human reader to process. Unpacks stacked nouns, keeps optional "that", keeps subjects close to their verbs, and avoids other dense sentence shapes that make reading harder even when the grammar is fine. Grounded in Clark, Martin, and Mahowald (2026). Use as a final pass after coherent-writing or blog-explainer-prose-dedup, or when a draft feels hard to read or overly compressed.
 
+### explainer-video
+
+Location: `skills/explainer-video/`
+
+Make a narrated problem-chain explainer MP4: the viewer is the builder, the naive version fails, and each real feature arrives as the fix. Two formats: `short` (60-90 s vertical) and `build-up` (a few minutes). Narration comes from a cloned voice in `voices.yaml`, with a pronunciation lexicon in front of TTS, music-synced cuts, and a HyperFrames render. Primary voice is Fun-CosyVoice3 on CUDA. Mac fallback is Chatterbox Turbo. Use `video-script-writing` for the spoken script alone, and `motion-graphics-video` for a music-led piece with no cloned narration.
+
 ### motion-graphics-video
 
 Location: `skills/motion-graphics-video/`

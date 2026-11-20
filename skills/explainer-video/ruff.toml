@@ -1,0 +1,3 @@
+# Typer options are function calls in argument defaults. That is the library's API.
+[lint]
+ignore = ["B008"]

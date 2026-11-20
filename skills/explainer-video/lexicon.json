@@ -1,0 +1,497 @@
+{
+  "version": 6,
+  "updated": "2026-11-20",
+  "entries": [
+    {
+      "term": ".agents/skills/",
+      "cmu": "[D] [AA1] [T] | [EY1] [JH] [AH0] [N] [T] [S] | [S] [K] [IH1] [L] [Z]",
+      "respelling": "dot agents skills",
+      "ipa": "dɑt ˈeɪdʒənts skɪlz",
+      "note": "From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": ".env",
+      "cmu": "[D] [AA1] [T] | [IY1] | [EH1] [N] | [V] [IY1]",
+      "respelling": "dot E N V",
+      "ipa": "dɑt i ɛn vi",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": ".gitignore",
+      "cmu": "[D] [AA1] [T] | [G] [IH1] [T] | [IH0] [G] [N] [AO1] [R]",
+      "respelling": "dot git ignore",
+      "ipa": "dɑt ɡɪt ɪɡˈnɔr",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "AGENTS.md",
+      "cmu": "[EY1] [JH] [AH0] [N] [T] [S] | [D] [AA1] [T] | [EH1] [M] | [D] [IY1]",
+      "respelling": "agents dot em dee",
+      "ipa": "ˈeɪdʒənts dɑt ˌɛm ˈdi",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the Data Science Bootstrap Notes short.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "AI",
+      "cmu": "[EY1] | [AY1]",
+      "respelling": "ay eye",
+      "ipa": "ˌeɪ ˈaɪ",
+      "note": "Letter names. Unverified. Added after the first GB10 render.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "analysis_final_v3",
+      "cmu": "[AH0] [N] [AE1] [L] [AH0] [S] [IH0] [S] | [F] [AY1] [N] [AH0] [L] | [V] [IY1] | [TH] [R] [IY1]",
+      "respelling": "analysis final vee three",
+      "ipa": "əˈnæləsɪs ˈfaɪnəl vi θri",
+      "note": "From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "BioPython",
+      "cmu": "[B] [AY1] [OW0] | [P] [AY1] [TH] [AH0] [N]",
+      "respelling": "bio python",
+      "ipa": "ˌbaɪoʊ ˈpaɪθən",
+      "note": "Library name. Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "CI",
+      "cmu": "[S] [IY1] | [AY1]",
+      "respelling": "see eye",
+      "ipa": "ˌsi ˈaɪ",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the Data Science Bootstrap Notes short.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "Constraints",
+      "cmu": "[K] [AH0] [N] [S] [T] [R] [EY1] [N] [T] [S]",
+      "respelling": "constraints",
+      "ipa": "kənˈstreɪnts",
+      "note": "From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "cookiecutter",
+      "cmu": "[K] [UH1] [K] [IY0] | [K] [AH1] [T] [ER0]",
+      "respelling": "cookie cutter",
+      "ipa": "ˈkʊki ˌkʌtər",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "CSV",
+      "cmu": "[S] [IY1] | [EH1] [S] | [V] [IY1]",
+      "respelling": "see ess vee",
+      "ipa": "si ɛs vi",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "debugging",
+      "cmu": "[D] [IY0] | [B] [AH1] [G] [IH0] [NG]",
+      "respelling": "dee bugging",
+      "ipa": "diˈbʌɡɪŋ",
+      "note": "From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "Diataxis",
+      "cmu": "[D] [AY1] | [AH0] | [T] [AE1] [K] [S] [IH0] [S]",
+      "respelling": "dye uh tax iss",
+      "ipa": "ˌdaɪ əˈtæksɪs",
+      "note": "Eric confirmed the reading is dye-a-taxis. From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false,
+      "misheard": "dee ataxis"
+    },
+    {
+      "term": "dotfiles",
+      "cmu": "[D] [AA1] [T] | [F] [AY1] [L] [Z]",
+      "respelling": "dot files",
+      "ipa": "ˈdɑt faɪlz",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the Data Science Bootstrap Notes short.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "Equinox",
+      "cmu": "[IY1] | [K] [W] [AH0] | [N] [AA2] [K] [S]",
+      "respelling": "ee kwuh nocks",
+      "ipa": "ˈikwəˌnɑks",
+      "note": "JAX library. Stress unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "FastAPI",
+      "cmu": "[F] [AE1] [S] [T] | [EY1] | [P] [IY1] | [AY1]",
+      "respelling": "fast ay pee eye",
+      "ipa": "fæst ˌeɪ piː ˈaɪ",
+      "note": "Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "Git",
+      "cmu": "[G] [IH1] [T]",
+      "respelling": "ghit",
+      "ipa": "ɡɪt",
+      "note": "Hard g. Unverified by ear as of 2026-11-20. Seeded from the Data Science Bootstrap Notes short.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "git add dot",
+      "cmu": "[G] [IH1] [T] | [AE1] [D] | [D] [AA1] [T]",
+      "respelling": "git add dot",
+      "ipa": "ɡɪt æd dɑt",
+      "note": "Spoken form of git add . Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "GitHub",
+      "cmu": "[G] [IH1] [T] | [HH] [AH1] [B]",
+      "respelling": "git hub",
+      "ipa": "ɡɪt hʌb",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "GxP",
+      "cmu": "[JH] [IY1] | [EH1] [K] [S] | [P] [IY1]",
+      "respelling": "jee eks pee",
+      "ipa": "ˌdʒi ˌɛks ˈpi",
+      "note": "Good-practice acronyms (GMP, GLP, GCP). Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "hard-codes",
+      "cmu": "[HH] [AA1] [R] [D] | [K] [OW1] [D] [Z]",
+      "respelling": "hard codes",
+      "ipa": "hɑrd koʊdz",
+      "note": "From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false,
+      "misheard": "card codes"
+    },
+    {
+      "term": "HTMX",
+      "cmu": "[EY1] [CH] [T] | [IY1] | [EH1] [M] | [EH1] [K] [S]",
+      "respelling": "aitch tee em eks",
+      "ipa": "ˌeɪtʃ ˌti ˌɛm ˈɛks",
+      "note": "Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "integration runs",
+      "cmu": "[IH2] [N] [T] [AH0] [G] [R] [EY1] [SH] [AH0] [N] | [R] [AH1] [N] [Z]",
+      "respelling": "integration runs",
+      "ipa": "ˌɪntəˈɡreɪʃən rʌnz",
+      "note": "Only there to place the pause after 'runs'. From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "JAX",
+      "cmu": "[JH] [AE1] [K] [S]",
+      "respelling": "jacks",
+      "ipa": "dʒæks",
+      "note": "Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "live in",
+      "cmu": "[L] [IH1] [V] | [IH0] [N]",
+      "respelling": "liv in",
+      "ipa": "lɪv ɪn",
+      "note": "The verb, rhymes with give. From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "llamabot",
+      "cmu": "[L] [AA1] [M] [AH0] | [B] [AA1] [T]",
+      "respelling": "llama bot",
+      "ipa": "ˈlɑmə bɑt",
+      "note": "Python library. Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "LNP",
+      "cmu": "[EH1] [L] | [EH1] [N] | [P] [IY1]",
+      "respelling": "el en pee",
+      "ipa": "ˌɛl ˌɛn ˈpi",
+      "note": "Lipid nanoparticle. Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "load_customer_data",
+      "cmu": "[L] [OW1] [D] | [K] [AH1] [S] [T] [AH0] [M] [ER0] | [D] [EY1] [T] [AH0]",
+      "respelling": "load customer data",
+      "ipa": "loʊd ˈkʌstəmər ˈdeɪtə",
+      "note": "Function name spoken in the DS Bootstrap build-up script. Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "lockfile",
+      "cmu": "[L] [AA1] [K] | [F] [AY1] [L]",
+      "respelling": "lock file",
+      "ipa": "ˈlɑk faɪl",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the Data Science Bootstrap Notes short.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "loguru",
+      "cmu": "[L] [OW1] | [G] [UH0] | [R] [UW0]",
+      "respelling": "loh guh roo",
+      "ipa": "ˈloʊɡʊru",
+      "note": "Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "Modal",
+      "cmu": "[M] [OW1] [D] [AH0] [L]",
+      "respelling": "Modul",
+      "ipa": "ˈmoʊdəl",
+      "note": "Modal.com, first-syllable stress. Exact case so the adjective modal is left alone. Respelling recorded in eric-video on 2026-07-03. Unverified by ear in this skill.",
+      "match": "exact",
+      "verified": false
+    },
+    {
+      "term": "mRNA",
+      "cmu": "[EH1] [M] | [AA1] [R] | [EH1] [N] | [EY1]",
+      "respelling": "em ar en ay",
+      "ipa": "ˌɛm ˌɑr ˌɛn ˈeɪ",
+      "note": "Letter by letter. Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "my_env",
+      "cmu": "[M] [AY1] | [EH1] [N] [V]",
+      "respelling": "my env",
+      "ipa": "maɪ ɛnv",
+      "note": "From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "numpy",
+      "cmu": "[N] [AH1] [M] | [P] [AY0]",
+      "respelling": "num pie",
+      "ipa": "ˈnʌmpaɪ",
+      "note": "Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "Ollama",
+      "cmu": "[OW0] | [L] [AA1] [M] [AH0]",
+      "respelling": "oh llama",
+      "ipa": "oʊˈlɑmə",
+      "note": "Unverified by ear as of 2026-11-20. Whisper has mis-heard this as Alama; that is a caption problem, not this lexicon.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "overwrite",
+      "cmu": "[OW1] [V] [ER0] | [R] [AY1] [T]",
+      "respelling": "over write",
+      "ipa": "ˌoʊvərˈraɪt",
+      "note": "From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false,
+      "misheard": "overrate"
+    },
+    {
+      "term": "pixi",
+      "cmu": "[P] [IH1] [K] [S] [IY0]",
+      "respelling": "pixie",
+      "ipa": "ˈpɪksi",
+      "note": "Confirmed by Eric on 2026-11-20.",
+      "match": "insensitive",
+      "verified": true
+    },
+    {
+      "term": "pixi.lock",
+      "cmu": "[P] [IH1] [K] [S] [IY0] | [D] [AA1] [T] | [L] [AA1] [K]",
+      "respelling": "pixie dot lock",
+      "ipa": "ˈpɪksi dɑt lɑk",
+      "note": "Separate from the verified pixi entry. Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "pre-commit",
+      "cmu": "[P] [R] [IY1] | [K] [AH0] [M] [IH1] [T]",
+      "respelling": "pree commit",
+      "ipa": "ˌpri kəˈmɪt",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the Data Science Bootstrap Notes short.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "pyds-cli",
+      "cmu": "[P] [AY1] | [D] [IY1] | [EH1] [S] | [S] [IY1] | [EH1] [L] | [AY1]",
+      "respelling": "pie D S C L I",
+      "ipa": "paɪ di ɛs si ɛl aɪ",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "pyjanitor",
+      "cmu": "[P] [AY1] | [JH] [AE1] [N] [IH0] [T] [ER0]",
+      "respelling": "pie janitor",
+      "ipa": "paɪ ˈdʒænɪtɚ",
+      "note": "Python library. Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "PyMC",
+      "cmu": "[P] [AY1] | [EH1] [M] | [S] [IY1]",
+      "respelling": "pie em see",
+      "ipa": "ˌpaɪ ˌɛm ˈsi",
+      "note": "Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "pyproject.toml",
+      "cmu": "[P] [AY1] | [P] [R] [AA1] [JH] [EH0] [K] [T] | [D] [AA1] [T] | [T] [AA1] [M] [AH0] [L]",
+      "respelling": "pie project dot toml",
+      "ipa": "paɪ ˈprɑdʒɛkt dɑt tɑməl",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "pytest",
+      "cmu": "[P] [AY1] | [T] [EH1] [S] [T]",
+      "respelling": "pie test",
+      "ipa": "paɪ tɛst",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "RDKit",
+      "cmu": "[AA1] [R] | [D] [IY1] | [K] [IH2] [T]",
+      "respelling": "ar dee kit",
+      "ipa": "ˌɑr di ˈkɪt",
+      "note": "Chemistry toolkit. Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "reusable",
+      "cmu": "[R] [IY0] | [Y] [UW1] [Z] [AH0] [B] [AH0] [L]",
+      "respelling": "ree use uh bull",
+      "ipa": "riˈjuzəbəl",
+      "note": "From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false,
+      "misheard": "reachable"
+    },
+    {
+      "term": "scikit-learn",
+      "cmu": "[S] [AY1] | [K] [IH0] [T] | [L] [ER1] [N]",
+      "respelling": "sy kit learn",
+      "ipa": "ˈsaɪkɪt lɜrn",
+      "note": "Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "SKILL.md",
+      "cmu": "[S] [K] [IH1] [L] | [D] [AA1] [T] | [EH1] [M] | [D] [IY1]",
+      "respelling": "skill dot em dee",
+      "ipa": "skɪl dɑt ɛm di",
+      "note": "Unverified by ear as of 2026-11-20. Seeded from the DS Bootstrap build-up script.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "Skills",
+      "cmu": "[S] [K] [IH1] [L] [Z]",
+      "respelling": "skills",
+      "ipa": "skɪlz",
+      "note": "Exact match so the take does not come out skis, skits, or spews. From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "exact",
+      "verified": false
+    },
+    {
+      "term": "SMILES",
+      "cmu": "[S] [M] [AY1] [L] [Z]",
+      "respelling": "smiles",
+      "ipa": "smaɪlz",
+      "note": "Chemistry line notation. Exact case so the verb smiles is left alone. Unverified by ear as of 2026-11-20.",
+      "match": "exact",
+      "verified": false
+    },
+    {
+      "term": "SQLAlchemy",
+      "cmu": "[S] [IY1] [K] [W] [AH0] [L] | [AE1] [L] [K] [AH0] [M] [IY0]",
+      "respelling": "sequel alchemy",
+      "ipa": "ˈsikwəl ˈælkəmi",
+      "note": "Unverified by ear as of 2026-11-20.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "teammate",
+      "cmu": "[T] [IY1] [M] | [M] [EY1] [T]",
+      "respelling": "team mate",
+      "ipa": "ˈtiːm meɪt",
+      "note": "The first GB10 render heard this as tim mate. Unverified.",
+      "match": "insensitive",
+      "verified": false
+    },
+    {
+      "term": "two-gigabyte",
+      "cmu": "[T] [UW1] | [G] [IH1] [G] [AH0] [B] [AY2] [T]",
+      "respelling": "two gigabyte",
+      "ipa": "tu ˈɡɪɡəbaɪt",
+      "note": "From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false,
+      "misheard": "toe gigabyte"
+    },
+    {
+      "term": "uv",
+      "cmu": "[Y] [UW1] | [V] [IY1]",
+      "respelling": "you vee",
+      "ipa": "ju vi",
+      "note": "From the Nov 20, 2026 v2 render. Unverified by ear.",
+      "match": "insensitive",
+      "verified": false
+    }
+  ]
+}

@@ -34,7 +34,9 @@ Load this skill for any request like:
 - "Make me a teaser video, 9:16, with music and sound effects"
 
 If the request is only about *scripting* the narration or voiceover text, use
-`video-script-writing` instead. If the user explicitly wants a Remotion/React
+`video-script-writing` instead. If the user wants a problem-chain explainer
+with a cloned voice, a pronunciation lexicon, and a music-synced HyperFrames
+render, use `explainer-video`. If the user explicitly wants a Remotion/React
 codebase, use `remotion-video`. Otherwise this skill is the default for
 finished motion graphics output.
 

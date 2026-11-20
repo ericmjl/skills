@@ -1,0 +1,46 @@
+# Named voices for explainer narration.
+# Reference audio stays outside the repo. ~ expands at runtime.
+# model: cosyvoice3 is the wired primary. chatterbox-turbo is the Mac fallback.
+# kokoro is listed so the slot exists; synthesis refuses it on purpose.
+
+version: 1
+default: eric
+
+voices:
+  eric:
+    label: Eric Ma, cloned
+    reference: ~/voice/eric-voice-ref.m4a
+    reference_transcript: ""
+    model: cosyvoice3
+    model_dir: ~/models/Fun-CosyVoice3-0.5B
+    cosyvoice_repo: ~/github/CosyVoice
+    settings:
+      device: cuda
+    notes: >
+      Primary voice. Fill reference_transcript with the words actually spoken
+      in the reference clip when you have them. An empty transcript uses
+      CosyVoice inference_cross_lingual, which needs only the clip.
+
+  eric-mac:
+    label: Eric Ma, cloned, Mac fallback
+    reference: ~/voice/eric-voice-ref.m4a
+    reference_transcript: ""
+    model: chatterbox-turbo
+    settings:
+      device: mps
+      chatterbox_model: turbo
+    notes: >
+      Same clip, Chatterbox Turbo, via an optional sibling
+      chatterbox-voice-clone skill or CHATTERBOX_SCRIPT. Pronunciation
+      uses the lexicon respelling field. Chatterbox has no phoneme API.
+
+  kokoro-af-heart:
+    label: Kokoro af_heart, preset, not a clone
+    reference: ""
+    model: kokoro
+    settings:
+      voice: af_heart
+      lang_code: a
+    notes: >
+      Apache-2.0 preset voice with a real phoneme lexicon (Misaki golds).
+      Not wired. Do not pick this voice when the brief asks for Eric's clone.

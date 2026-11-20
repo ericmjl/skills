@@ -32,8 +32,9 @@ Full citations: `references/research-digest.md`.
 - A voice skill for the speaker's prose voice (e.g. write-like-eric) when
   writing as a specific person; the script must survive a table read.
 - marketing-copy for offer construction and persuasion strategy upstream.
-- eric-video (or the production pipeline du jour) when the script moves to
-  rendering; this skill ends at the script plus its production spec.
+- explainer-video when the script is a problem-chain explainer that should
+  become a HyperFrames MP4; motion-graphics-video for a music-led piece with
+  no cloned narration. This skill ends at the script plus its production spec.
 
 ## Step 1 — Intake (ask before drafting)
 

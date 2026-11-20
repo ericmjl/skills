@@ -57,20 +57,19 @@ Include sections: Usage, Requirements, What It Does, How It Works. Use fenced co
 ## Pronunciation lexicon
 
 The canonical pronunciation glossary is `skills/explainer-video/lexicon.json`
-in the private repository `ericmjl/skills-private`. Each voice skill that
-uses the glossary keeps its own copy of that file inside the skill folder.
-Skills must not import the glossary from another skill at runtime, including
-across these two repositories.
+in this repository. Each voice skill that uses the glossary keeps its own
+copy of that file inside the skill folder. Skills must not import the
+glossary from another skill at runtime.
 
-This public repository does not fetch the private file. The SHA-256 of the
-canonical file is pinned in `scripts/pronunciation-lexicon.sha256`. Edit the
-canonical file in `ericmjl/skills-private` first, then update the pin here
-and copy the file unchanged to every public path listed in
-`scripts/pronunciation-lexicon-copies.txt`. Those copies must match the pin
-exactly. A CI check fails when a listed copy is missing or differs.
+Edit the canonical file first, then copy it unchanged to every path listed
+in `scripts/pronunciation-lexicon-copies.txt`. Those copies must match the
+canonical file exactly (byte-for-byte). A CI check fails when the canonical
+file is missing, or when a listed copy is missing or differs.
 
-Copies that must match the pin are the paths in
-`scripts/pronunciation-lexicon-copies.txt`. None are listed yet.
+Copies that must match the canonical file are the paths in
+`scripts/pronunciation-lexicon-copies.txt`. None are listed yet: do not add
+a copy to a skill until that skill can use it, then add the path to the
+manifest in the same change.
 
 Only one entry has been verified by ear so far: `pixi` is respelt `pixie`
 (2026-11-20). Leave other entries unverified until Eric confirms them.
