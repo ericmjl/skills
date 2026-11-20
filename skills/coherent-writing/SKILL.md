@@ -1,6 +1,20 @@
 ---
 name: coherent-writing
-description: "Improve coherence in drafts through a five-pass sub-agent workflow: resolve cross-draft argument conflicts, fix within-paragraph logic (self-contradictions, sudden topic jumps, disconnects, unsignaled pivots), smooth section transitions, smooth paragraph-boundary transitions, and run a final coherence audit. Use when a user says things like 'make this coherent', 'tighten the flow', 'this feels choppy', 'this paragraph contradicts itself', 'fix the logic jumps inside this paragraph', 'the sentences don't connect', 'can you smooth transitions', or asks to revise prose in Markdown, notes, essays, blog posts, or docs so ideas connect cleanly without adding new points. ALSO covers information redundancy across sections and takeaway coverage: use when the user says 'less repetitive', 'too repetitive', 'this restates what was already said', flags a concept explained multiple times (intro re-explains, body re-derives, later re-states), or says the takeaway/summary doesn't reflect what the piece went deep into."
+description: >-
+  Use whenever drafting or revising any prose for the user: emails, blog
+  posts, docs, READMEs, tutorials, notebook markdown, video scripts, handoffs,
+  and PR descriptions. This skill improves coherence through a five-pass
+  workflow: resolve cross-draft argument conflicts, fix within-paragraph logic
+  (self-contradictions, sudden topic jumps, disconnects, unsignaled pivots),
+  smooth section and paragraph transitions, and run a final coherence audit.
+  Also use when the user says "make this coherent", "tighten the flow", "this
+  feels choppy", "this paragraph contradicts itself", "fix the logic jumps
+  inside this paragraph", "the sentences don't connect", or "can you smooth
+  transitions", or asks to revise prose so ideas connect cleanly without
+  adding new points. Also covers redundancy and takeaway coverage: use when
+  the user says "less repetitive", "too repetitive", "this restates what was
+  already said", flags a concept explained multiple times, or says the
+  takeaway or summary doesn't reflect what the piece went deep into.
 license: MIT
 ---
 

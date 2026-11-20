@@ -1,16 +1,19 @@
 ---
 name: processing-friendly-prose
 description: >-
-  Revise prose so it is easier for a human reader to process: unpack stacked
-  nouns, keep optional "that" in relative clauses, keep subjects close to
-  their verbs, avoid animate verbs on inanimate subjects, and prefer ordinary
-  wording over dense coinages. Use when a draft feels hard to read, dense, or
-  "AI-sounding" even after a voice or slop pass; when the user says "unpack
-  this", "this is cognitively hard", "too compressed", or "make this easier
-  to read"; or as a final pass on blogs, docs, tutorials, notebook markdown,
-  video scripts, emails, and handoffs. Distinct from coherent-writing (argument
-  flow and transitions) and blog-explainer-prose-dedup (repeated facts): this
-  skill covers the shape of sentences, not the shape of the argument.
+  Use whenever drafting or revising any prose for the user: emails, blog
+  posts, docs, READMEs, tutorials, notebook markdown, video scripts, handoffs,
+  and PR descriptions. This skill revises sentences so they are easier for a
+  human reader to process: unpack stacked nouns, keep optional "that" in
+  relative clauses, keep subjects close to their verbs, avoid animate verbs on
+  inanimate subjects, and prefer ordinary wording over dense coinages. Also
+  use when a draft feels hard to read, dense, or "AI-sounding" even after a
+  voice or slop pass; when the user says "unpack this", "this is cognitively
+  hard", "too compressed", or "make this easier to read"; or as a final pass
+  after coherent-writing or blog-explainer-prose-dedup. Distinct from
+  coherent-writing (argument flow and transitions) and
+  blog-explainer-prose-dedup (repeated facts): this skill covers the shape of
+  sentences, not the shape of the argument.
 license: MIT
 ---
 

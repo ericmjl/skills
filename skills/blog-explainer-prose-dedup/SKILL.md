@@ -1,7 +1,21 @@
 ---
 name: blog-explainer-prose-dedup
 description: >-
-  Tighten long-form explainer/pedagogical blog prose by auditing for facts and concepts stated 2+ times across sections and condensing each to a single mention with forward-references. Use when the user says 'less repetitive', 'more pedagogically coherent', 'too repetitive', 'this restates what was already said', 'tighten the prose', or flags a concept explained multiple times (intro re-explains, body re-derives, later section re-states). ALSO governs the INVERSE coverage problem: a takeaway/summary that UNDER-represents the post's actual deep arc — use when the user says 'the takeaway doesn't reflect what we went deep into' or 'this summary is generic'. Distinct from coherent-writing (transitions/flow): THIS governs information redundancy across sections AND summary-coverage fidelity. The dedup technique, takeaway-coverage rewrite, redundancy patterns, and summary-drift failure mode live in the body.
+  Use whenever drafting or revising long-form explainer, tutorial, or
+  pedagogical blog prose for the user. This skill tightens the draft by
+  auditing for facts and concepts stated 2+ times across sections and
+  condensing each to a single mention with forward-references. Also use when
+  the user says "less repetitive", "more pedagogically coherent", "too
+  repetitive", "this restates what was already said", "tighten the prose", or
+  flags a concept explained multiple times (intro re-explains, body
+  re-derives, later section re-states). ALSO governs the inverse coverage
+  problem: a takeaway or summary that under-represents the post's actual deep
+  arc — use when the user says "the takeaway doesn't reflect what we went deep
+  into" or "this summary is generic". Distinct from coherent-writing
+  (transitions/flow): this skill governs information redundancy across
+  sections and summary-coverage fidelity. The dedup technique,
+  takeaway-coverage rewrite, redundancy patterns, and summary-drift failure
+  mode live in the body.
 created_at: "2026-08-04"
 ---
 
