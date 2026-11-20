@@ -18,7 +18,7 @@ metadata:
 
 # evident-charts
 
-Charts that make one point a reader gets at a glance. Paths are relative to this skill's directory (Claude Code: `${CLAUDE_SKILL_DIR}`); run `scripts/` with the project's Python.
+Charts that make one point a reader gets at a glance. Paths are relative to this skill's directory; run `scripts/` with the project's Python.
 
 Critique, review, or a chart image with a question: follow `references/critique.md`; otherwise the workflow below.
 
