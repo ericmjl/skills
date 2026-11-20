@@ -138,7 +138,7 @@ Full ladder (updated 2026-09-25): webfetch empty/too-large -> agent-browser head
 Verified end-to-end on `https://claude.ai/public/artifacts/<uuid>` (Jen Brady course proposal). This supersedes the 2026-07-23 "ask the user to paste" terminal verdict for this URL class. The rungs, with exact working commands:
 
 1. **webfetch** → 200 but empty JS-rendered app shell. **agent-browser headless** → opens fine but title stays `Just a moment...` forever (Turnstile never auto-resolves under HeadlessChrome). One poll is enough to diagnose.
-2. **Launch REAL Chrome with a throwaway profile over CDP** (subshell double-fork so it survives the bash tool; throwaway dir because Chrome 136+ ignores CDP on the default profile — memory #63; headed-but-backgrounded per Eric's standing preference — memory #18):
+2. **Launch REAL Chrome with a throwaway profile over CDP** (subshell double-fork so it survives a shell; throwaway dir because Chrome 136+ ignores CDP on the default profile — memory #63; headed-but-backgrounded per Eric's standing preference — memory #18):
 
 ```bash
 PORT=9233
