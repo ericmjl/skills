@@ -101,7 +101,7 @@ For sub-agent prompt templates, read `references/subagent-prompts.md`.
 
 **Goal:** Ensure the entire piece has no conflicting arguments at the cross-paragraph / whole-draft scale.
 
-**Dispatch:** Exactly **one** sub-agent via the Task tool.
+**Dispatch:** Exactly **one** sub-agent (if your agent can start one; otherwise run this pass yourself).
 
 **Scope:** Full draft + the claim inventory from Preparation.
 
@@ -157,7 +157,7 @@ blog-explainer-prose-dedup skill (2026-10-13 quality-chain pass):
 
 **Goal:** Each paragraph is internally coherent — no self-contradictions, sudden topic jumps, logical disconnects, or unsignaled pivots *inside* the paragraph.
 
-**Dispatch:** Launch **one sub-agent per paragraph** in parallel (Task tool, single message with multiple calls). For large drafts (>30 paragraphs), batch in groups of ~15 to keep dispatch manageable.
+**Dispatch:** Launch **one sub-agent per paragraph** in parallel (if your agent supports subagents; otherwise run the review passes yourself). For large drafts (>30 paragraphs), batch in groups of ~15 to keep dispatch manageable.
 
 **Scope per agent:** The full interior of ONE assigned paragraph. No boundary work — that belongs to Passes 3 and 4.
 
@@ -198,7 +198,7 @@ The orchestrator merges revised paragraphs back into the working draft in docume
 
 **Goal:** Every consecutive section pair flows smoothly; no abrupt section shifts.
 
-**Dispatch:** Launch **one sub-agent per consecutive section pair** in parallel (Task tool, single message with multiple calls).
+**Dispatch:** Launch **one sub-agent per consecutive section pair** in parallel (if your agent supports subagents; otherwise run the review passes yourself).
 
 Example: sections `Intro`, `Methods`, `Results` → agents for `(Intro, Methods)` and `(Methods, Results)`.
 
@@ -258,7 +258,7 @@ The orchestrator merges boundary edits back into the working draft in document o
 
 **Goal:** Recheck the full revised draft for any remaining coherence issues and remediate them.
 
-**Dispatch:** Exactly **one** sub-agent via the Task tool.
+**Dispatch:** Exactly **one** sub-agent (if your agent can start one; otherwise run this pass yourself).
 
 **Scope:** Full draft from Pass 4.
 
