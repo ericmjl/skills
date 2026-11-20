@@ -661,7 +661,8 @@ There is no in-code recovery. Prevention:
 ## Phase 6: Review & refine
 
 After the notebook is built, dispatch 2-3 read-only review subagents in
-parallel, each with a distinct focus:
+parallel, each with a distinct focus (if your agent supports subagents;
+otherwise run the review passes yourself):
 
 1. **Structure & flow** — logical top-to-bottom argument? Explicit
    transitions? Redundancy between sections?
