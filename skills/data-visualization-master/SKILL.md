@@ -108,7 +108,7 @@ distilled in `references/points-of-view.md`. A project style guide overrides
 - ENC1 `[E]` Encoding accuracy ranking, best to worst: position on a common
   scale > length > angle/slope > area > volume > color saturation. Reserve
   pies/donuts for the rare single-part-to-whole glance; never for comparison
-  or trends. Cite: [CM84], [HB10], [T14]; POV: [W10-Design].
+  or trends. Cite: [CM84], [HB10], [T14], [H24]; POV: [W10-Design].
 - ENC2 `[E]` Lines only over an ordered axis (usually time), with tick spacing
   proportional to the intervals — evenly spaced uneven time steps produced the
   largest measured deception effect. Bars for discrete categories. Never
@@ -151,7 +151,7 @@ distilled in `references/points-of-view.md`. A project style guide overrides
   [K13-Axes], [W10-Salience].
 - LAY4 `[P]` Simplify to clarify: remove gridlines, borders, boxes, and
   legends that carry no information ("chartjunk"); maximize the data-ink
-  share. Cite: [T83], [A22]; POV: [W11-Simplify].
+  share. Cite: [T83], [A22], [SC25]; POV: [W11-Simplify].
 
 ### Text and elements
 
@@ -177,7 +177,7 @@ distilled in `references/points-of-view.md`. A project style guide overrides
   differences and deceive a majority of readers even after warnings; the
   measured harm concentrates in ratio judgments, and direct value labels
   mitigate it. Line charts may use a non-zero range when stated.
-  Cite: [P15], [C20], [Y21], [WSB22], [MO26].
+  Cite: [P15], [C20], [Y21], [WSB22], [LK24], [MO26].
 - INT2 `[E]` No dual y-axes; no inverted value axes; no 3D effect charts;
   aspect ratio must not distort the perceived effect. Measured: inverted
   y-axes ≈7× and dual axes ≈6× lower odds of a correct reading. Cite: [P15],

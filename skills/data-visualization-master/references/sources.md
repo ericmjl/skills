@@ -96,11 +96,14 @@ topics with modern tools.
 
 J26-Viridis: bibliographic record verified via Crossref and the publisher
 abstract read 2026-09-26; full text paywalled, so it backs no rule yet.
-Columns July–October 2026 (JL26-Click through BJ26-Companion): Crossref
-records resolved (authors, volume, pages) and publisher pages fetched
-2026-11-01; all paywalled, so they back no rule yet. Distillations pending
-in `references/points-of-view.md`. BJ26-Companion was advance-online on
-2026-10-13 at verification time (no volume/page assigned yet by Crossref).
+Columns July–September 2026 (JL26-Click, LJ26-Code, JD26-GraphAbs,
+JR26-Engaging) were first verified 2026-10-04 (Crossref records and
+publisher standfirsts; JR26-Engaging still advance-online) and re-verified
+2026-11-01 with BJ26-Companion (then advance-online, 2026-10-13; no
+volume/page assigned yet by Crossref). JR26-Engaging had volume/pages
+1921–1923 by 2026-11-01. All paywalled, so they back no rule yet.
+Distillations pending in `references/points-of-view.md`. JD26-GraphAbs
+cites the original overview-figure column [W11-Overview].
 
 ## Foundational and research literature
 
@@ -136,6 +139,13 @@ in `references/points-of-view.md`. BJ26-Companion was advance-online on
   https://doi.org/10.1145/3173574.3174012
 - [A22] Ajani K et al. 2022, Declutter and focus: Explicitly guiding users
   with data visualization, IEEE TVCG. https://doi.org/10.1109/TVCG.2021.3068337
+- [SC25] Song H, Cho A, Xiong Bearfield C & Stasko J 2025, Visualizing
+  Trust: How Chart Embellishments Influence Perceptions of Credibility,
+  IEEE TVCG (IEEE VIS 2025). https://doi.org/10.1109/TVCG.2025.3634785
+  Two crowdsourced experiments: plain charts rated more credible than
+  embellished ones overall; cartoon-style bars and hand-drawn fonts
+  significantly undermined credibility, while color and image-style bars
+  could enhance it — effect is context-dependent. Supports LAY4.
 - [B12] Birch J 2012, Worldwide prevalence of red-green color deficiency,
   JOSA A 29(3). https://doi.org/10.1364/JOSAA.29.000313
 - [M09] Machado GM, Oliveira MM & Fernandes LA 2009, A physiologically-based
@@ -179,15 +189,27 @@ in `references/points-of-view.md`. BJ26-Companion was advance-online on
 - [WSB22] Wijnker W, Smeets I, Burger P & Willems S 2022, Debunking
   strategies for misleading bar charts, Journal of Science Communication
   21(7): A07. https://doi.org/10.22323/2.21070207
+- [LK24] Long S & Kay M 2024, To Cut or Not To Cut? A Systematic Exploration
+  of Y-Axis Truncation, CHI 2024. https://doi.org/10.1145/3613904.3642102
+  Qualifies INT1 without overturning it: truncation did not affect accuracy
+  of absolute-difference judgments between two bars; the documented harm
+  sits in perceived relative change, and non-monotonic truncation impaired
+  relative-growth judgments.
 - [OI02] Okabe M & Ito K 2002, Color Universal Design (CUD): How to make
   figures and presentations that are friendly to colorblind people
   (palette), University of Cologne.
   https://jfly.uni-koeln.de/html/manuals/pdf/color_blind.pdf
 - [H24] Hill A 2024, Are pie charts evil? An assessment of the value of pie
   and donut charts compared to bar charts, Information Visualization 24(1).
-  https://doi.org/10.1177/14738716241259432 [UNVERIFIED] (record and author
-  abstract via Crossref; SAGE full text bot-blocked on 2026-09-26 — fetch
-  and read full text before citing in a rule)
+  https://doi.org/10.1177/14738716241259432
+  Verified 2026-10-04: full text read (open access, CC BY 4.0) via the
+  official SAGE mirror sage.cnpereading.com (journals.sagepub.com itself
+  remained bot-blocked); Crossref record re-checked. Findings: bar charts
+  beat pie/donut charts for ranking only when compared segments are nearly
+  equal (<~3 percentage points apart); all three chart types were equally
+  accurate for part-whole extraction, with similar cognitive load
+  (pupillometry) but pies consistently slower. Backs the pie clause of
+  ENC1.
 - [MO26] McKinley OG & Ottley A 2026, Taking truncation to task: A task-based
   exploration of axis truncation in bar charts, Proc. CHI '26 (ACM, Article
   111). https://doi.org/10.1145/3772318.3790617
