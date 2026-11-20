@@ -260,33 +260,37 @@ perceptually ordered scales for magnitude; never rainbow).
 
 ### Click to plot — [JL26-Click] (Jambor & Lex, 2026)
 
-*Abstract-only entry: full text paywalled at verification (2026-11-01);
-distillation pending.* Dek: "Biological figures increasingly originate in
-the browser." A practical tour of web-based/interactive plotting (Shiny and
-kin) — the interactive-figure counterpart of the original series.
+*Abstract-only entry: full text paywalled at verification (first 2026-10-04,
+re-verified 2026-11-01); distillation pending.* Dek: "Biological figures
+increasingly originate in the browser." A practical tour of web-based/
+interactive plotting (Shiny and kin) — the interactive-figure counterpart
+of the original series. Backs no rule yet.
 
 ### Code to plot — [LJ26-Code] (Lex & Jambor, 2026)
 
-*Abstract-only entry: full text paywalled at verification (2026-11-01);
-distillation pending.* Covers making the same plot across plotting libraries
-(matplotlib, seaborn, ggplot2, plotly) and with chat interfaces; figures as
-reproducible code.
+*Abstract-only entry: full text paywalled at verification (first 2026-10-04,
+re-verified 2026-11-01); distillation pending.* Dek: "Biologists can reuse,
+remix and vibe code scientific figures." Covers making the same plot across
+plotting libraries (matplotlib, seaborn, ggplot2, plotly) and with chat
+interfaces; figures as reproducible code. Backs no rule yet.
 
 ### The graphical abstract — [JD26-GraphAbs] (Jambor & Dürr, 2026)
 
-*Abstract-only entry: full text paywalled at verification (2026-11-01);
-distillation pending.* Dek: "Graphical abstracts are visual summaries that
-help communicate scientific discoveries." Extends the overview-figure idea
-[W11-Overview] to the graphical-abstract format.
+*Abstract-only entry: full text paywalled at verification (first 2026-10-04,
+re-verified 2026-11-01); distillation pending.* Dek: "Graphical abstracts
+are visual summaries that help communicate scientific discoveries." Extends
+the overview-figure idea [W11-Overview] to the graphical-abstract format;
+adjacent to rule FIG3. Backs no rule yet.
 
 ### Engaging figures — [JR26-Engaging] (Jambor, Rajabiyazdi, Prantl, Flotho,
 Möller & Turkay, 2026)
 
-*Abstract-only entry: full text paywalled at verification (2026-11-01);
-distillation pending.* Dek: "Some visualizations resonate while others are
-forgotten." Frames memorability via 'proximity' principles: credibility,
-plausibility, importance, temporal proximity, individual-level focus,
-anticipation of consequences.
+*Abstract-only entry: full text paywalled at verification (first 2026-10-04
+as advance online, re-verified 2026-11-01 with volume/pages); distillation
+pending.* Dek: "Some visualizations resonate while others are forgotten."
+Frames memorability via 'proximity' principles: credibility, plausibility,
+importance, temporal proximity, individual-level focus, anticipation of
+consequences. Backs no rule yet.
 
 ### The companion website — [BJ26-Companion] (Bueckle, Stahl, Krause, Möller
 & Jambor, 2026)
