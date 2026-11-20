@@ -89,7 +89,10 @@ value:
 
 Keep every section; if one is genuinely empty, write "none". Target ≤250 lines,
 hard ceiling 400 (it must fit in a fresh context). Cut narrative prose before cutting
-Dead Ends, Verified State, or Next Steps.
+Dead Ends, Verified State, or Next Steps. When you compress toward that
+budget, do not stack nouns or drop "that" to save a line. The next agent
+is also a reader; run `processing-friendly-prose` if a section has become
+dense.
 
 ```markdown
 # Handoff: <one-line title>
@@ -162,3 +165,4 @@ Report the exact file path written and a one-line summary of what's in it.
 | Padding thin sections | Invention is worse than a gap; write "not started, no design chosen" honestly. |
 | Overwriting the old handoff | Archive it; carry forward its unresolved dead ends. |
 | Saving only at 90% context | Write at ~50-60%, while recall is sharp. Finish the current micro-step first, then save. |
+| Compressing by stacking nouns or dropping "that" | Shorter is not always clearer. Unpack noun stacks and keep optional "that" (`processing-friendly-prose`). |

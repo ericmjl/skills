@@ -16,6 +16,7 @@ competition entries, conference tutorials, blog companions, or standalone demos.
 **Related skills:**
 - `marimo-pair` — pair-program inside a running marimo kernel (the build tool)
 - `marimo-notebook-patterns` — exhaustive gotcha reference for marimo `.py` editing
+- `processing-friendly-prose` — make markdown cells and written explanations easier to read; run it on cell prose after the narrative is in place
 
 ---
 
@@ -671,7 +672,9 @@ parallel, each with a distinct focus:
    reproducible?
 
 Each agent reads the notebook dump (cell-by-cell `.txt`) + this skill.
-They report findings; you consolidate and apply fixes.
+They report findings; you consolidate and apply fixes. Then run
+`processing-friendly-prose` on markdown cells, docstrings, and other
+written explanations, not only on a companion blog post.
 
 ### Common fixes after review
 

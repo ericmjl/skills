@@ -140,6 +140,11 @@ not fix a weak hook by talking faster.
 - If the user rejects drafts as "not my voice", stop generating variants and
   ask them to dictate or table-read; their spoken phrasing is authoritative
   and gets spliced near-verbatim.
+- Speakability also depends on sentence shape. Unpack stacks of three or
+  more nouns, keep optional "that", and keep subjects close to their verbs.
+  These constructions are hard to read; they are harder still to say.
+  After drafting, run the `processing-friendly-prose` checklist on the
+  script (or include it in the table read).
 
 ## Step 6 — Attach the production spec
 
@@ -175,6 +180,9 @@ as much as the words):
       urgency; numbers verified against the speaker's own material.
 - [ ] Table read done by the actual speaker; flagged lines rewritten in
       their dictated phrasing.
+- [ ] Speakability: no packed noun stacks, no dropped "that" in a long
+      clause, and no long gap between a subject and its verb
+      (`processing-friendly-prose`).
 
 ## Step 8 — Measure after launch
 

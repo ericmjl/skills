@@ -90,6 +90,9 @@ Use this skill when the user wants to run an ML experiment, test a model or idea
 - **No editorialization**: state what happened and what the data show; do not state what you wish had happened.
 - Include highlights from JOURNAL.md (e.g. anomalies, resolved issues) in Discussion.
 - Use the template in [references/report-template.md](references/report-template.md).
+- After the report is drafted, run `processing-friendly-prose` on the
+  write-up so methods and results stay easy to parse. Do not tighten the
+  report by stacking nouns or dropping "that".
 
 ## Guardrails
 

@@ -472,3 +472,12 @@ Related, from the same session: when Eric flags example sentences, he
 expects a WHOLE-DOCUMENT sweep for that slop class (grep the pattern across
 every cell/docstring), not a fix of only the flagged instances. Flagged
 examples are evidence of a class.
+
+
+## Related skills
+
+This skill covers argument flow, transitions, contradictions, and (in the
+dedup passes) repeated facts. It does not cover sentence shapes that raise
+reading effort, such as stacked nouns, dropped "that", or a long gap
+between a subject and its verb. After the coherence and dedup passes, load
+`processing-friendly-prose` and run that checklist on the revised draft.

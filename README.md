@@ -91,6 +91,24 @@ Location: `skills/video-script-writing/`
 
 Retention-first video script writing for any purpose (founder story, landing-page conversion, YouTube explainer, short-form, demo/testimonial). Grounded in viewer-attention research: hook concreteness tests, open-loop architecture, spoken-register drafting, speech-rate bands, cut rhythm and caption specs, and per-purpose benchmarks. Use when writing, revising, or auditing a video script, or when asked whether a script will hold attention.
 
+### coherent-writing
+
+Location: `skills/coherent-writing/`
+
+Improve coherence in drafts through a five-pass workflow: resolve conflicts in the argument, fix logic inside paragraphs, smooth section and paragraph transitions, and run a final coherence audit. Use when a draft feels choppy, jumps, or contradicts itself, and you want the ideas to connect without adding new points.
+
+### blog-explainer-prose-dedup
+
+Location: `skills/blog-explainer-prose-dedup/`
+
+Tighten long explainer or tutorial posts by giving each fact one home and replacing repeat explanations with short pointers. Also checks that the takeaway covers what the post actually went deep on. Distinct from coherent-writing (flow) and processing-friendly-prose (sentence shape).
+
+### processing-friendly-prose
+
+Location: `skills/processing-friendly-prose/`
+
+Revise prose so it is easier for a human reader to process. Unpacks stacked nouns, keeps optional "that", keeps subjects close to their verbs, and avoids other dense sentence shapes that make reading harder even when the grammar is fine. Grounded in Clark, Martin, and Mahowald (2026). Use as a final pass after coherent-writing or blog-explainer-prose-dedup, or when a draft feels hard to read or overly compressed.
+
 ### motion-graphics-video
 
 Location: `skills/motion-graphics-video/`

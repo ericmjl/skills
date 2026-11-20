@@ -53,3 +53,11 @@ Distinct from Pass 2 (dedup): Pass 2 removes REPEATED facts; Pass 5 adds MISSING
 (a) TRIPLE-STATED SIGNIFICANCE — a key property (e.g. 'amplitudes are signed') stated in the geometric intro, restated in the main section, re-explained in a later section; fix = state once in its proper home, forward-reference elsewhere.
 (b) RE-DERIVED SQUARING — measurement probability = amplitude² re-derived in multiple sections when one earlier widget/section already demonstrated it; fix = reference the earlier demonstration, do not re-derive.
 (c) RE-STATED WIDGET COVERAGE — prose re-describing what an interactive widget on the same page already shows; fix = replace the prose with BEFORE/AFTER orientation scaffolding (Pass 3), do not just delete it. Deleting alone leaves the reader disoriented; the scaffolding re-purposes the freed space to teach how to USE the widget.
+
+
+## Related skills
+
+Cutting repeated explanations can pack the sentences that remain. After
+the dedup and takeaway-coverage passes, run `processing-friendly-prose` so
+those sentences do not become noun stacks or clauses that drop "that".
+For argument flow and transitions, use `coherent-writing`.
