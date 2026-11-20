@@ -12,7 +12,9 @@ description: >-
   pacing, retention, or CTA, or when asked whether a script will hold
   attention. Covers hook tests, loop architecture, spoken-register drafting,
   production specs (cut rhythm, captions, words-per-minute bands, placement),
-  and per-purpose playbooks with benchmarks.
+  and per-purpose playbooks with benchmarks. For a short engineering or
+  science explainer built as a chain of failures and fixes, also use
+  problem-chain-explainer.
 license: MIT
 ---
 
@@ -34,6 +36,10 @@ Full citations: `references/research-digest.md`.
 - marketing-copy for offer construction and persuasion strategy upstream.
 - eric-video (or the production pipeline du jour) when the script moves to
   rendering; this skill ends at the script plus its production spec.
+- problem-chain-explainer when the video is a short engineering or science
+  explainer (about 45 to 90 seconds) built as a chain of failures and fixes.
+  That skill owns the chain. This one still owns the hook tests, the loop
+  map, and the production spec. Keep its "but" / "therefore" joins.
 
 ## Step 1 — Intake (ask before drafting)
 

@@ -105,6 +105,11 @@ not the whole script.
 Completion and rewatch in 15 to 60 seconds. There is no back half:
 front-load everything.
 
+A 45 to 90 second engineering or science explainer that teaches a design
+by failing the naive version is a problem chain. Draft those beats with
+`problem-chain-explainer`, then apply the short-form rules here. Keep its
+"but" / "therefore" joins.
+
 - Hook: frame 1 is visual (the thing itself, mid-action); line 1 is a
   content hook (claim, number, or question). "Hook in 3 seconds" applies
   to the VISUAL hook here.

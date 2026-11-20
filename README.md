@@ -91,6 +91,12 @@ Location: `skills/video-script-writing/`
 
 Retention-first video script writing for any purpose (founder story, landing-page conversion, YouTube explainer, short-form, demo/testimonial). Grounded in viewer-attention research: hook concreteness tests, open-loop architecture, spoken-register drafting, speech-rate bands, cut rhythm and caption specs, and per-purpose benchmarks. Use when writing, revising, or auditing a video script, or when asked whether a script will hold attention.
 
+### problem-chain-explainer
+
+Location: `skills/problem-chain-explainer/`
+
+Scripts and shot notes for short engineering or science explainers in the problem-chain style: the viewer is the builder, the naive version fails, and each real feature arrives as the fix. Uses problem–solution chaining, but/therefore structure, design from first principles, and productive failure. Use for a 45-90 second Short. Pair with `video-script-writing` for hooks, loops, and the production spec.
+
 ### motion-graphics-video
 
 Location: `skills/motion-graphics-video/`
