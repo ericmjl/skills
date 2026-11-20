@@ -4,7 +4,9 @@ This is a skills repository following the [Anthropic Agent Skills Specification]
 
 ## Build/Test Commands
 
-No build or test system. Skills are markdown instructions with optional scripts.
+No package build. Skills are markdown instructions with optional scripts.
+The pronunciation-lexicon sync check is `bash scripts/check-pronunciation-lexicon.sh`
+(GitHub Actions runs it on push and pull requests).
 
 ## Version Control
 
@@ -45,3 +47,30 @@ commits (one skill per commit) over mixed batches.
 ## SKILL.md Structure
 
 Include sections: Usage, Requirements, What It Does, How It Works. Use fenced code blocks with language specifiers for examples.
+
+## Pronunciation lexicon
+
+The canonical pronunciation glossary is `skills/explainer-video/lexicon.json`
+in the private repository `ericmjl/skills-private`. Each voice skill that
+uses the glossary keeps its own copy of that file inside the skill folder.
+Skills must not import the glossary from another skill at runtime, including
+across these two repositories.
+
+This public repository does not fetch the private file. The SHA-256 of the
+canonical file is pinned in `scripts/pronunciation-lexicon.sha256`. Edit the
+canonical file in `ericmjl/skills-private` first, then update the pin here
+and copy the file unchanged to every public path listed in
+`scripts/pronunciation-lexicon-copies.txt`. Those copies must match the pin
+exactly. A CI check fails when a listed copy is missing or differs.
+
+Copies that must match the pin are the paths in
+`scripts/pronunciation-lexicon-copies.txt`. None are listed yet.
+
+Only one entry has been verified by ear so far: `pixi` is respelt `pixie`
+(2026-11-20). Leave other entries unverified until Eric confirms them.
+
+Voice skills in this repo that can produce spoken audio, but do not yet
+carry a `lexicon.json` copy (list only):
+
+- `skills/motion-graphics-video` — optional voiceover; no glossary file.
+

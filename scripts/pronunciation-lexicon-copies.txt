@@ -1,0 +1,5 @@
+# Paths, relative to the repository root, that must match the SHA-256
+# pinned in pronunciation-lexicon.sha256 (the hash of
+# ericmjl/skills-private:skills/explainer-video/lexicon.json).
+# Add a path here when a skill in this repo receives its own copy.
+# Lines starting with # and blank lines are ignored.
