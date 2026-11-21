@@ -58,7 +58,7 @@ Use the primary on the GB10. Use the fallback on the Mac, or when CUDA is missin
 - Paper: <https://arxiv.org/abs/2505.17589> (arXiv:2505.17589, section 2.3 covers pronunciation inpainting)
 - Accessed 2026-11-20
 
-Zero-shot cloning uses a reference clip. When the transcript of that clip is known, `inference_zero_shot` takes the text, the prompt `You are a helpful assistant.<|endofprompt|>` plus the transcript, and the wav path. When the transcript is empty, `inference_cross_lingual` takes the prompt plus the line, and the wav. Voice `eric` follows that split. `reference_transcript` in `voices.yaml` is empty until someone writes down the words in `~/voice/eric-voice-ref.m4a`.
+Zero-shot cloning uses a reference clip. When the transcript of that clip is known, `inference_zero_shot` takes the text, the prompt `You are a helpful assistant.<|endofprompt|>` plus the transcript, and the wav path. When the transcript is empty, `inference_cross_lingual` takes the prompt plus the line, and the wav. Voice `eric` follows that split. `reference_transcript` in `voices.yaml` is empty until someone writes down the words in `~/.voice/reference.m4a`.
 
 The tokenizer registers CMU tokens from `[AA]` through `[ZH]`, including stress digits. The README describes CMU plus Chinese pinyin. `example.py` shows Chinese pinyin inpainting (`[j][ǐ]`) and the two inference methods. It does not show an English sentence full of CMU tokens. The paper's correction-rate table is the evidence that inpainting works for the languages they measured. English jargon through those tokens is the reason this model is primary, and it is untested by ear.
 

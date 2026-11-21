@@ -56,7 +56,15 @@ from reference_pad import (
     prepare_reference,
 )
 from timeline import ScriptError, parse_script
-from voices import VoiceError, expand_path, get_voice, load_registry, target_for
+from voices import (
+    VoiceError,
+    expand_path,
+    get_voice,
+    load_registry,
+    missing_reference_message,
+    resolve_reference,
+    target_for,
+)
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_LEXICON = SKILL_ROOT / "lexicon.json"
@@ -195,7 +203,7 @@ def _with_padded_reference(record: dict[str, object]) -> dict[str, object]:
         prepared["_reference_padded"] = False
         return prepared
     seconds = _pad_seconds()
-    reference = expand_path(record.get("reference"))
+    reference = resolve_reference(record.get("reference"))
     if seconds <= 0 or reference is None:
         prepared["_reference_padded"] = False
         return prepared
@@ -254,15 +262,9 @@ def _synthesize_cosyvoice(text: str, record: dict[str, object], wav_path: Path) 
     :param record: Voice record.
     :param wav_path: Destination WAV.
     """
-    reference = expand_path(record.get("reference"))
+    reference = _require_reference(record)
     model_dir = expand_path(record.get("model_dir"))
     repo = expand_path(record.get("cosyvoice_repo"))
-    if reference is None or not reference.is_file():
-        raise SystemExit(
-            "Error: voice reference clip is missing. "
-            f"Expected {reference}. Put a clone clip at the path in voices.yaml "
-            "(default ~/voice/eric-voice-ref.m4a), or edit that file."
-        )
     if model_dir is None or not model_dir.is_dir():
         raise SystemExit(
             "Error: Fun-CosyVoice3 weights not found. Download "
@@ -350,9 +352,7 @@ def _synthesize_chatterbox(text: str, record: dict[str, object], wav_path: Path)
     :param record: Voice record.
     :param wav_path: Destination WAV. Copied out of that helper's output directory.
     """
-    reference = expand_path(record.get("reference"))
-    if reference is None or not reference.is_file():
-        raise SystemExit(f"Error: voice reference clip is missing: {reference}")
+    reference = _require_reference(record)
     helper = resolve_chatterbox_script()
     if not helper.is_file():
         raise SystemExit(
@@ -396,6 +396,19 @@ def _synthesize_chatterbox(text: str, record: dict[str, object], wav_path: Path)
             raise SystemExit(f"Error: Chatterbox did not write {produced}.")
         wav_path.parent.mkdir(parents=True, exist_ok=True)
         wav_path.write_bytes(produced.read_bytes())
+
+
+def _require_reference(record: dict[str, object]) -> Path:
+    """Return the clone clip, or exit with a ~/.voice/ error.
+
+    :param record: Voice record from the registry.
+    :returns: An existing reference file.
+    :raises SystemExit: No clip was found under ``~/.voice/``.
+    """
+    reference = resolve_reference(record.get("reference"))
+    if reference is None:
+        raise SystemExit(missing_reference_message(record.get("reference")))
+    return reference
 
 
 def with_lead_in(text: str, pad: str | None = None) -> str:

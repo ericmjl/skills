@@ -1,7 +1,9 @@
 # Named voices for explainer narration.
-# Reference audio stays outside the repo. ~ expands at runtime.
-# model: cosyvoice3 is the wired primary. chatterbox-turbo is the Mac fallback.
-# kokoro is listed so the slot exists; synthesis refuses it on purpose.
+# Reference audio stays outside the repo, under ~/.voice/
+# (Path.home() / ".voice"). A relative name such as reference.m4a
+# is resolved there. Lookup order for that stem: reference.m4a,
+# then reference.wav, then reference.mp3. ~ on other fields still
+# expands at runtime.
 
 version: 1
 default: eric
@@ -9,7 +11,7 @@ default: eric
 voices:
   eric:
     label: Eric Ma, cloned
-    reference: ~/voice/eric-voice-ref.m4a
+    reference: reference.m4a
     reference_transcript: ""
     model: cosyvoice3
     model_dir: ~/models/Fun-CosyVoice3-0.5B
@@ -23,7 +25,7 @@ voices:
 
   eric-mac:
     label: Eric Ma, cloned, Mac fallback
-    reference: ~/voice/eric-voice-ref.m4a
+    reference: reference.m4a
     reference_transcript: ""
     model: chatterbox-turbo
     settings:

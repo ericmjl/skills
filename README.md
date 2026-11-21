@@ -119,7 +119,7 @@ Revise prose so it is easier for a human reader to process. Unpacks stacked noun
 
 Location: `skills/explainer-video/`
 
-Make a narrated problem-chain explainer MP4: the viewer is the builder, the naive version fails, and each real feature arrives as the fix. Two formats: `short` (60-90 s vertical) and `build-up` (a few minutes). Narration comes from a cloned voice in `voices.yaml`, with a pronunciation lexicon in front of TTS, music-synced cuts, and a HyperFrames render. Primary voice is Fun-CosyVoice3 on CUDA. Mac fallback is Chatterbox Turbo. Use `video-script-writing` for the spoken script alone, and `motion-graphics-video` for a music-led piece with no cloned narration.
+Make a narrated problem-chain explainer MP4: the viewer is the builder, the naive version fails, and each real feature arrives as the fix. Two formats: `short` (60-90 s vertical) and `build-up` (a few minutes). Narration comes from a cloned voice in `voices.yaml`, with a pronunciation lexicon in front of TTS, music-synced cuts, and a HyperFrames render. The clone clip lives at `~/.voice/reference.m4a` (not in git). Primary voice is Fun-CosyVoice3 on CUDA. Mac fallback is Chatterbox Turbo. Use `video-script-writing` for the spoken script alone, and `motion-graphics-video` for a music-led piece with no cloned narration.
 
 ### motion-graphics-video
 

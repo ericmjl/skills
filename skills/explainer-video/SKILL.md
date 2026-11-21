@@ -39,7 +39,7 @@ The reference shape is <https://www.youtube.com/shorts/AvRjarGrmC8>. Paraphrase 
 
 - Node.js 22 or newer, ffmpeg, and `uv`.
 - HyperFrames: `npx hyperframes --version`. Confirm flags with `npx hyperframes render --help` before a render. Flag names move. See [references/hyperframes.md](references/hyperframes.md).
-- A row in [voices.yaml](voices.yaml). Eric's clip is `~/voice/eric-voice-ref.m4a` and is not in git.
+- A row in [voices.yaml](voices.yaml). The clone clip is not in git. Put it in `~/.voice/` (`Path.home() / ".voice"`). Look for `reference.m4a` first, then `reference.wav`, then `reference.mp3`.
 - Voice `eric` needs Fun-CosyVoice3 weights and CUDA. The GB10 is the intended GPU.
 - Voice `eric-mac` is the Mac path when CosyVoice is not installed.
 - A royalty-free music file the user supplies, or a track made with the public skill's audio guide.
@@ -78,6 +78,10 @@ uv run skills/explainer-video/scripts/check_script.py mine PROJECT/docs
 Put the chain table in `docs/chain.md`. Anything above the first `# Artifact` heading in `script.md` is ignored. A table inside a section becomes part of that section and will confuse the parser.
 
 ### 2. Voice
+
+Before you clone, look for a reference clip in `~/.voice/` (`Path.home() / ".voice"` on macOS, Linux, and Windows). Look for `reference.m4a` first, then `reference.wav`, then `reference.mp3`. A relative name in `voices.yaml` is looked up under that directory.
+
+If none of those files exist, stop. Do not fail silently. Do not invent a clip. Tell the user that the reference clip is missing, and offer to help create one at `~/.voice/reference.m4a`. Help here means recording a short, clean sample of their voice, or converting a clip they already have, then saving it there. Create `~/.voice/` if it does not exist. Do this only after the user agrees.
 
 `eric` is Fun-CosyVoice3 on CUDA. `eric-mac` is Chatterbox Turbo. That fallback shells out to an optional sibling `chatterbox-voice-clone` script, or to `CHATTERBOX_SCRIPT` if that environment variable is set. `kokoro-af-heart` is listed and refused on purpose: Kokoro does not clone. The survey and the reason for this pair are in [references/tts-models.md](references/tts-models.md).
 
@@ -202,6 +206,7 @@ uv run --with ruff ruff check skills/explainer-video
 Verified on 2026-11-20, on this machine (x86_64, no NVIDIA GPU, Python 3.12):
 
 - Lexicon matching, CMU validation, CosyVoice token emission with a `|` word break, the sound-code shield, the reference-clip silence, no spoken Hmm filler, the one-load model cache, pronunciation QA (CTC decode, first/last matching, span selection, misheard substitution, report shape, retry ranking) with models mocked, loudness filter parsing, Chatterbox respelling, hyphen boundaries, overlapping terms, and the shipped seed list. The version and verified pins live on `tests/fixtures/lexicon.json`.
+- Voice reference resolution under `Path.home() / ".voice"`, lookup order `.m4a` then `.wav` then `.mp3`, and the missing-clip error that names `~/.voice/`.
 - Script parsing, including `caveat`, optional `delta`, free-text `source`, and an optional `# Format` heading (`short` default, `build-up`). A beat outside 15 to 18 words warns. Every therefore opening with "Therefore" warns and does not fail. All-So therefore openers do not warn. Gap snap, ducking gains, WAV duration, and the HTML scaffold (escaped text, cumulative picture, file tree for path deltas including empty directories that keep a trailing `/`, comma-separated paths, a `~/` second tree root, volume lane, monospace fallbacks, 1080x1920 and 1920x1080).
 - The build-up example at `examples/ds-bootstrap-build-up/script.md` parses and `check_script.py` accepts it. A missing "That's X." punchline warns. Short budget, failure count, and sign-off defaults stay in force when Format is omitted.
 - CC BY attribution written to `credits.txt`, and left unwritten for CC0.

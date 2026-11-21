@@ -19,6 +19,7 @@ Script, from [problem-chain.md](problem-chain.md):
 Voice:
 
 - The `# Voice` section names a row in `voices.yaml`.
+- The clone clip is in `~/.voice/` (`reference.m4a`, then `reference.wav`, then `reference.mp3`). If it is missing, stop and ask the user; do not invent a clip.
 - `pronounce.py list` shows the terms this script uses. Any term with `verified: false` that you can hear in a beat gets a listen before the final export.
 - `audio/beats/NN.spoken.txt` is the line the model received. It matches the lexicon, not a hand edit that bypassed it.
 - Each WAV is one voice, with no clipped breath at the cut and no spoken bracket tags.
