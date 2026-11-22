@@ -134,7 +134,7 @@ CARDS = [
         "title": "Review a pull request",
         "blurb": "A two-pass code review that drafts its comments and posts nothing until you approve.",
         "src": NEW_CARDS_DIR / "review-a-pr.html",
-        "skill": ("gh-pr-code-review", f"{SKILL_TREE_URL}/gh-pr-code-review"),
+        "skill": ("pr-review", f"{SKILL_TREE_URL}/pr-review"),
     },
 ]
 

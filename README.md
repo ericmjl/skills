@@ -43,9 +43,9 @@ Location: `skills/gh-cli/`
 
 Comprehensive GitHub CLI operations skill for common tasks like creating PRs, viewing GitHub Actions logs, managing issues, reviewing code, and more. Use this when you need to interact with GitHub repositories directly from the command line without switching to the browser.
 
-### gh-pr-code-review
+### pr-review
 
-Location: `skills/gh-pr-code-review/`
+Location: `skills/pr-review/`
 
 PR code review with gh: pull the diff and checks, flag sensitive paths, two-pass findings graded critical/optional/trivial, then draft comments and post via gh api only after an explicit yes. Use when reviewing a GitHub pull request or re-reviewing after new commits.
 

@@ -1,5 +1,5 @@
 ---
-name: gh-pr-code-review
+name: pr-review
 description: "PR code review with gh: pull the diff and checks, flag sensitive paths, two-pass findings graded critical/optional/trivial, then draft comments and post via gh api only after an explicit yes. Use when reviewing a GitHub pull request, leaving review comments, re-reviewing after new commits, or asked to review a PR by number, URL, or branch."
 license: MIT
 ---
