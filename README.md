@@ -47,7 +47,7 @@ Comprehensive GitHub CLI operations skill for common tasks like creating PRs, vi
 
 Location: `skills/gh-pr-code-review/`
 
-PR code review workflow: pull diff, two-pass findings, draft and prioritize comments, then optionally post via gh api. Use when reviewing pull requests and leaving actionable feedback.
+PR code review with gh: pull the diff and checks, flag sensitive paths, two-pass findings graded critical/optional/trivial, then draft comments and post via gh api only after an explicit yes. Use when reviewing a GitHub pull request or re-reviewing after new commits.
 
 ### marketing-copy
 
