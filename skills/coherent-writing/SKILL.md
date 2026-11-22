@@ -3,18 +3,17 @@ name: coherent-writing
 description: >-
   Use whenever drafting or revising any prose for the user: emails, blog
   posts, docs, READMEs, tutorials, notebook markdown, video scripts, handoffs,
-  and PR descriptions. This skill improves coherence through a five-pass
-  workflow: resolve cross-draft argument conflicts, fix within-paragraph logic
-  (self-contradictions, sudden topic jumps, disconnects, unsignaled pivots),
-  smooth section and paragraph transitions, and run a final coherence audit.
-  Also use when the user says "make this coherent", "tighten the flow", "this
-  feels choppy", "this paragraph contradicts itself", "fix the logic jumps
-  inside this paragraph", "the sentences don't connect", or "can you smooth
-  transitions", or asks to revise prose so ideas connect cleanly without
-  adding new points. Also covers redundancy and takeaway coverage: use when
-  the user says "less repetitive", "too repetitive", "this restates what was
-  already said", flags a concept explained multiple times, or says the
-  takeaway or summary doesn't reflect what the piece went deep into.
+  and PR descriptions. Improves coherence through a five-pass workflow plus a
+  one-point-per-paragraph point map: resolve cross-draft argument conflicts,
+  give every paragraph one main point stated early (split or cut paragraphs
+  that make two, openers especially), fix within-paragraph logic, smooth
+  section and paragraph transitions, and run a final coherence audit. Also
+  use when the user says "make this coherent", "tighten the flow", "this
+  feels choppy", "this paragraph contradicts itself", "the sentences don't
+  connect", "this paragraph makes too many points", or "the opener isn't
+  coherent". Also covers redundancy and takeaway coverage: "less
+  repetitive", a concept explained multiple times, or a takeaway that
+  doesn't reflect what the piece went deep into.
 license: MIT
 ---
 
@@ -33,6 +32,8 @@ Target common requests such as:
 - "This paragraph contradicts itself."
 - "Fix the logic jumps inside this paragraph."
 - "The sentences don't connect."
+- "This paragraph is making too many points."
+- "The opener isn't coherent."
 
 ## Requirements
 
@@ -50,6 +51,7 @@ Audience and tone are wired into every sub-agent prompt's CONSTRAINTS block (see
 Perform coherence-first editing in five passes with sub-agents:
 
 1. **Global argument pass** — read the full draft and resolve cross-draft argument conflicts.
+   - **Pass 1b, point map** — list each paragraph's main point in a few words; split or cut every paragraph that makes more than one.
 2. **Within-paragraph pass** — fix self-contradictions, sudden topic jumps, logical disconnects, and unsignaled pivots *inside* each paragraph.
 3. **Section transition pass** — smooth every consecutive section boundary.
 4. **Paragraph transition pass** — smooth every consecutive paragraph boundary.
@@ -66,8 +68,9 @@ Every pass is trained to detect and remediate these four failure types (plus pro
 - **Logical disconnect** — the sentence does not contradict the prior one, but the connection between them is never surfaced.
 - **Unsignaled pivot** — a shift in mode (explanation → recommendation, claim → evidence, general → specific) with no warning to the reader.
 - **Pronoun fog** — `this`, `it`, `they`, `which` with no clear referent.
+- **Multi-point paragraph** — one paragraph makes two or more main points, so no single sentence can say what the paragraph is about. Pass 1b owns this one; every later pass re-checks it.
 
-Pass 1 hunts these at the cross-paragraph / whole-draft scale. Pass 2 hunts them *inside* each paragraph. Passes 3 and 4 hunt them at boundaries.
+Pass 1 hunts these at the cross-paragraph / whole-draft scale. Pass 1b checks that each paragraph has exactly one main point. Pass 2 hunts them *inside* each paragraph. Passes 3 and 4 hunt them at boundaries.
 
 ## How It Works
 
@@ -129,7 +132,7 @@ For sub-agent prompt templates, read `references/subagent-prompts.md`.
 3. Conflicts resolved (bulleted: conflict → resolution).
 4. Final word count.
 
-The orchestrator replaces the working draft with this output before Pass 2.
+The orchestrator replaces the working draft with this output before Pass 1b.
 
 ### Pass 1 upgrade - whole-draft claim-conflict audit
 
@@ -152,6 +155,50 @@ blog-explainer-prose-dedup skill (2026-10-13 quality-chain pass):
   silently dropped and never fixed by breaking a constraint. Restate
   baseline counts (words, headings, blockquote lines, image embeds) in the
   verification line.
+
+### Pass 1b - One main point per paragraph (point map)
+
+**Goal:** Every paragraph makes ONE main point. A reader should be able to say what each paragraph is about in a few words.
+
+**The rule:**
+
+- Each paragraph makes one main point, stated early (usually the first sentence).
+- Everything else in the paragraph supports that point: evidence, an example, an explanation, a consequence. A sentence that supports a different point belongs in another paragraph, or nowhere.
+- If a paragraph makes two points, split it into two paragraphs or cut one of the points. Split when both points are load-bearing; cut (or move the sentence to the paragraph whose point it supports) when one point is a throwaway or already has a home elsewhere in the draft (see Pass D2).
+- Openers especially must be one point per paragraph. The first paragraphs are where the reader decides whether to keep going, and an opener that bundles motivation, caveat, scope, and context into two paragraphs reads as throat-clearing, however smooth its transitions are.
+
+**Dispatch:** Exactly **one** sub-agent (if your agent can start one; otherwise run this pass yourself). It needs the full draft, because deciding whether to cut a point depends on whether that point already lives somewhere else.
+
+**Scope:** Every prose paragraph in the draft. Lists, tables, code blocks, diagrams, and author TODO callouts are not prose paragraphs; map them as `¶N (list)` and do not split them.
+
+**Diagnose first, then fix:**
+
+1. Build the **point map**: one line per paragraph, `¶N: <main point in a few words>`. If the summary needs an "and" to cover the paragraph, the paragraph has more than one point.
+2. Flag every paragraph that fails: `¶N: MULTI-POINT: <point A> + <point B> [+ ...]`, or `¶N: BURIED POINT: <point> (stated in sentence K, not early)`.
+3. Only then revise.
+
+**Allowed edits:**
+
+- Split a paragraph at the boundary between its points.
+- Cut a secondary point, or move its sentence(s) into the paragraph whose point they support (including moving a scope or framing sentence into the opener).
+- Move the main point to the first sentence, rewording only as needed so each paragraph opens with its point, using words and claims already in the draft.
+
+**Forbidden edits:**
+
+- Adding new points, examples, or claims, including a new "topic sentence" that asserts something the paragraph did not.
+- Merging paragraphs that make different points.
+- Changing section order.
+
+Pass 1b is the ONLY pass allowed to split paragraphs. Passes 2 and 4 keep their no-split rule and run on the post-split paragraph list, so rebuild the Pass 2 and Pass 4 work queues after this pass.
+
+**Output:**
+
+1. Point map before revision, with flags.
+2. Revised full draft.
+3. Point map after revision (every paragraph has exactly one point, stated early).
+4. Final word count.
+
+Reviewer check: a reviewer should be able to list each paragraph's main point in a few words and flag any paragraph with more than one. (Eric 2026-10-21, four-pillar Obsidian wiki post: the opener's two paragraphs made about four points and did not read as coherent. Transition polish could not fix it; one point per paragraph did.)
 
 ### Pass 2 — Within-paragraph coherence (1 sub-agent per paragraph)
 
@@ -181,7 +228,7 @@ blog-explainer-prose-dedup skill (2026-10-13 quality-chain pass):
 
 - Adding new claims, examples, citations, or arguments.
 - Editing outside the assigned paragraph.
-- Merging with adjacent paragraphs or splitting the paragraph into multiple.
+- Merging with adjacent paragraphs or splitting the paragraph into multiple. (Splitting is Pass 1b's job. If a paragraph still makes two points, report it as `MULTI-POINT` for the orchestrator to send back through Pass 1b.)
 - Changing paragraph order.
 
 **Edit budget:** Bounded by "no new claims," NOT by sentence count. May rewire multiple sentence-to-sentence transitions inside the paragraph. This is the key difference from Pass 4 (paragraph boundaries), which is tightly capped.
@@ -265,6 +312,7 @@ The orchestrator merges boundary edits back into the working draft in document o
 **Check:**
 
 - No self-contradictions remain (within or across paragraphs).
+- Every paragraph still makes one main point, stated early: rebuild the point map and flag any paragraph whose summary needs an "and".
 - No sudden topic jumps, logical disconnects, or unsignaled pivots remain (within or across paragraphs).
 - Section boundaries still flow.
 - Paragraph boundaries still flow.
@@ -358,6 +406,7 @@ Deliver:
 2. **Consolidated issue list** — all issues found across all passes, in reading order, one by one. Each entry: `pass · location · type · fix applied`. This is the deliverable that matches the "surface issues one by one" workflow.
 3. **Pass summary** (brief):
    - Pass 1: cross-draft conflicts resolved (count).
+   - Pass 1b: point map, plus paragraphs split or trimmed (count).
    - Pass 2: paragraphs edited (count) + issues caught by failure type.
    - Pass 3: section boundaries edited (count).
    - Pass 4: paragraph-boundary transitions edited (count).
@@ -368,6 +417,7 @@ Use this checkpoint rubric during every pass:
 
 - **Continuity:** Does each sentence naturally follow from the prior one?
 - **Progression:** Does each paragraph add something new?
+- **One point per paragraph:** Can you name each paragraph's main point in a few words, and is it stated early?
 - **Signposting:** Are transitions explicit where needed?
 - **Alignment:** Does every section support the core claim?
 - **No interior incoherence:** Is every paragraph free of self-contradiction, sudden jumps, disconnects, and unsignaled pivots?
