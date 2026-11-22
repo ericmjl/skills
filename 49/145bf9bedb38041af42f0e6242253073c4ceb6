@@ -1,0 +1,14 @@
+skills/coherent-writing/SKILL.md
+  h_923f9eef54c2c1 6-16,35-36,54,71,73,135,159-202,231,315,409,420
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "49145bf9bedb38041af42f0e6242253073c4ceb6",
+  "prompts": {},
+  "humans": {
+    "h_923f9eef54c2c1": {
+      "author": "Eric Ma <ericmajinglong@gmail.com>"
+    }
+  }
+}
