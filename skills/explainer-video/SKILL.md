@@ -7,7 +7,10 @@ description: >-
   technical jargon that must be pronounced correctly (pyjanitor, llamabot,
   mRNA, LNP, GxP, SMILES), music-synced cuts, or a HyperFrames render of a
   narrated explainer. Also use when a feature list reads as a sequence of
-  "and then" and should become a chain of failures and fixes.
+  "and then" and should become a chain of failures and fixes; when reviewing
+  a composition for dead zones or no-motion holds; when a file-tree node
+  needs a seek-safe camera push-in; or when a beat's picture is a
+  number-counter, before-after-stat, cause-chain, or checklist-pop.
 license: MIT
 ---
 
@@ -64,7 +67,7 @@ The chain table exists before any polished line. Audio exists before animation c
 
 Follow [references/problem-chain.md](references/problem-chain.md). Start from [references/script-template.md](references/script-template.md).
 
-The parser reads `script.md` and these fields: `join`, `spoken`, `visual`, `number`, `source`, `delta`. Beats are numbered `## Beat 0`, `## Beat 1`, with no gaps. An optional `# Format` heading is `short` or `build-up`. Missing means `short`, so older scripts still parse. `join` may be `none`, `but`, `therefore`, or `caveat`. A `therefore` line opens with "So". "Therefore" is allowed; using it on every fix is a warning. `source` is optional free text (`path:line` is the useful form). `delta` is optional. When it is a path such as `data/raw.csv` or `environment.yml`, the composition grows a file tree and marks the new file. Comma-separated paths (`.env, .gitignore`) are separate files. A path that starts with `~/` (such as `~/dotfiles/install.sh`) is a second tree root, next to the project tree. A sentence delta stays a labeled row. Omitted source and delta parse as `none`, so a script written before those fields still loads. The composition carries earlier deltas forward, so the visual line does not restate them.
+The parser reads `script.md` and these fields: `join`, `spoken`, `visual`, `number`, `source`, `delta`, `push`. Beats are numbered `## Beat 0`, `## Beat 1`, with no gaps. An optional `# Format` heading is `short` or `build-up`. Missing means `short`, so older scripts still parse. `join` may be `none`, `but`, `therefore`, or `caveat`. A `therefore` line opens with "So". "Therefore" is allowed; using it on every fix is a warning. `source` is optional free text (`path:line` is the useful form). `delta` is optional. When it is a path such as `data/raw.csv` or `environment.yml`, the composition grows a file tree and marks the new file. Comma-separated paths (`.env, .gitignore`) are separate files. A path that starts with `~/` (such as `~/dotfiles/install.sh`) is a second tree root, next to the project tree. A sentence delta stays a labeled row. Named kinds `number-counter`, `before-after-stat`, `cause-chain`, and `checklist-pop` render as picture templates (JSON object or `key=value` after the kind). `push` is optional camera control: `auto` (default) pushes in on a new file-tree node, `none` skips, a number such as `1.8` is an explicit zoom. Omitted source and delta parse as `none`, so a script written before those fields still loads. The composition carries earlier deltas forward, so the visual line does not restate them.
 
 The spoken field is the only text that is synthesized. Check the budget before you synthesize:
 
@@ -163,7 +166,7 @@ npx hyperframes render --quality draft -o out/draft.mp4
 skills/explainer-video/scripts/verify_render.sh out/draft.mp4 DURATION 1080 1920
 ```
 
-`build_composition.py` writes `index.html`, and `credits.txt` when `audio/credit.json` names a CC BY license. Narration WAVs are already loudness-normalized by the synthesize step, and the music bed is normalized by align, both before HyperFrames muxes them. Each scene's picture is the cumulative `delta` list. A path delta grows a file tree and marks the new file. A path that ends with `/` is a directory, including empty ones such as `.git/`. Comma-separated paths are separate files. A `~/` path is a second tree root. A sentence delta stays a labeled row. The picture survives from beat to beat. The music element carries a `data-automation` volume lane that dips under each narration clip. HyperFrames does not apply `data-fx-carve` at playback. That attribute stores Studio settings so a carve can be recomputed. The lane is what the player reads. The type stack starts at Berkeley Mono and falls back to DejaVu Sans Mono, Liberation Mono, Nimbus Mono PS, and Noto Sans Mono. On the GB10, point HyperFrames at Playwright's `headless_shell`. Details are in [references/hyperframes.md](references/hyperframes.md).
+`build_composition.py` writes `index.html`, and `credits.txt` when `audio/credit.json` names a CC BY license. Narration WAVs are already loudness-normalized by the synthesize step, and the music bed is normalized by align, both before HyperFrames muxes them. Each scene's picture is the cumulative `delta` list. A path delta grows a file tree and marks the new file. A path that ends with `/` is a directory, including empty ones such as `.git/`. Comma-separated paths are separate files. A `~/` path is a second tree root. A sentence delta stays a labeled row. Named template deltas (`number-counter`, `before-after-stat`, `cause-chain`, `checklist-pop`) replace that beat's picture with a seek-safe graphic. The scaffold wraps the picture in a `#viewport` / `#camera` / `#world` / `#hud` rig. File-tree beats push the camera onto the newest node (`#added-N`) unless `push: none`. Kickers and visual lines sit in `#hud` so type stays readable. The picture survives from beat to beat. The music element carries a `data-automation` volume lane that dips under each narration clip. HyperFrames does not apply `data-fx-carve` at playback. That attribute stores Studio settings so a carve can be recomputed. The lane is what the player reads. The type stack starts at Berkeley Mono and falls back to DejaVu Sans Mono, Liberation Mono, Nimbus Mono PS, and Noto Sans Mono. On the GB10, point HyperFrames at Playwright's `headless_shell`. Details are in [references/hyperframes.md](references/hyperframes.md). The build also prints a dead-zone report (idle stretches of at least 1.0 s).
 
 Vertical is the default. For 16:9, re-run align and build with `--aspect 16:9` as its own timeline. Do not crop a 16:9 master down to 9:16.
 
@@ -171,7 +174,7 @@ Vertical is the default. For 16:9, re-run align and build with `--aspect 16:9` a
 
 ### 7. Review
 
-[references/review.md](references/review.md). Grade, fix the three worst problems, render again. Three draft rounds before a high-quality export. In the final, no beat holds a single entrance longer than 4 seconds.
+[references/review.md](references/review.md). After each draft, run `dead_zones.py` on `index.html`. Grade, fix the three worst problems, render again. Three draft rounds before a high-quality export. In the final, no beat holds a single entrance longer than 4 seconds.
 
 ## Project layout
 
@@ -207,7 +210,8 @@ Verified on 2026-11-20, on this machine (x86_64, no NVIDIA GPU, Python 3.12):
 
 - Lexicon matching, CMU validation, CosyVoice token emission with a `|` word break, the sound-code shield, the reference-clip silence, no spoken Hmm filler, the one-load model cache, pronunciation QA (CTC decode, first/last matching, span selection, misheard substitution, report shape, retry ranking) with models mocked, loudness filter parsing, Chatterbox respelling, hyphen boundaries, overlapping terms, and the shipped seed list. The version and verified pins live on `tests/fixtures/lexicon.json`.
 - Voice reference resolution under `Path.home() / ".voice"`, lookup order `.m4a` then `.wav` then `.mp3`, and the missing-clip error that names `~/.voice/`.
-- Script parsing, including `caveat`, optional `delta`, free-text `source`, and an optional `# Format` heading (`short` default, `build-up`). A beat outside 15 to 18 words warns. Every therefore opening with "Therefore" warns and does not fail. All-So therefore openers do not warn. Gap snap, ducking gains, WAV duration, and the HTML scaffold (escaped text, cumulative picture, file tree for path deltas including empty directories that keep a trailing `/`, comma-separated paths, a `~/` second tree root, volume lane, monospace fallbacks, 1080x1920 and 1920x1080).
+- Script parsing, including `caveat`, optional `delta`, optional `push`, free-text `source`, and an optional `# Format` heading (`short` default, `build-up`). A beat outside 15 to 18 words warns. Every therefore opening with "Therefore" warns and does not fail. All-So therefore openers do not warn. Gap snap, ducking gains, WAV duration, and the HTML scaffold (escaped text, cumulative picture, file tree for path deltas including empty directories that keep a trailing `/`, comma-separated paths, a `~/` second tree root, named template deltas, `#viewport`/`#camera`/`#world`/`#hud` camera rig, CSS zoom push-ins, volume lane, monospace fallbacks, 1080x1920 and 1920x1080).
+- Dead-zone audit of the built GSAP timeline: idle spans of at least 1.0 s labelled `intentional-hold` or `missing-entrance`. Logarithmic zoom duration (`1→2x` is 0.55 s, clamped 0.30–0.94 s). Four picture templates (`number-counter`, `before-after-stat`, `cause-chain`, `checklist-pop`) emit seek-safe GSAP, with no `setTimeout` or CSS loops.
 - The build-up example at `examples/ds-bootstrap-build-up/script.md` parses and `check_script.py` accepts it. A missing "That's X." punchline warns. Short budget, failure count, and sign-off defaults stay in force when Format is omitted.
 - CC BY attribution written to `credits.txt`, and left unwritten for CC0.
 - CLI `add`, `apply`, `import`, duplicate refusal, and `resynth --text-only`.

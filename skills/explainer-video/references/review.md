@@ -35,7 +35,10 @@ Picture, still on paper:
 ```bash
 npx hyperframes render --quality draft -o out/draft.mp4
 skills/explainer-video/scripts/verify_render.sh out/draft.mp4 DURATION 1080 1920
+uv run skills/explainer-video/scripts/dead_zones.py PROJECT
 ```
+
+`dead_zones.py` reads the built `index.html` (tween comments, falling back to `tl.from` / `tl.to` statements) and lists every stretch of at least 1.0 s with no active tween. Each stretch is `intentional-hold` or `missing-entrance`. A missing entrance is a beat that holds longer than 4 s with only one tween start — the same rule as the old `WARN beat N holds` comment, now measured from the GSAP map. Exit code 1 means at least one missing entrance. `build_composition.py` prints the same report after it writes the HTML.
 
 Watch the file once with the sound on, and once reading only the pictures.
 
@@ -47,7 +50,7 @@ Watch the file once with the sound on, and once reading only the pictures.
 | Ducking | Music is audible between lines and drops while a line plays. A full-volume bed means the volume lane was lost. |
 | Snap | Line starts sit on a music beat, or the gap is the short minimum because no beat fell in the window. No line starts late by a full bar. |
 | Speech | No time-stretch artifacts, no two lines overlapping, no lexicon token spoken as the word "bracket". |
-| Holds | No shot sits for more than 4 seconds with a single entrance. The HTML comment `WARN beat N holds` is a miss until the picture gains another entrance. |
+| Holds | No shot sits for more than 4 seconds with a single entrance. `dead_zones.py` must not print `missing-entrance`. HTML comments `WARN … missing-entrance` are the same miss; `HOLD … intentional-hold` is a labelled pause, not a failure. |
 | Jargon | The words you added to the lexicon this session sound like the note says they should. Then `correct TERM --verified`. |
 | Sign-off | The last words are the congratulations line, and the card shows the artifact name. |
 | Loudness | The mixed file is in the neighborhood of -14 LUFS integrated. Measure with ffmpeg `loudnorm` or the public skill's checker when you have a render. The scaffold does not measure this. |

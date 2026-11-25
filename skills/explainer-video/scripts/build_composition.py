@@ -21,6 +21,7 @@ from loguru import logger
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from composition import CompositionError, render_html
+from dead_zones import DeadZoneError, format_report, parse_html
 
 CC_BY = re.compile(r"^cc[\s-]*by\b", re.IGNORECASE)
 
@@ -56,13 +57,17 @@ def build(
         raise typer.Exit(code=2) from exc
     if credit is not None:
         typer.echo(f"Wrote {credit}")
-    held = [
-        row["index"]
-        for row in document["placements"]
-        if float(row["duration"]) + float(row["gap_after"]) > 4.0
-    ]
-    if held:
-        logger.warning("Beats {} hold longer than 4s. Add another visual change before final.", held)
+    try:
+        report = parse_html(html)
+    except DeadZoneError as exc:
+        logger.warning("Dead-zone check skipped: {}", exc)
+        report = None
+    if report is not None:
+        typer.echo(format_report(report), nl=False)
+        if report.missing_entrances:
+            logger.warning(
+                "Dead zones labelled missing-entrance. Add a second visual change before final."
+            )
 
 
 def attribution_line(payload: dict[str, object]) -> str | None:

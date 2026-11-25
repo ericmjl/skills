@@ -12,10 +12,11 @@ import wave
 from dataclasses import dataclass, replace
 from pathlib import Path
 
+from camera import parse_push
 from visuals import split_delta
 
 FIELD_RE = re.compile(
-    r"^(?:-\s*)?(join|spoken|visual|number|source|delta)\s*:\s*(.*)$",
+    r"^(?:-\s*)?(join|spoken|visual|number|source|delta|push)\s*:\s*(.*)$",
     re.IGNORECASE,
 )
 JOINS: frozenset[str] = frozenset({"none", "but", "therefore", "caveat"})
@@ -38,6 +39,10 @@ class Beat:
     :param source: Free text, often ``path:line`` or ``none``. Omitted means ``none``.
     :param delta: What this beat adds to the persistent on-screen picture.
         Omitted means ``none``. A path such as ``data/raw.csv`` grows a file tree.
+        Named kinds (``number-counter``, ``before-after-stat``, ``cause-chain``,
+        ``checklist-pop``) render as picture templates.
+    :param push: Camera push-in. ``auto`` (default) pushes on a new file-tree
+        node, ``none`` skips, a number is an explicit zoom.
     """
 
     index: int
@@ -47,6 +52,7 @@ class Beat:
     number: str
     source: str
     delta: str
+    push: str = "auto"
 
     def with_spoken(self, spoken: str) -> Beat:
         """Return a copy with a new spoken line.
@@ -216,7 +222,22 @@ def _parse_beat(index: int, body: str) -> Beat:
         number=fields.get("number") or "none",
         source=fields.get("source") or "none",
         delta=fields.get("delta") or "none",
+        push=_parse_push_field(index, fields.get("push")),
     )
+
+
+def _parse_push_field(index: int, raw: str | None) -> str:
+    """Read the optional camera push field.
+
+    :param index: Beat number, for the error message.
+    :param raw: Field text, or None when omitted.
+    :returns: ``auto``, ``none``, or a zoom string.
+    :raises ScriptError: The value is not a recognized push setting.
+    """
+    try:
+        return parse_push(raw)
+    except ValueError as exc:
+        raise ScriptError(f"Beat {index} {exc}") from exc
 
 
 def wav_duration(path: Path) -> float:
@@ -445,6 +466,7 @@ def build_timeline(
                 "number": beat.number,
                 "source": beat.source,
                 "delta": beat.delta,
+                "push": beat.push,
                 "picture": list(picture),
                 "start": round(placement.start, 3),
                 "duration": round(placement.duration, 3),

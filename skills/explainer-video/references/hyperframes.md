@@ -57,7 +57,13 @@ Music shorter than the timeline is a warning, not a loop. Looping a short bed ma
 
 Narration is normalized to -16 LUFS when it is synthesized. Align writes the music bed to -24 LUFS as `audio/music.norm.wav` and the timeline points at that file. Both happen before HyperFrames muxes the stems. `--no-loudness` on the synthesizer skips the narration pass.
 
-The scaffold adds an HTML comment when a beat's entrance would hold longer than 4 seconds. That comment is a review flag. The final composition needs a second and third entrance inside that beat (a diagram completing, a number landing, the failure showing). Pull the shot design from `motion-graphics-video` and keep the audio elements this scaffold already timed.
+The scaffold wraps the picture in a seek-safe camera rig: `#viewport` (fixed frame, `overflow: hidden`) holds `#camera` (lens only) which holds `#world` (the file tree, templates, and other picture). `#hud` sits beside `#camera`, not inside it, so kickers and visual lines do not scale with the lens. File-tree beats push in on the newest node (`#added-N`) unless the beat sets `push: none`. Zoom duration is `0.55 * |ln(z2/z1)| / ln(2)`, clamped to 0.30–0.94 s, so a doubling always takes 0.55 s. The move is a GSAP tween of a `{cx, cy, zoom}` proxy with `onUpdate` writing CSS `zoom` onto `#world` (layout-level scale, so type stays sharp). Labels that must ride along in `#world` counter-scale with `scale(1/zoom)`; this scaffold keeps type in `#hud` instead. Everything is derived from the paused timeline. Seeking is deterministic.
+
+The scaffold records each tween as an HTML comment and runs a dead-zone pass: any stretch of at least 1.0 s with no active tween is labelled `intentional-hold` or `missing-entrance`. A missing entrance is a hold over 4 s with only one tween start — the same review rule as before, now measured from the GSAP map rather than speech length alone. `WARN … missing-entrance` comments are the flag. The final composition needs a second and third entrance inside a long beat (a diagram completing, a number landing, the failure showing, a camera push-in). Pull extra shot design from `motion-graphics-video` and keep the audio elements this scaffold already timed.
+
+Named `delta` kinds `number-counter`, `before-after-stat`, `cause-chain`, and `checklist-pop` render as picture templates in this palette. They tween on the same paused timeline (a counting proxy, staggered autoAlpha). No CSS loops, no `setTimeout`.
+
+Sources for the camera rig and the dead-zone idea, and for the four templates, are listed in [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
 
 ## CLI
 

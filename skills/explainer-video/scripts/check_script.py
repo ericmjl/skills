@@ -36,7 +36,7 @@ from timeline import (
     ScriptError,
     parse_script,
 )
-from visuals import is_file_path, split_delta
+from visuals import is_file_path, is_template_delta, split_delta
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_LEXICON = SKILL_ROOT / "lexicon.json"
@@ -340,8 +340,9 @@ def missing_jargon(script: Script, lexicon: Lexicon) -> tuple[str, ...]:
     for beat in script.beats:
         texts = [beat.spoken]
         for piece in split_delta(beat.delta):
-            if not is_file_path(piece):
-                texts.append(piece)
+            if is_file_path(piece) or is_template_delta(piece):
+                continue
+            texts.append(piece)
         for text in texts:
             for token in _jargon_tokens(text):
                 key = token.casefold()

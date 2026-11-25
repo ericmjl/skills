@@ -192,6 +192,6 @@ uv run skills/explainer-video/scripts/check_script.py check PROJECT/script.md
 - On a short: 4 or 5 `but` beats. Up to 7 in the chain table, then condense. On a build-up, keep the failures the chain needs.
 - On a short: 10 to 12 beats, 15 to 18 words each, 150 to 216 spoken words. Prefer the 150 to 190 center. On a build-up, no beat or total cap; warn above about 650 words. Each therefore ends with "That's X." or "Those are X."
 - Every number has a `source` of `path:line` and an everyday analogy in the line.
-- Every beat's `delta` says what it adds to the persistent picture. The visual line does not restate earlier deltas.
+- Every beat's `delta` says what it adds to the persistent picture. The visual line does not restate earlier deltas. A path grows the file tree. A named kind (`number-counter`, `before-after-stat`, `cause-chain`, `checklist-pop`) is a picture template for that beat.
 - Second person throughout. No "the user", no "we recommend".
 - Nothing in the spoken lines was copied from the reference Short.
