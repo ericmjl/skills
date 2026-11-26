@@ -23,9 +23,10 @@ commits (one skill per commit) over mixed batches.
 
 ## Writing
 
-For any writing or drafting task, load the `writing` skill before producing
-text. It is a short router that names the specialized writing skills to run
-and the order to run them in. Then load those skills instead of improvising.
+For any writing or drafting task, including academic papers, load the
+`writing` skill before producing text. It is a short router that names
+the specialized writing skills to run and the order to run them in. Then
+load those skills instead of improvising.
 
 ## Shell Script Style
 

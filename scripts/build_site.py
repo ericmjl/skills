@@ -235,7 +235,7 @@ SKILL_CARDS = [
     ("webfetch-empty-use-agent-browser", "Read a page that fetching can't",
      "Reach for this when fetching a web page comes back empty, too large, or as a bare JavaScript shell, as with many job boards and single-page apps."),
     ("writing", "Start any writing task",
-     "Reach for this before you write or revise any prose: an email, a blog post, a README, a tutorial, a video script, a handoff, or a PR description. It names which writing skills to load and in what order."),
+     "Reach for this before you write or revise any prose: an email, a blog post, a README, a tutorial, a video script, a handoff, a PR description, or an academic paper. It names which writing skills to load and in what order."),
     ("xarray-linked-data", "Put linked lab data in one xarray",
      "Reach for this when measurements, derived estimates, and model outputs sit in separate files but share samples or conditions, and you want them in one aligned xarray structure."),
     ("youtube", "Get a YouTube transcript",

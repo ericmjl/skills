@@ -3,11 +3,14 @@ name: writing
 description: >-
   Use for ANY writing or drafting task for the user: emails, blog posts, docs,
   READMEs, tutorials, notebook markdown, video scripts, handoffs, PR
-  descriptions, or any other prose. This skill is a short router: it names
-  the writing passes to run and which specialized skill to load for the job.
-  Load it before producing text, then load the specific skills it names
-  instead of improvising. Also use when the user asks to write, draft, revise,
-  edit, proofread, or "make this sound better."
+  descriptions, academic papers, or any other prose. This skill is a short
+  router: it names the writing passes to run and which specialized skill to
+  load for the job. Load it before producing text, then load the specific
+  skills it names instead of improvising. Also use when the user asks to
+  write, draft, revise, edit, proofread, or "make this sound better"; or
+  when the work is a research paper, literature review, paper introduction,
+  methods or benchmark paper, paper figures, citations, pre-submission
+  review, or reviewer rebuttal.
 license: MIT
 ---
 
@@ -24,6 +27,11 @@ writing checklist when one of those skills already covers the job.
 - The writing skills this router names should be available in the skills
   library. If a named skill is missing, skip it and say so; still run every
   other pass that is present.
+- Academic-paper skills are not in this library. They are installed
+  separately. If the matching one is missing, say so, point to the upstream
+  URL in [references/academic-paper.md](references/academic-paper.md), and
+  fall back to the general writing route. Do not invent a paper-writing
+  checklist.
 - A voice or slop skill such as `write-like-eric` is optional. Load it when
   it is installed (often in a private library). Do not invent a voice
   profile if it is not.
@@ -52,19 +60,34 @@ problem; later passes should not undo earlier ones.
 3. **Voice and slop** — a voice skill such as `write-like-eric`, when it is
    available. Match the user's voice and remove known slop. If no voice
    skill is installed, skip this pass rather than guessing.
-4. **Processing-friendly prose** — `processing-friendly-prose`, always last.
-   Unpack stacked nouns, keep optional "that", keep subjects close to
-   their verbs, and prefer ordinary wording. Dedup and compression can
-   pack sentences; this pass repairs that.
+4. **Processing-friendly prose** — `processing-friendly-prose`, always last
+   on the general writing route. Unpack stacked nouns, keep optional
+   "that", keep subjects close to their verbs, and prefer ordinary wording.
+   Dedup and compression can pack sentences; this pass repairs that.
 
 If the user asked only for one of these passes, still load that skill and
 consider a final `processing-friendly-prose` read.
+
+On academic-paper work, the matching paper skill leads. Run these general
+passes afterwards only as optional prose cleanup. They must not override
+citation or evidence rules from the paper skills.
 
 ### Which skill leads, by job
 
 Load the router first, then the skill that owns the document type, then
 the remaining passes in the order above.
 
+- **Academic paper** — a research idea to judge, a literature review, a
+  methods or benchmark paper plan, an Introduction, other paper sections,
+  figures, language polish, a pre-submission audit, or a reviewer
+  rebuttal. Load [references/academic-paper.md](references/academic-paper.md)
+  and follow it. The matching upstream skill leads. This library's general
+  prose skills may run afterwards as optional passes on prose; they must
+  not override citation or evidence rules from the paper skills. If those
+  skills are not installed, say so, point to
+  https://github.com/HKUSTDial/Supervisor-Skills, and fall back to the
+  general writing route. The suite is separately licensed CC BY-NC-SA 4.0
+  (non-commercial); flag that before using it for paid client work.
 - **Blog or explainer post** — start with `coherent-writing` and
   `blog-explainer-prose-dedup`. End with `processing-friendly-prose`.
 - **Notebook markdown or experiment write-up** — write the narrative in
@@ -88,3 +111,5 @@ the remaining passes in the order above.
 Load the skill that applies and follow its checklist. If two skills could
 apply, load both; do not merge them from memory. If you are unsure which
 skill to use, load this router and the last pass, `processing-friendly-prose`.
+For academic-paper work, load the academic-paper reference first rather
+than guessing a paper checklist.
