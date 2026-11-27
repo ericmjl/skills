@@ -1,13 +1,15 @@
 ---
 name: issue-pr-triage
-description: "GitHub issue/PR triage that ends in action: survey open issues and PRs, classify what is solved, in progress, or workable, then pick exactly one item and deliver a new PR or an updated PR. Use when asked to triage, sweep the backlog, find what can be closed, or pick something to work on."
+description: "GitHub issue/PR triage that ends in action: survey open issues and PRs, classify what is solved, in progress, or workable, then pick exactly one item and deliver a new PR or an updated PR. Stops at the open PR: never merges unless a rule in the target repo lets the agent merge. Use when asked to triage, sweep the backlog, find what can be closed, or pick something to work on."
 license: MIT
 ---
 
 # Issue & PR triage → one fix
 
 A repeatable triage sweep using the GitHub CLI. Survey is read-only; every run
-ends with exactly one item selected and worked to a PR (new or updated).
+ends with exactly one item selected and worked to an open PR (new or updated).
+The run stops there. A human merges the PR unless a rule in the target repo
+lets the agent merge (see *Repo rules that grant merge authority*).
 
 ## Usage
 
@@ -72,7 +74,8 @@ Assign exactly one disposition to each open issue:
 
 Open PRs get their own classification:
 
-- `ready` — passing CI, no unaddressed review comments
+- `ready` — passing CI, no unaddressed review comments → waits for a
+  maintainer to merge; not a candidate
 - `needs-work` — failing CI, or unaddressed review comments → **workable**
 - `stale` — author gone, no activity, conflicts → candidate for housekeeping
 
@@ -172,10 +175,59 @@ item:
 2. Address failing CI and each open review comment; rebase if conflicts.
 3. Push updates; note what changed in a PR comment if the change is substantive.
 
+**Stop at the open PR.** Both paths end with a PR that is open and ready for
+a maintainer. Do not merge it, approve it, or enable auto-merge (`gh pr merge
+--auto`). An approval can trigger an auto-merge that the author already
+enabled. This holds even when CI is green and every review comment is handled:
+a green PR is still a human's call to merge. The only way a run goes further
+is a rule in the target repo that grants merge authority (next section).
+
 **Do not start a second item.** Everything else goes in the final report as
 backlog. If the selected fix turns out to be too large for one session, report
 partial findings on the issue (with confirmation) and pick again from the
 remaining pool.
+
+### Repo rules that grant merge authority
+
+Some repos give the agent limited merge authority, for example: "the agent may
+merge docs-only PRs that touch no code". A rule like that overrides the
+default, but only within the limits it states.
+
+Look for one before assuming there is none. Search the places where a repo
+states policy for agents and contributors:
+
+```bash
+rg -n -i --hidden -g '!.git' merge \
+  -g 'AGENTS.md' -g 'CLAUDE.md' -g 'CONTRIBUTING.md' \
+  -g '.cursorrules' -g '.github/**'
+```
+
+Also check project-level skills or rules the repo keeps under `.agents/` or
+`.claude/`.
+
+A rule counts only if, read plainly, it lets the agent merge a defined class
+of PRs. None of these count:
+
+- A merge method ("use rebase merges").
+- A repo setting (auto-merge allowed, no branch protection).
+- A relaxed requirement ("docs-only PRs need no review"). It removes a
+  barrier; it does not give the agent permission.
+
+Before acting on a rule:
+
+1. Check the PR against the rule with a command, not by impression. For a
+   docs-only rule, run `gh pr diff <N> --name-only` and confirm every file is
+   documentation, as the repo defines it. A workflow, script, config, or
+   dependency file is code.
+2. If the PR matches fully, merge the way the rule says: at once, or through
+   auto-merge. Wait for CI first unless the rule allows skipping it; if that
+   wait is too long for the session, leave the PR open and report it. If the
+   rule names no method, follow the `gh-cli` skill's merge policy. Never
+   bypass branch protection (`--admin`).
+3. If the PR matches only partly, or the rule is ambiguous, leave the PR open
+   and report the rule as a possible match.
+
+Quote the rule and the check in the final report.
 
 ### Housekeeping (optional, confirmation required)
 
@@ -194,6 +246,11 @@ one type label is usually enough.
 - Never dismiss an issue without investigation; never relabel based on title.
 - Be honest: cannot reproduce or cannot verify → say so, do not guess.
 - One and only one selection per run. Two items "in progress" is a failure.
+- Stop at the open PR. Merging is never a step in a run: not at the end of
+  Phase 4, not as housekeeping, not under blanket approval, and not on an
+  instruction given before the PR existed. Inside a run, the only exception
+  is a repo rule that grants merge authority. A later request from the user
+  to merge a named PR is not triage: handle it with the `gh-cli` skill.
 - Prefer finishing an existing PR over opening a new one when both are workable.
 
 ## Final report
@@ -203,5 +260,8 @@ End every run with:
 1. **Disposition table** — every open issue/PR with its disposition, evidence,
    and (where applicable) the covering PR or canonical issue.
 2. **The pick** — one sentence: what was selected and why.
-3. **The result** — new/updated PR URL, or honest blockers if nothing qualified.
+3. **The result** — the new/updated PR URL, left open for a maintainer to
+   merge, or honest blockers if nothing qualified. If a repo rule authorized
+   a merge: the merged PR URL, the rule quoted word for word, and the check
+   you ran against it.
 4. **Proposed housekeeping** — pending confirmation list, if any.
