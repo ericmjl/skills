@@ -1,6 +1,6 @@
 ---
 name: issue-pr-triage
-description: "GitHub issue/PR triage that ends in action: survey open issues and PRs, classify what is solved, in progress, or workable, then pick exactly one item and deliver a new PR or an updated PR. Stops at the open PR: never merges unless a rule in the target repo lets the agent merge. Use when asked to triage, sweep the backlog, find what can be closed, or pick something to work on."
+description: "GitHub issue/PR triage that ends in action: survey open issues and PRs, classify what is solved, in progress, or workable, apply the one-command verdicts (close, label, comment) on the spot, then pick exactly one item and deliver a new PR or an updated PR. Stops at the open PR: never merges unless a rule in the target repo lets the agent merge. Use when asked to triage, sweep the backlog, find what can be closed, or pick something to work on."
 license: MIT
 ---
 
@@ -32,8 +32,9 @@ issue/PR numbers, optional label filter, optional `--dry-run` for survey only.
 ## What it does
 
 Four phases: **survey** (read-only) → **classify** → **select one** → **execute
-to a PR**. Plus optional housekeeping (close/comment/label) that always requires
-user confirmation.
+to a PR**. Housekeeping is not a separate output. Every item on the backlog
+gets a verdict, a verdict that costs one command is applied on the spot, and
+anything larger competes for the single pick. No run ends with a pending list.
 
 ## How it works
 
@@ -71,13 +72,15 @@ Assign exactly one disposition to each open issue:
 | `needs-info`  | Bug report missing repro steps, versions, or environment.                |
 | `duplicate`   | An open or closed canonical issue covers it. Verify the similarity.      |
 | `workable`    | Actionable, unblocked work. This is the candidate pool for Phase 3.      |
+| `blocked`     | Needs something this run cannot supply: a maintainer decision, an upstream fix, access. Record what it waits on. |
 
 Open PRs get their own classification:
 
 - `ready` — passing CI, no unaddressed review comments → waits for a
   maintainer to merge; not a candidate
 - `needs-work` — failing CI, or unaddressed review comments → **workable**
-- `stale` — author gone, no activity, conflicts → candidate for housekeeping
+- `stale` — author gone, no activity, conflicts → comment with an update
+  request and a close-by date
 
 **Map dependencies between items.** Build a dependency graph of the open
 pool before ranking anything, grounded in **strong reasoning over the
@@ -151,8 +154,8 @@ State the pick in one or two sentences: the reason and, if you departed from
 the topo default, the stated reason. E.g. "Working on #123 — three issues
 depend on it and its prerequisite #100 is closed. Skipped #45 (the other
 root): blocked on a maintainer decision." If nothing is workable (everything
-is `needs-info`, `in-progress`, or `solved`), say so instead of inventing
-work, and report the blockers.
+is `needs-info`, `in-progress`, `solved`, or `blocked`), say so instead of
+inventing work, and report the blockers.
 
 ### Phase 4 — Execute the pick
 
@@ -183,9 +186,9 @@ a green PR is still a human's call to merge. The only way a run goes further
 is a rule in the target repo that grants merge authority (next section).
 
 **Do not start a second item.** Everything else goes in the final report as
-backlog. If the selected fix turns out to be too large for one session, report
-partial findings on the issue (with confirmation) and pick again from the
-remaining pool.
+backlog. If the selected fix turns out to be too large for one session, post
+the partial findings on the issue; that comment is the result of the run. A
+later run picks again from the remaining pool.
 
 ### Repo rules that grant merge authority
 
@@ -229,25 +232,60 @@ Before acting on a rule:
 
 Quote the rule and the check in the final report.
 
-### Housekeeping (optional, confirmation required)
+### Verdicts are applied, not proposed
 
-After the survey, you may propose bulk actions — close `solved`/`duplicate`
-issues, post `needs-info` comments, link duplicates to their canonical issue.
-Propose them as a list and apply only after explicit user confirmation.
-Applicable labels go on the selected issue/PR only, and keep them minimal —
-one type label is usually enough.
+Housekeeping belongs inside triage. A run that defers it to a confirmation
+list ends with a list that no one acts on, and the pile grows with every run.
+
+Every disposition is a verdict. When the verdict's action is one `gh` command
+whose content is fully determined by the evidence that Phase 2 already
+gathered, apply it on the spot:
+
+- `solved` → close, with a comment that cites the fixing PR or commit.
+- `duplicate` → close, with a comment that links the canonical issue.
+- `needs-info` → label, and comment with what is missing.
+- A wrong or missing label → fix it, when the evidence supports the label and
+  not just the title. Keep labels minimal: one type label is usually enough.
+- `stale` PR → comment with an update request and a close-by date. A later run
+  closes the PR once that date passes without a reply.
+
+These do not count against "one and only one". The one is a deliverable that
+needs investigation and judgment (a PR). Closing three solved issues is three
+verdicts, not three picks.
+
+**Bright line.** If you would have to decide *what* to say beyond restating
+the evidence, it is not a verdict application. It is a work item: put it in
+the `workable` pool and let it compete for the pick. Typical cases: a
+commenter's question that needs a real answer, an unaddressed change request
+on someone's PR, a duplicate claim you could not verify.
+
+**Never leave a verdict half-made.** "Close as solved, or keep open?" and
+"which of these two is the duplicate?" are Phase 2 work that was not
+finished, not questions for the user. Verify and act. If you cannot verify,
+do not act: leave the item open, mark the claim as unverified in the evidence
+column, and say so. That is a complete outcome.
+
+**What only the user can do** — merge, review as the maintainer, make a
+product call — is `blocked`. Record what it waits on in the disposition
+table. That is a state, not a request: the run is complete without a reply.
+
+Ask before acting only when a step is destructive and hard to undo
+(force-push, deleting a branch) or falls outside the target repo. `--dry-run`
+applies nothing, verdicts included.
 
 ## Rules
 
-- Survey is read-only. Any state change (comment, close, label, push) requires
-  explicit confirmation unless the user already granted blanket approval.
+- Phase 1 is read-only. From Phase 2 on, act: apply verdicts, open or update
+  the PR. Ask first only for destructive steps (force-push, deleting a branch)
+  or actions outside the target repo.
 - Never close a bug report. Close only duplicates, questions, invalid items,
   and `solved` items with evidence.
 - Never dismiss an issue without investigation; never relabel based on title.
 - Be honest: cannot reproduce or cannot verify → say so, do not guess.
-- One and only one selection per run. Two items "in progress" is a failure.
+- One and only one pick per run. Two items "in progress" is a failure.
+  Verdicts applied on the spot are not picks.
 - Stop at the open PR. Merging is never a step in a run: not at the end of
-  Phase 4, not as housekeeping, not under blanket approval, and not on an
+  Phase 4, not as an applied verdict, not under blanket approval, and not on an
   instruction given before the PR existed. Inside a run, the only exception
   is a repo rule that grants merge authority. A later request from the user
   to merge a named PR is not triage: handle it with the `gh-cli` skill.
@@ -257,11 +295,14 @@ one type label is usually enough.
 
 End every run with:
 
-1. **Disposition table** — every open issue/PR with its disposition, evidence,
-   and (where applicable) the covering PR or canonical issue.
+1. **Disposition table** — every open issue/PR with its disposition and
+   evidence. For each verdict, say whether it was applied (closed, commented,
+   labeled) or why it was not. For each `blocked` item, say what it waits on.
 2. **The pick** — one sentence: what was selected and why.
 3. **The result** — the new/updated PR URL, left open for a maintainer to
    merge, or honest blockers if nothing qualified. If a repo rule authorized
    a merge: the merged PR URL, the rule quoted word for word, and the check
    you ran against it.
-4. **Proposed housekeeping** — pending confirmation list, if any.
+
+Nothing is left pending. The report has no "say which of these to apply" list:
+every verdict is applied, or has a recorded reason that it could not be.
